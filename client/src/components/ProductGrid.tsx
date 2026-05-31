@@ -20,7 +20,7 @@ export function ProductGrid({ produtos, termo, siteKey }: ProductGridProps) {
   const totalPalavras = termo.trim() ? termo.split(/\s+/).length : 0;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-sm:gap-3">
       {produtos.map((p, i) => (
         <ProductCard
           key={i}

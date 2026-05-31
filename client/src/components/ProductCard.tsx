@@ -28,7 +28,7 @@ export function ProductCard({ produto, index, siteKey, isBestOption, totalPalavr
 
   return (
     <div
-      className="group rounded-xl border border-white/[0.06] bg-white/[0.03] p-5 flex flex-col opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:bg-white/[0.05] hover:border-accent/20 hover:-translate-y-0.5"
+      className="group rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 sm:p-5 flex flex-col opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:bg-white/[0.05] hover:border-accent/20 hover:-translate-y-0.5"
       style={{
         animationDelay: `${index * 0.05}s`,
         transitionProperty: 'border-color, background-color, box-shadow, transform',
@@ -36,17 +36,17 @@ export function ProductCard({ produto, index, siteKey, isBestOption, totalPalavr
         boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
       }}
     >
-      <div className="flex gap-4 mb-auto">
+      <div className="flex gap-3 sm:gap-4 mb-auto">
         {produto.image && !imgError ? (
           <img
             src={produto.image}
             alt=""
             loading="lazy"
-            className="w-20 h-20 rounded-xl object-contain bg-white/[0.03] flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
+            className="w-16 sm:w-20 h-16 sm:h-20 rounded-xl object-contain bg-white/[0.03] flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-20 h-20 rounded-xl bg-white/[0.03] flex-shrink-0 flex items-center justify-center text-text-muted text-xl">
+          <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-xl bg-white/[0.03] flex-shrink-0 flex items-center justify-center text-text-muted text-xl">
             ∅
           </div>
         )}
@@ -55,7 +55,7 @@ export function ProductCard({ produto, index, siteKey, isBestOption, totalPalavr
           <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-muted font-body">
             {categoriaRelevancia(produto.relevancia, totalPalavras)}
           </span>
-          <h3 className="font-display text-sm leading-snug text-text-primary line-clamp-3 mt-1.5 font-medium">
+          <h3 className="font-display text-sm leading-snug text-text-primary line-clamp-2 sm:line-clamp-3 mt-1.5 font-medium">
             {produto.title}
           </h3>
         </div>
@@ -65,7 +65,7 @@ export function ProductCard({ produto, index, siteKey, isBestOption, totalPalavr
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`font-display text-xl font-semibold leading-none tracking-tight ${
+              className={`font-display text-lg sm:text-xl font-semibold leading-none tracking-tight ${
                 produto.price ? 'text-price' : 'text-text-muted'
               }`}
             >

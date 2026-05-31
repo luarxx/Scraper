@@ -62,7 +62,7 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
           <button
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className={`${height} px-3 bg-white/[0.04] border rounded-lg ${textSize} text-text-secondary outline-none transition-all duration-200 cursor-pointer min-w-[130px] appearance-none hover:border-white/[0.25] flex items-center justify-between gap-2 w-full ${dropdownOpen ? 'border-accent' : 'border-white/[0.08]'}`}
+            className={`${height} px-3 bg-white/[0.04] border rounded-lg ${textSize} text-text-secondary outline-none transition-all duration-200 cursor-pointer min-w-[130px] max-sm:min-w-[90px] appearance-none hover:border-white/[0.25] flex items-center justify-between gap-2 w-full ${dropdownOpen ? 'border-accent' : 'border-white/[0.08]'}`}
             style={{
               backdropFilter: 'blur(8px)',
               boxShadow: dropdownOpen ? '0 0 0 3px rgba(249, 115, 22, 0.15), 0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.2)',
@@ -125,7 +125,7 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className={`${height} px-5 bg-gradient-to-r from-accent to-orange-500 text-white font-medium ${textSize} rounded-lg hover:from-orange-500 hover:to-orange-400 disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-300 whitespace-nowrap tracking-wide shadow-lg shadow-orange-500/20`}
+          className={`${height} px-4 sm:px-5 bg-gradient-to-r from-accent to-orange-500 text-white font-medium ${textSize} rounded-lg hover:from-orange-500 hover:to-orange-400 disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-300 whitespace-nowrap tracking-wide shadow-lg shadow-orange-500/20`}
         >
           {loading ? 'Buscando…' : 'Buscar'}
         </button>

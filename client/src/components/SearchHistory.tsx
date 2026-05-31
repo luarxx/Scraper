@@ -21,8 +21,8 @@ export function SearchHistory({ history, onSelect }: SearchHistoryProps) {
   if (history.length === 0) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pt-2 pb-1">
-      <div className="flex flex-wrap items-center gap-1.5">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-2 pb-1">
+      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
         <span className="text-[11px] font-medium text-text-muted tracking-wide uppercase mr-0.5">
           Últimas buscas
         </span>

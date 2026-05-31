@@ -54,12 +54,12 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <header className="sticky top-0 z-20 bg-surface/80 backdrop-blur-md border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 max-sm:py-1.5 flex items-center justify-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 flex-shrink-0">
             <div className="w-5 h-5 rounded-full bg-gradient-to-br from-accent to-orange-500 flex items-center justify-center shadow-sm">
               <span className="text-[9px] font-bold text-white">M</span>
             </div>
-            <span className="font-display text-sm font-semibold text-text-primary tracking-tight">
+            <span className="font-display text-sm font-semibold text-text-primary tracking-tight hidden sm:inline">
               Meu Buscador
             </span>
           </div>
@@ -96,7 +96,7 @@ export default function App() {
 
       {isResults ? (
         <main className="flex-1">
-          <div className="max-w-7xl mx-auto px-6 pt-8 pb-24">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 pb-20 sm:pb-24">
             <div className="mb-6">
               <span className="font-display text-sm text-text-primary truncate max-w-[100px]">
                 &ldquo;{termo}&rdquo;

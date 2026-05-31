@@ -1,169 +1,169 @@
 window.__RESULT = {
-  "termo": "ryzen 5 5600",
+  "termo": "ssd sata",
   "site": "terabyteshop",
   "siteNome": "TerabyteShop",
-  "timestamp": "2026-05-31T01:47:37.850Z",
+  "timestamp": "2026-05-31T02:34:25.415Z",
   "total": 20,
   "produtos": [
     {
-      "title": "Processador AMD Ryzen 5 5600GT, 3.6GHz (4.6GHz Turbo), 6-Cores 12-Threads, Cooler Wraith Stealth, AM4, 100-100001488BOX",
-      "price": "R$ 879,9",
-      "parcelamento": "18x de R$ 57,51",
-      "image": "https://img.terabyteshop.com.br/produto/g/processador-amd-ryzen-5-5600gt-36ghz-46ghz-turbo-6-cores-12-threads-cooler-wraith-stealth-am4-100-100001488box_186129.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/27314/processador-amd-ryzen-5-5600gt-36ghz-46ghz-turbo-6-cores-12-threads-cooler-wraith-stealth-am4-100-100001488box",
-      "relevancia": 3
+      "title": "SSD Patriot Burst Elite, 120GB, Sata III, Leitura 450MB/s e Gravação 320MB/s, PBE120GS25SSDR",
+      "price": "R$ 219,9",
+      "parcelamento": "12x de R$ 21,56",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-patriot-burst-elite-120gb-sata-iii-leitura-560mbs-e-gravacao-540mbs-pbe120gs25ssdr_129460.png",
+      "url": "https://www.terabyteshop.com.br/produto/19311/ssd-patriot-burst-elite-120gb-sata-iii-leitura-560mbs-e-gravacao-540mbs-pbe120gs25ssdr",
+      "relevancia": 2
     },
     {
-      "title": "Kit Upgrade, AMD Ryzen 5 5600GT, Placa Mãe Gamer Ninja A520M, Chipset A520, Air Cooler",
-      "price": "R$ 1199,99",
-      "parcelamento": "18x de R$ 78,43",
-      "image": "https://img.terabyteshop.com.br/produto/g/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-gamer-ninja-a520m-chipset-a520-air-cooler_268642.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/41610/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-gamer-ninja-a520m-chipset-a520-air-cooler",
-      "relevancia": 3
+      "title": "SSD Patriot Burst Elite, 240GB, Sata III, Leitura 450MB/s e Gravação 320MB/s, PBE240GS25SSDR",
+      "price": "R$ 299,9",
+      "parcelamento": "17x de R$ 20,75",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-patriot-burst-elite-240gb-sata-iii-leitura-560mbs-e-gravacao-540mbs-pbe240gs25ssdr_129466.png",
+      "url": "https://www.terabyteshop.com.br/produto/19312/ssd-patriot-burst-elite-240gb-sata-iii-leitura-560mbs-e-gravacao-540mbs-pbe240gs25ssdr",
+      "relevancia": 2
     },
     {
-      "title": "Kit Upgrade, AMD Ryzen 5 5600GT, Placa Mãe Chipset A520, 16GB (2X8GB) DDR4",
-      "price": "R$ 1899,99",
-      "parcelamento": "18x de R$ 124,18",
-      "image": "https://img.terabyteshop.com.br/produto/g/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-a520-16gb-2x8gb-ddr4_263789.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/27683/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-a520-16gb-2x8gb-ddr4",
-      "relevancia": 3
+      "title": "SSD Hawking, 240GB, Sata III, Leitura: 500MBs e Gravação: 450MBs, HKPSA-240",
+      "price": "R$ 299,9",
+      "parcelamento": "17x de R$ 20,75",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-hawking-240gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-hstv-sata240w_255520.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/39326/ssd-hawking-240gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-hstv-sata240w",
+      "relevancia": 2
     },
     {
-      "title": "Computador T-Home Create AMD Ryzen 5 5600GT / 8GB DDR4 / SSD 256GB",
-      "price": "R$ 2179,9",
-      "parcelamento": "18x de R$ 142,48",
-      "image": "https://img.terabyteshop.com.br/produto/g/computador-t-home-create-amd-ryzen-5-5600gt-8gb-ddr4-ssd-256gb_271453.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/21479/computador-t-home-create-amd-ryzen-5-5600gt-8gb-ddr4-ssd-256gb",
-      "relevancia": 3
+      "title": "SSD Adata SU650 256GB, Sata III, Leitura 520MBs e Gravação 450MBs, ASU650SS-256GT-R",
+      "price": "R$ 359,9",
+      "parcelamento": "18x de R$ 23,52",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-adata-su650-256gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-256gt-r_188726.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/26315/ssd-adata-su650-256gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-256gt-r",
+      "relevancia": 2
     },
     {
-      "title": "PC HOME FLEX AMD Ryzen 5 5600GT / 16GB DDR4 / SSD 480GB",
-      "price": "R$ 2399,99",
-      "parcelamento": "18x de R$ 156,86",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-home-flex-amd-ryzen-5-5600gt-16gb-ddr4-ssd-480gb_271946.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39225/pc-home-flex-amd-ryzen-5-5600gt-16gb-ddr4-ssd-480gb",
-      "relevancia": 3
+      "title": "SSD Kingston A400, 240GB, Sata III, Leitura 500MBs Gravação 350MBs, SA400S37/240G",
+      "price": "R$ 399,9",
+      "parcelamento": "18x de R$ 26,14",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-kingston-a400-240gb-sa400s37240g-sata-iii-leitura-500mbs-gravacao-350mbs_37616.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/7443/ssd-kingston-a400-240gb-sa400s37240g-sata-iii-leitura-500mbs-gravacao-350mbs",
+      "relevancia": 2
     },
     {
-      "title": "PC Gamer T-GAMER Worthy AMD Ryzen 5 5600GT / 16GB (2x8GB) DDR4 / SSD 512GB",
-      "price": "R$ 2479,99",
-      "parcelamento": "18x de R$ 162,09",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-t-gamer-worthy-amd-ryzen-5-5600gt-16gb-2x8gb-ddr4-ssd-512gb_265927.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/29883/pc-gamer-t-gamer-worthy-amd-ryzen-5-5600gt-16gb-2x8gb-ddr4-ssd-512gb",
-      "relevancia": 3
+      "title": "SSD WD Green 250GB, Sata III, Leitura 545MBs e Gravação 505MBs, WDS250G5G0A",
+      "price": "R$ 419,9",
+      "parcelamento": "18x de R$ 27,44",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-wd-green-250gb-sata-iii-leitura-545mbs-e-gravacao-505mbs-wds250g5g0a_257835.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/39864/ssd-wd-green-250gb-sata-iii-leitura-545mbs-e-gravacao-505mbs-wds250g5g0a",
+      "relevancia": 2
     },
     {
-      "title": "PC HOME PRICE AMD Ryzen 5 5600GT / 8GB DDR4 / SSD 240GB",
-      "price": "R$ 2488,55",
-      "parcelamento": "18x de R$ 162,65",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-home-price-amd-ryzen-5-5600gt-8gb-ddr4-ssd-240gb_265910.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39294/pc-home-price-amd-ryzen-5-5600gt-8gb-ddr4-ssd-240gb",
-      "relevancia": 3
+      "title": "SSD Patriot Burst Elite, 480GB, Sata III, Leitura 450MB/s e Gravação 320MB/s, PBE480GS25SSDR",
+      "price": "R$ 439,9",
+      "parcelamento": "18x de R$ 28,75",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-patriot-burst-elite-480gb-sata-iii-leitura-450mbs-e-gravacao-320mbs-pbe480gs25ssdr_198438.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/29161/ssd-patriot-burst-elite-480gb-sata-iii-leitura-450mbs-e-gravacao-320mbs-pbe480gs25ssdr",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER BREEZE AMD Ryzen 5 5600GT / 16GB DDR4 / SSD 512GB / Water Cooler",
-      "price": "R$ 2749,52",
-      "parcelamento": "18x de R$ 179,71",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-breeze-amd-ryzen-5-5600gt-16gb-ddr4-ssd-512gb-water-cooler_271003.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/42001/pc-gamer-breeze-amd-ryzen-5-5600gt-16gb-ddr4-ssd-512gb-water-cooler",
-      "relevancia": 3
+      "title": "SSD Hawking, 480GB, Sata III, Leitura: 500MBs e Gravação: 450MBs, HSTV-SATA480W",
+      "price": "R$ 499,9",
+      "parcelamento": "18x de R$ 32,67",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-hawking-480gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-hstv-sata480w_266465.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/41211/ssd-hawking-480gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-hstv-sata480w",
+      "relevancia": 2
     },
     {
-      "title": "PC Gamer T-Gamer Prodigy AMD Ryzen 5 5600GT / 16GB (2x8GB) DDR4 / SSD NVMe 1TB",
-      "price": "R$ 3402,69",
-      "parcelamento": "18x de R$ 222,4",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-t-gamer-prodigy-amd-ryzen-5-5600gt-16gb-2x8gb-ddr4-ssd-nvme-1tb_266044.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/34520/pc-gamer-t-gamer-prodigy-amd-ryzen-5-5600gt-16gb-2x8gb-ddr4-ssd-nvme-1tb",
-      "relevancia": 3
+      "title": "SSD Adata SU650 480GB, Sata III, Leitura 520MBs e Gravação 450MBs, ASU650SS-480GT-R",
+      "price": "R$ 499,9",
+      "parcelamento": "18x de R$ 32,67",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-adata-su650-480gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-480gt-r_188738.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/12221/ssd-adata-su650-480gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-480gt-r",
+      "relevancia": 2
     },
     {
-      "title": "PC Gamer T-Gamer Prodigy AMD Ryzen 5 5600GT / NVIDIA GeForce RTX 3050 / 8GB DDR4 / SSD 240GB",
-      "price": "R$ 3899,99",
-      "parcelamento": "18x de R$ 254,9",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-t-gamer-prodigy-amd-ryzen-5-5600g-nvidia-geforce-rtx-3050-ddr4-8gb-ssd-240gb_272072.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/20630/pc-gamer-t-gamer-prodigy-amd-ryzen-5-5600g-nvidia-geforce-rtx-3050-ddr4-8gb-ssd-240gb",
-      "relevancia": 3
+      "title": "SSD WD Green 480GB, Sata III, Leitura 545MBs e Gravação 430MBs, WDS480G3G0A",
+      "price": "R$ 499,99",
+      "parcelamento": "18x de R$ 32,68",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-wd-green-480gb-sata-iii-leitura-545mbs-e-gravacao-430mbs-wds480g3g0a_208105.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/23010/ssd-wd-green-480gb-sata-iii-leitura-545mbs-e-gravacao-430mbs-wds480g3g0a",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER COMMANDER AMD Ryzen 5 5600GT / NVIDIA GeForce RTX 3050 / 16GB DDR4 (2X8GB) / SSD 480GB",
-      "price": "R$ 4386,69",
-      "parcelamento": "18x de R$ 286,71",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-commander-amd-ryzen-5-5600gt-nvidia-geforce-rtx-3050-16gb-ddr4-2x8gb-ssd-480gb_269064.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39115/pc-gamer-commander-amd-ryzen-5-5600gt-nvidia-geforce-rtx-3050-16gb-ddr4-2x8gb-ssd-480gb",
-      "relevancia": 3
+      "title": "SSD SanDisk Plus, 500GB, Sata III, Leitura: 545MBs e Gravação: 505MBs, SDSSDA-500G-G28",
+      "price": "R$ 519,9",
+      "parcelamento": "18x de R$ 33,98",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-sandisk-plus-500gb-sata-iii-leitura-545mbs-e-gravacao-505mbs-sdssda-500g-g28_256374.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/39554/ssd-sandisk-plus-500gb-sata-iii-leitura-545mbs-e-gravacao-505mbs-sdssda-500g-g28",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER CAPTAIN AMD Ryzen 5 5600GT / AMD Radeon RX 7600 / 16GB DDR4 (2X8GB) / SSD 512GB",
-      "price": "R$ 4599,99",
-      "parcelamento": "18x de R$ 300,65",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-captain-amd-ryzen-5-5600gt-amd-radeon-rx-7600-16gb-ddr4-2x8gb-ssd-512gb_271947.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39438/pc-gamer-captain-amd-ryzen-5-5600gt-amd-radeon-rx-7600-16gb-ddr4-2x8gb-ssd-512gb",
-      "relevancia": 3
+      "title": "SSD MSI Spatium S270, 480GB, Sata III, Leitura 500Mbs e Gravação 450Mbs, S78-440E350-P83",
+      "price": "R$ 559,9",
+      "parcelamento": "18x de R$ 36,6",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-msi-spatium-s270-480gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-s78-440e350-p83_202763.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/29743/ssd-msi-spatium-s270-480gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-s78-440e350-p83",
+      "relevancia": 2
     },
     {
-      "title": "PC Gamer T-GAMER Uruchi AMD Ryzen 5 5600GT / GeForce RTX 5050 / 16GB (2x8GB) DDR4 / SSD 240GB",
-      "price": "R$ 4999,99",
-      "parcelamento": "18x de R$ 326,8",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-t-gamer-uruchi-amd-ryzen-5-5600gt-geforce-rtx-5050-16gb-2x8gb-ddr4-ssd-240gb_272111.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/28744/pc-gamer-t-gamer-uruchi-amd-ryzen-5-5600gt-geforce-rtx-5050-16gb-2x8gb-ddr4-ssd-240gb",
-      "relevancia": 3
+      "title": "SSD WD Green 500GB, Sata III, Leitura 545MBs e Gravação 505MBs, WDS500G5G0A",
+      "price": "R$ 559,9",
+      "parcelamento": "18x de R$ 36,6",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-wd-green-500gb-sata-iii-leitura-545mbs-e-gravacao-505mbs-wds500g5g0a_256797.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/39654/ssd-wd-green-500gb-sata-iii-leitura-545mbs-e-gravacao-505mbs-wds500g5g0a",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER CAPTAIN AMD Ryzen 5 5600GT / NVIDIA GeForce RTX 5050 / 16GB DDR4 (2X8GB) / SSD 480GB",
-      "price": "R$ 5099,99",
-      "parcelamento": "18x de R$ 333,33",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5050-16gb-ddr4-2x8gb-ssd-480gb_269876.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39234/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5050-16gb-ddr4-2x8gb-ssd-480gb",
-      "relevancia": 3
+      "title": "SSD Kingston A400, 480GB, Sata III, Leitura 500MBs Gravação 450MBs, SA400S37/480G",
+      "price": "R$ 569,99",
+      "parcelamento": "18x de R$ 37,25",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-kingston-a400-480gb-sata-iii-leitura-500mbs-gravacao-450mbs-sa400s37480g-imp_129879.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/19382/ssd-kingston-a400-480gb-sata-iii-leitura-500mbs-gravacao-450mbs-sa400s37480g-imp",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER CAPTAIN AMD Ryzen 5 5600GT / AMD Radeon RX 9060 XT / 16GB DDR4 (2X8GB) / SSD 480GB",
-      "price": "R$ 5599,99",
-      "parcelamento": "18x de R$ 366,01",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-captain-amd-ryzen-5-5600gt-amd-radeon-rx-9060-xt-16gb-ddr4-2x8gb-ssd-480gb_270584.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39254/pc-gamer-captain-amd-ryzen-5-5600gt-amd-radeon-rx-9060-xt-16gb-ddr4-2x8gb-ssd-480gb",
-      "relevancia": 3
+      "title": "SSD Adata SU650 512GB, Sata III, Leitura 520MBs e Gravação 450MBs, ASU650SS-512GT-R",
+      "price": "R$ 599,9",
+      "parcelamento": "18x de R$ 39,21",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-adata-su650-512gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-512gt-r_188732.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/24213/ssd-adata-su650-512gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-512gt-r",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER T-GAMER Prodigy AMD Ryzen 5 5600GT/ NVIDIA GeForce RTX 5050 / 16GB DDR4 (2X8GB) / SSD 1TB",
-      "price": "R$ 5764,72",
-      "parcelamento": "18x de R$ 376,78",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-t-gamer-prodigy-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5050-16gb-ddr4-2x8gb-ssd-1tb_272106.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/19086/pc-gamer-t-gamer-prodigy-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5050-16gb-ddr4-2x8gb-ssd-1tb",
-      "relevancia": 3
+      "title": "SSD Adata SU650 960GB, Sata III, Leitura 520MBs e Gravação 450MBs, ASU650SS-960GT-R",
+      "price": "R$ 659,9",
+      "parcelamento": "18x de R$ 43,13",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-adata-su650-960gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-960gt-r_188710.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/26313/ssd-adata-su650-960gb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-960gt-r",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER CAPTAIN AMD Ryzen 5 5600GT / NVIDIA GeForce RTX 5060 / 16GB DDR4 (2X8GB) / SSD 512GB",
-      "price": "R$ 5899,99",
-      "parcelamento": "18x de R$ 385,62",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5060-16gb-ddr4-2x8gb-ssd-512gb_272035.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39548/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5060-16gb-ddr4-2x8gb-ssd-512gb",
-      "relevancia": 3
+      "title": "SSD Kingston A400, 960GB, Sata III, Leitura 500MBs e Gravação 450MBs, SA400S37/960G",
+      "price": "R$ 764,9",
+      "parcelamento": "18x de R$ 49,99",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-kingston-a400-960gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-sa400s37960g-imp_129886.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/19384/ssd-kingston-a400-960gb-sata-iii-leitura-500mbs-e-gravacao-450mbs-sa400s37960g-imp",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER CAPTAIN AMD Ryzen 5 5600GT / NVIDIA GeForce RTX 5060 / 16GB DDR4 (2X8GB) / SSD 480GB",
-      "price": "R$ 5969,99",
-      "parcelamento": "18x de R$ 390,2",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5060-16gb-ddr4-2x8gb-ssd-480gb_272007.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39235/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5060-16gb-ddr4-2x8gb-ssd-480gb",
-      "relevancia": 3
+      "title": "SSD Winmemory, 960GB, SATA III, Leitura 520MB/s e Gravação 420MB/s, SWR960G-DS1",
+      "price": "R$ 799,99",
+      "parcelamento": "18x de R$ 52,29",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-winmemory-960gb-sata-iii-leitura-520mbs-e-gravacao-420mbs_261269.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/40345/ssd-winmemory-960gb-sata-iii-leitura-520mbs-e-gravacao-420mbs",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER CAPTAIN AMD Ryzen 5 5600GT / AMD Radeon RX 9060 XT / 16GB DDR4 (2X8GB) / SSD 512GB",
-      "price": "R$ 6499,99",
-      "parcelamento": "18x de R$ 424,84",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-captain-amd-ryzen-5-5600gt-amd-radeon-rx-9060-xt-16gb-ddr4-2x8gb-ssd-512gb_272019.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39439/pc-gamer-captain-amd-ryzen-5-5600gt-amd-radeon-rx-9060-xt-16gb-ddr4-2x8gb-ssd-512gb",
-      "relevancia": 3
+      "title": "SSD FNX Gamer, 1TB, SATA III, Leitura 550MB/s e Gravação 500MB/s, SFNX17/1TB",
+      "price": "R$ 859,99",
+      "parcelamento": "18x de R$ 56,21",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-fnx-gamer-1tb-sata-iii-leitura-550mbs-e-gravacao-500mbs-sfnx171tb_269713.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/41737/ssd-fnx-gamer-1tb-sata-iii-leitura-550mbs-e-gravacao-500mbs-sfnx171tb",
+      "relevancia": 2
     },
     {
-      "title": "PC GAMER CAPTAIN AMD Ryzen 5 5600GT / NVIDIA GeForce RTX 5060 Ti / 16GB DDR4 (2X8GB) / SSD 512GB",
-      "price": "R$ 6999,99",
-      "parcelamento": "18x de R$ 457,52",
-      "image": "https://img.terabyteshop.com.br/produto/g/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5060-ti-16gb-ddr4-2x8gb-ssd-512gb_272018.jpg",
-      "url": "https://www.terabyteshop.com.br/produto/39436/pc-gamer-captain-amd-ryzen-5-5600gt-nvidia-geforce-rtx-5060-ti-16gb-ddr4-2x8gb-ssd-512gb",
-      "relevancia": 3
+      "title": "SSD Adata SU650 1TB, Sata III, Leitura 520MBs e Gravação 450MBs, ASU650SS-1TT-R",
+      "price": "R$ 949,9",
+      "parcelamento": "18x de R$ 62,09",
+      "image": "https://img.terabyteshop.com.br/produto/g/ssd-adata-su650-1tb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-1tt-r_188741.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/26317/ssd-adata-su650-1tb-sata-iii-leitura-520mbs-e-gravacao-450mbs-asu650ss-1tt-r",
+      "relevancia": 2
     }
   ]
 };

@@ -7,14 +7,14 @@ interface SearchHistoryProps {
 
 const SITE_BADGES: Record<string, string> = {
   kabum: 'KaBuM!',
-  terabyteshop: 'TerabyteShop',
+  terabyteshop: 'Terabyte',
   pichau: 'Pichau',
 };
 
 const SITE_COLORS: Record<string, { text: string; bg: string }> = {
   kabum: { text: '#f97316', bg: 'rgba(249, 115, 22, 0.1)' },
   pichau: { text: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' },
-  terabyteshop: { text: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
+  terabyteshop: { text: '#34d399', bg: 'rgba(52, 211, 153, 0.1)' },
 };
 
 export function SearchHistory({ history, onSelect }: SearchHistoryProps) {
@@ -22,7 +22,7 @@ export function SearchHistory({ history, onSelect }: SearchHistoryProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-2 pb-1">
-      <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-[11px] font-medium text-text-muted tracking-wide uppercase mr-0.5">
           Últimas buscas
         </span>
@@ -33,21 +33,11 @@ export function SearchHistory({ history, onSelect }: SearchHistoryProps) {
               key={`${entry.termo}-${entry.site}-${i}`}
               type="button"
               onClick={() => onSelect(entry.termo, entry.site)}
-              className="group flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] hover:bg-[var(--site-bg)] hover:border-[var(--site-border)] transition-all duration-200 cursor-pointer"
-              style={{
-                '--site-bg': c.bg,
-                '--site-border': `${c.text}4D`,
-              } as React.CSSProperties}
+              className="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-orange-500/40 rounded-xl text-slate-300 hover:text-white transition-all font-medium text-xs shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-1.5"
             >
+              <span className="truncate max-w-[120px]">&ldquo;{entry.termo}&rdquo;</span>
               <span
-                className="w-1 h-1 rounded-full transition-all duration-200 flex-shrink-0 opacity-60 group-hover:opacity-100"
-                style={{ background: c.text }}
-              />
-              <span className="text-xs text-text-secondary group-hover:text-text-primary transition-colors duration-200 truncate max-w-[120px]">
-                &ldquo;{entry.termo}&rdquo;
-              </span>
-              <span
-                className="text-[10px] font-medium px-1.5 py-0.5 rounded-full transition-colors duration-200"
+                className="text-[10px] font-medium px-1.5 py-0.5 rounded-full flex-shrink-0"
                 style={{ color: c.text, background: c.bg }}
               >
                 {SITE_BADGES[entry.site] || entry.siteNome}

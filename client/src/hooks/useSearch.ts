@@ -33,7 +33,7 @@ export function useSearch() {
   }, []);
 
   const search = useCallback(async (q: string, siteKey: string) => {
-    setState(s => ({ ...s, loading: true, erro: null }));
+    setState(s => ({ ...s, loading: true, erro: null, siteKey, termo: q }));
 
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&site=${siteKey}`);

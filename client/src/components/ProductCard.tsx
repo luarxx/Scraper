@@ -6,99 +6,99 @@ interface ProductCardProps {
   index: number;
   siteKey: string;
   isBestOption?: boolean;
-  totalPalavras: number;
 }
 
-const SITE_COLORS: Record<string, { text: string; bg: string }> = {
-  kabum: { text: '#f97316', bg: 'rgba(249, 115, 22, 0.1)' },
-  pichau: { text: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' },
-  terabyteshop: { text: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
+const SITE_COLORS: Record<string, { text: string; bg: string; btnBg: string }> = {
+  kabum: { text: '#f97316', bg: 'rgba(249, 115, 22, 0.1)', btnBg: 'linear-gradient(to right, #f97316, #f59e0b)' },
+  pichau: { text: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', btnBg: 'linear-gradient(to right, #ef4444, #f43f5e)' },
+  terabyteshop: { text: '#34d399', bg: 'rgba(52, 211, 153, 0.1)', btnBg: 'linear-gradient(to right, #10b981, #14b8a6)' },
 };
 
-function categoriaRelevancia(relevancia: number, total: number): string {
-  if (relevancia === 0) return 'Sem correspondência';
-  if (relevancia === total) return 'Correspondência total';
-  if (relevancia > total / 2) return 'Correspondência alta';
-  return 'Correspondência baixa';
-}
+const SITE_NAMES: Record<string, string> = {
+  kabum: 'KaBuM!',
+  terabyteshop: 'Terabyte',
+  pichau: 'Pichau',
+};
 
-export function ProductCard({ produto, index, siteKey, isBestOption, totalPalavras }: ProductCardProps) {
+export function ProductCard({ produto, index, siteKey, isBestOption }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
-  const priceDisplay = produto.price || 'Preço não informado';
+  const siteStyle = SITE_COLORS[siteKey] ?? SITE_COLORS.kabum;
+  const siteName = SITE_NAMES[siteKey] ?? siteKey;
 
   return (
     <div
-      className="group rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 sm:p-5 flex flex-col opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:bg-white/[0.05] hover:border-accent/20 hover:-translate-y-0.5"
-      style={{
-        animationDelay: `${index * 0.05}s`,
-        transitionProperty: 'border-color, background-color, box-shadow, transform',
-        backdropFilter: 'blur(12px)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-      }}
+      className="group bg-slate-900 border border-slate-800/90 rounded-2xl shadow-2xl flex flex-col overflow-hidden opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:border-slate-700/80 hover:-translate-y-0.5"
+      style={{ animationDelay: `${index * 0.05}s` }}
     >
-      <div className="flex gap-3 sm:gap-4 mb-auto">
+      <div className="bg-white p-5 flex items-center justify-center border-b border-slate-200 shadow-inner overflow-hidden relative min-h-[160px]">
         {produto.image && !imgError ? (
           <img
             src={produto.image}
             alt=""
             loading="lazy"
-            className="w-16 sm:w-20 h-16 sm:h-20 rounded-xl object-contain bg-white/[0.03] flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
+            className="max-w-full max-h-36 object-contain group-hover:scale-110 transition-transform duration-700 ease-out"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-16 sm:w-20 h-16 sm:h-20 rounded-xl bg-white/[0.03] flex-shrink-0 flex items-center justify-center text-text-muted text-xl">
+          <div className="flex items-center justify-center text-slate-300 text-2xl font-medium">
             ∅
           </div>
         )}
 
-        <div className="flex-1 min-w-0">
-          <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-text-muted font-body">
-            {categoriaRelevancia(produto.relevancia, totalPalavras)}
+        {isBestOption && (
+          <span
+            className="absolute top-2 left-2 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider z-10 shadow-lg animate-[badgePop_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+            style={{ color: '#fff', background: siteStyle.text }}
+          >
+            Melhor Opção
           </span>
-          <h3 className="font-display text-sm leading-snug text-text-primary line-clamp-2 sm:line-clamp-3 mt-1.5 font-medium">
-            {produto.title}
-          </h3>
-        </div>
+        )}
       </div>
 
-      <div className="mt-4 pt-3.5 border-t border-white/[0.06] flex items-end justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className={`font-display text-lg sm:text-xl font-semibold leading-none tracking-tight ${
-                produto.price ? 'text-price' : 'text-text-muted'
-              }`}
-            >
-              {priceDisplay}
+      <div className="p-4 sm:p-5 flex flex-col flex-1">
+        <span
+          className="mb-2.5 px-2.5 py-1 text-[11px] font-bold rounded-lg uppercase tracking-widest self-start"
+          style={{
+            color: siteStyle.text,
+            background: siteStyle.bg,
+            border: `1px solid ${siteStyle.text}33`,
+          }}
+        >
+          {siteName}
+        </span>
+
+        <h3 className="text-sm sm:text-base font-bold text-white leading-snug line-clamp-3">
+          {produto.title}
+        </h3>
+
+        <div className="flex-1" />
+
+        <div className="mt-3 pt-3 border-t border-slate-800/50">
+          {produto.price && (
+            <span className="text-xs text-slate-500 line-through mb-1 block">
+              De: {produto.price}
             </span>
-            {isBestOption && (
-              <span
-                className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider animate-[badgePop_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-                style={{
-                  color: SITE_COLORS[siteKey]?.text ?? '#f97316',
-                  background: SITE_COLORS[siteKey]?.bg ?? 'rgba(249, 115, 22, 0.1)',
-                }}
-              >
-                Melhor Opção
-              </span>
-            )}
+          )}
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="text-xl sm:text-2xl font-black tracking-tight text-emerald-400">
+              {produto.price || 'Preço não informado'}
+            </span>
           </div>
           {produto.parcelamento && (
-            <div className="text-xs text-text-secondary font-body mt-1">
+            <div className="text-xs font-medium text-slate-400 mt-1.5 bg-slate-800/50 px-2.5 py-1 rounded-lg border border-slate-700/50 inline-block">
               {produto.parcelamento}
             </div>
           )}
         </div>
+
         <a
           href={produto.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-medium text-text-secondary hover:text-accent transition-colors duration-300 whitespace-nowrap flex-shrink-0 no-underline flex items-center gap-1.5 group/link"
+          className="mt-4 w-full text-slate-950 font-bold text-sm px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl no-underline"
+          style={{ background: siteStyle.btnBg }}
         >
-          Acessar
-          <span className="inline-block transition-transform duration-300 group-hover/link:translate-x-1">
-            →
-          </span>
+          Ir para a Loja
         </a>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 
 interface SearchFormProps {
   onSearch: (q: string, site: string) => void;
@@ -7,27 +7,15 @@ interface SearchFormProps {
 }
 
 const SITES = [
-  { key: 'kabum', nome: 'KaBuM!' },
-  { key: 'terabyteshop', nome: 'TerabyteShop' },
-  { key: 'pichau', nome: 'Pichau' },
+  { key: 'kabum', nome: 'KaBuM!', color: 'text-orange-400', activeBg: 'bg-orange-600/20', activeBorder: 'border-orange-500/30' },
+  { key: 'terabyteshop', nome: 'Terabyte', color: 'text-emerald-400', activeBg: 'bg-emerald-600/20', activeBorder: 'border-emerald-500/30' },
+  { key: 'pichau', nome: 'Pichau', color: 'text-red-400', activeBg: 'bg-red-600/20', activeBorder: 'border-red-500/30' },
 ];
 
 export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
   const [q, setQ] = useState('');
   const [site, setSite] = useState('kabum');
   const [focused, setFocused] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -35,100 +23,65 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
     onSearch(q.trim(), site);
   }
 
-  const height = compact ? 'h-9' : 'h-12';
-  const textSize = compact ? 'text-xs' : 'text-sm';
-  const inputPadding = compact ? 'px-4' : 'px-5';
-  const selectedNome = SITES.find(s => s.key === site)?.nome || site;
+  const inputClasses = compact
+    ? 'py-2.5 pl-11 pr-28 text-sm'
+    : 'py-4 pl-12 pr-32 text-base';
+
+  const btnClasses = compact
+    ? 'px-4 py-1.5 text-xs'
+    : 'px-6 py-3 text-sm';
 
   return (
-    <form onSubmit={handleSubmit} className={`flex ${compact ? 'flex-row items-center' : 'flex-col sm:flex-row'} gap-2 w-full`}>
-      <div className={`flex-1 relative ${compact ? 'min-w-[160px]' : ''}`}>
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="relative flex items-center">
+        <svg className="absolute left-4 w-5 h-5 text-slate-500 pointer-events-none z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
         <input
           type="text"
           value={q}
           onChange={e => setQ(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="Buscar produto..."
-          className={`w-full ${height} ${inputPadding} bg-white/[0.04] border rounded-lg ${textSize} text-text-primary placeholder:text-text-muted outline-none transition-all duration-300 ${focused ? 'border-accent' : 'border-white/[0.08]'}`}
+          placeholder="Ex: Ryzen 5 5600gt, RTX 4060..."
+          className={`w-full bg-slate-900 border-2 rounded-2xl text-slate-100 placeholder-slate-500 focus:outline-none shadow-2xl transition-all ${inputClasses}`}
           style={{
-            boxShadow: focused ? '0 0 0 3px rgba(249, 115, 22, 0.15), 0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.2)',
-            backdropFilter: 'blur(8px)',
+            borderColor: focused ? 'rgba(249, 115, 22, 0.5)' : '#1e293b',
+            boxShadow: focused
+              ? '0 0 0 4px rgba(249, 115, 22, 0.2), 0 25px 50px -12px rgba(0,0,0,0.25)'
+              : '0 25px 50px -12px rgba(0,0,0,0.25)',
           }}
         />
-      </div>
-      <div className={`flex ${compact ? 'flex-row' : ''} gap-2`}>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            type="button"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className={`${height} px-3 bg-white/[0.04] border rounded-lg ${textSize} text-text-secondary outline-none transition-all duration-200 cursor-pointer min-w-[130px] max-sm:min-w-[90px] appearance-none hover:border-white/[0.25] flex items-center justify-between gap-2 w-full ${dropdownOpen ? 'border-accent' : 'border-white/[0.08]'}`}
-            style={{
-              backdropFilter: 'blur(8px)',
-              boxShadow: dropdownOpen ? '0 0 0 3px rgba(249, 115, 22, 0.15), 0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.2)',
-            }}
-          >
-            <span>{selectedNome}</span>
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-text-muted transition-transform duration-200"
-              style={{ transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
-            >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </button>
-
-          {dropdownOpen && (
-            <div
-              className="absolute top-full left-0 right-0 mt-1.5 bg-surface/95 backdrop-blur-xl border border-white/[0.08] rounded-lg overflow-hidden z-30 animate-[fadeIn_0.15s_ease-out]"
-              style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
-            >
-              {SITES.map(s => (
-                <button
-                  key={s.key}
-                  type="button"
-                  onClick={() => { setSite(s.key); setDropdownOpen(false); }}
-                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 text-left ${textSize} transition-colors duration-150 ${
-                    s.key === site
-                      ? 'text-accent bg-accent-subtle'
-                      : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
-                  }`}
-                >
-                  {s.nome}
-                  {s.key === site && (
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-accent flex-shrink-0"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
         <button
           type="submit"
           disabled={loading}
-          className={`${height} px-4 sm:px-5 bg-gradient-to-r from-accent to-orange-500 text-white font-medium ${textSize} rounded-lg hover:from-orange-500 hover:to-orange-400 disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-300 whitespace-nowrap tracking-wide shadow-lg shadow-orange-500/20`}
+          className={`absolute right-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20 whitespace-nowrap ${btnClasses}`}
         >
           {loading ? 'Buscando…' : 'Buscar'}
         </button>
+      </div>
+
+      <div className="flex items-center justify-center mt-2.5">
+        <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+          {SITES.map(s => (
+            <button
+              key={s.key}
+              type="button"
+              onClick={() => setSite(s.key)}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-out active:scale-95 ${
+                site === s.key
+                  ? `${s.activeBg} ${s.color} border ${s.activeBorder} shadow-sm`
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] border border-transparent'
+              }`}
+              style={{
+                animation: site === s.key ? 'tabActivate 0.35s cubic-bezier(0.16, 1, 0.3, 1)' : undefined,
+              }}
+            >
+              {s.nome}
+            </button>
+          ))}
+        </div>
       </div>
     </form>
   );

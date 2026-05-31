@@ -1,32 +1,35 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #0b1120;
-  --color-surface: #131a2e;
+  --color-bg: #020617;
+  --color-surface: #0f172a;
   --color-surface-alt: #1b2440;
-  --color-border: rgba(30, 42, 69, 0.6);
+  --color-border: #1e293b;
   --color-border-hover: rgba(249, 115, 22, 0.25);
   --color-accent: #f97316;
   --color-accent-hover: #fb923c;
   --color-accent-subtle: rgba(249, 115, 22, 0.1);
   --color-pichau: #ef4444;
   --color-pichau-subtle: rgba(239, 68, 68, 0.1);
-  --color-terabyte: #10b981;
-  --color-terabyte-subtle: rgba(16, 185, 129, 0.1);
+  --color-terabyte: #34d399;
+  --color-terabyte-subtle: rgba(52, 211, 153, 0.1);
   --color-price: #fbbf24;
   --color-price-hover: #fcd34d;
   --color-text-primary: #f1f5f9;
   --color-text-secondary: #94a3b8;
   --color-text-muted: #64748b;
-  --font-display: 'Outfit', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
+}
+
+::selection {
+  background-color: rgba(249, 115, 22, 0.3);
+  color: #fff;
 }
 
 body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text-primary);
-  font-family: var(--font-body);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -90,8 +93,31 @@ body::before {
   80%, 100% { opacity: 0.2; transform: translateY(0); }
 }
 
+@keyframes tabActivate {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 @keyframes badgePop {
   0% { transform: scale(0); opacity: 0; }
   60% { transform: scale(1.15); }
   100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes radarRing {
+  0% { transform: scale(0.3); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes radarSweep {
+  to { transform: rotate(360deg); }
 }

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "scraper",
+  "instructions": ["AGENTS.md"],
+  "agent": {
+    "scraper": {
+      "description": "Agente especializado no Scraper de e-commerce (KaBuM!, TerabyteShop).",
+      "mode": "primary"
+    }
+  },
+  "permission": {
+    "edit": "allow",
+    "bash": { "git *": "allow", "npm *": "allow", "npx *": "ask", "tsx *": "allow", "*": "ask" }
+  }
+}

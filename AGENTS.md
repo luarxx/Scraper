@@ -45,6 +45,7 @@ Server (server.ts — Node.js http)
 ├── scraper.ts          # Core: tipos, config dos sites, lógica de scraping, CLI
 ├── server.ts           # HTTP server: API endpoints + static file serving
 ├── AGENTS.md           # ← este arquivo
+├── DESIGN.md           # Documentação do design system e UI/UX
 ├── opencode.json       # Config do opencode (default agent: scraper)
 ├── tsconfig.json       # TS config (root, CommonJS)
 ├── package.json        # Scripts: dev, dev:server, typecheck, build
@@ -140,11 +141,11 @@ interface SiteConfig {
 
 ```
 App
-├── SearchForm          # Input + site dropdown + submit button
+├── SearchForm          # Input + site tabs + submit button
 ├── SearchHistory       # "Últimas buscas" pills (localStorage)
 ├── StateMessage        # initial | loading | empty | error
 └── ProductGrid
-    └── ProductCard[]   # Card com imagem, título, preço, badge "Melhor Opção"
+    └── ProductCard[]   # Card com imagem no topo, store badge, preço, parcelamento e botão gradiente "Ir para a Loja"
 ```
 
 ### State Machine (App.tsx)
@@ -157,11 +158,13 @@ initial → (search) → loading → results | empty | error
 
 ### Styling
 
-- **Tema escuro**: variáveis CSS customizadas, classes Tailwind com `bg-white/[opacity]`
-- **Cor de destaque**: laranja (`--color-accent: #f97316`)
-- **Fontes**: Outfit (display) + DM Sans (body), via Google Fonts
-- **Animações**: `fadeIn`, `fadeInUp`, `badgePop`, `dotPulse`, `spinSlow` — definidas em `index.css`
-- Efeito vidro (`backdrop-blur`), transições suaves em todos os componentes
+- **Tema escuro**: fundo `#020617` (slate-950), superfície `#0f172a` (slate-900), variáveis CSS customizadas via `@theme`
+- **Cor de destaque**: laranja (`--color-accent: #f97316`), aplicada em inputs, badges e botões
+- **Cores por loja**: KaBuM! laranja, Pichau vermelho, Terabyte verde — definidas em `App.tsx`, `ProductCard.tsx` e `SearchHistory.tsx`
+- **Fontes**: `system-ui` stack (nativas do sistema), sem dependência externa
+- **Background animado**: gradientes radiais fixos com `gradientShift` (30s infinite alternate)
+- **Animações**: `fadeIn`, `fadeInUp`, `badgePop`, `dotPulse`, `spinSlow`, `spinReverse`, `shimmer`, `breathe`, `tabActivate`, `radarRing`, `radarSweep`, `gradientShift` — definidas em `index.css`
+- Efeito vidro (`backdrop-blur-md`) no header sticky
 
 ### Hooks
 

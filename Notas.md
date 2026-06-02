@@ -19,7 +19,18 @@ Usuário baixa o resultado da busca como CSV ou JSON para análise offline.
 ## 2. Monitoramento e Rastreamento de Produtos
 
 ### 2.1 "Watch" de preços (alertas de queda)
-Usuário marca um produto e recebe alerta quando o preço cai abaixo de um limite (console, email, WebSocket ou Discord).
+Usuário cadastra um alerta com Nome, URL, Preço-alvo, Site e Canal. O servidor verifica o preço atual periodicamente (via cron interno ou scheduler) e, quando o preço fica ≤ alvo, dispara uma notificação no canal configurado.
+
+**Fluxo:**
+1. Frontend exibe botão "Criar Alerta" no card do produto e uma página `/alerts` para gerenciar todos os alertas.
+2. Ao criar, usuário informa: preço-meta, canal de notificação e intervalo de verificação.
+3. Alerta é salvo em banco (SQLite, item 1.1) com status `active`.
+4. Servidor executa scraping do produto em background no intervalo configurado.
+5. Se preço atual ≤ preço-meta, marca alerta como `triggered` e envia notificação.
+6. Canal suporta: console (log), email (nodemailer), Discord (webhook), Telegram (bot), WebSocket (SSE em tempo real no frontend).
+7. Usuário pode pausar, reativar ou excluir alerta.
+
+**Stack:** node-cron ou `setInterval` para scheduler; `nodemailer` para email; webhook HTTP para Discord/Telegram; SSE (`text/event-stream`) para notificações no frontend.
 **Valor:** Alto | **Complexidade:** Alta
 
 ### 2.2 Histórico de preços por produto

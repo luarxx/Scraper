@@ -1,6 +1,7 @@
 import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
+import Database from 'better-sqlite3';
 import { buscarProduto, SITES } from './scraper';
 
 const PORT = process.env.PORT || 3000;
@@ -59,6 +60,235 @@ function sendSpa(res: http.ServerResponse): void {
   sendStatic(res, path.join(CLIENT_DIST, 'index.html'));
 }
 
+// ─── Helpers ──────────────────────────────────────────────────
+
+function sendJson(res: http.ServerResponse, status: number, data: unknown): void {
+  res.writeHead(status, jsonHeaders());
+  res.end(JSON.stringify(data));
+}
+
+function parseLocalDatetime(s: string): Date {
+  const [datePart, timePart] = s.split(' ');
+  const [y, m, d] = datePart.split('-').map(Number);
+  const [hh, mm, ss] = timePart.split(':').map(Number);
+  return new Date(y, m - 1, d, hh, mm, ss);
+}
+
+function brlToCents(price: string | null): number | null {
+  if (!price) return null;
+  const cleaned = price.replace(/R\$\s*/i, '').replace(/\./g, '').replace(',', '.').trim();
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? null : Math.round(num * 100);
+}
+
+function salvarPrecos(produtos: { title: string; price: string | null; parcelamento: string | null; image: string; url: string; relevancia: number }[], site: string): void {
+  if (produtos.length === 0) return;
+  const insert = db.prepare(
+    `INSERT INTO price_history (url, site, price_cents, parcelamento) VALUES (?, ?, ?, ?)`
+  );
+  const saveMany = db.transaction((items: { url: string; price: string | null; parcelamento: string | null }[]) => {
+    for (const p of items) {
+      insert.run(p.url, site, brlToCents(p.price), p.parcelamento);
+    }
+  });
+  saveMany(produtos);
+}
+
+// ─── Database ──────────────────────────────────────────────────
+
+const DB_PATH = path.join(ROOT, 'data', 'scraper.db');
+fs.mkdirSync(path.join(ROOT, 'data'), { recursive: true });
+const db = new Database(DB_PATH);
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
+
+function initDatabase(): void {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS auto_config (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      termo TEXT NOT NULL,
+      site TEXT NOT NULL,
+      ordem INTEGER NOT NULL DEFAULT 0,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      criado_em TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+    );
+
+    CREATE TABLE IF NOT EXISTS auto_execucoes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      iniciada_em TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+      finalizada_em TEXT,
+      status TEXT NOT NULL DEFAULT 'executando'
+    );
+
+    CREATE TABLE IF NOT EXISTS auto_resultados (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      execucao_id INTEGER NOT NULL,
+      config_id INTEGER,
+      termo TEXT NOT NULL,
+      site TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'ok',
+      total INTEGER DEFAULT 0,
+      produtos TEXT,
+      erro TEXT,
+      FOREIGN KEY (execucao_id) REFERENCES auto_execucoes(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS price_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      url TEXT NOT NULL,
+      site TEXT NOT NULL,
+      price_cents INTEGER,
+      parcelamento TEXT,
+      captured_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_price_history_url ON price_history(url, site);
+  `);
+}
+
+initDatabase();
+
+// ─── Scheduler (a cada 6h) ──────────────────────────────────────
+
+const INTERVALO_MS = 6 * 60 * 60 * 1000;
+let schedulerStatus: 'idle' | 'executando' | 'agendado' = 'idle';
+let proximaExecucao: string | null = null;
+let schedulerTimer: ReturnType<typeof setInterval> | null = null;
+
+function calcularProximoHorario(): Date {
+  const now = new Date();
+  const hours = now.getHours();
+  const nextHour = (Math.floor(hours / 6) + 1) * 6;
+  const next = new Date(now);
+  if (nextHour >= 24) {
+    next.setDate(next.getDate() + 1);
+    next.setHours(0, 0, 0, 0);
+  } else {
+    next.setHours(nextHour, 0, 0, 0);
+  }
+  return next;
+}
+
+async function executarAutoBuscas(): Promise<void> {
+  if (schedulerStatus === 'executando') return;
+  schedulerStatus = 'executando';
+  proximaExecucao = null;
+
+  const configs = db.prepare(
+    `SELECT id, termo, site FROM auto_config WHERE ativo = 1 ORDER BY ordem`
+  ).all() as { id: number; termo: string; site: string }[];
+
+  if (configs.length === 0) {
+    schedulerStatus = 'agendado';
+    proximaExecucao = calcularProximoHorario().toISOString();
+    return;
+  }
+
+  const insertExec = db.prepare(
+    `INSERT INTO auto_execucoes (iniciada_em, status) VALUES (datetime('now', 'localtime'), 'executando')`
+  );
+  const execResult = insertExec.run();
+  const execucaoId = execResult.lastInsertRowid as number;
+
+  const insertResultado = db.prepare(
+    `INSERT INTO auto_resultados (execucao_id, config_id, termo, site, status, total, produtos, erro)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  );
+
+  const insertMany = db.transaction((items: { id: number; termo: string; site: string }[]) => {
+    for (const config of items) {
+      insertResultado.run(execucaoId, config.id, config.termo, config.site, 'pendente', 0, null, null);
+    }
+  });
+  insertMany(configs);
+
+  for (const config of configs) {
+    try {
+      const data = await buscarProduto(config.site, config.termo);
+      if ('erro' in data && data.erro) {
+        db.prepare(
+          `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
+        ).run(data.mensagem, execucaoId, config.id);
+      } else {
+        db.prepare(
+          `UPDATE auto_resultados SET status = 'ok', total = ?, produtos = ? WHERE execucao_id = ? AND config_id = ?`
+        ).run(data.total, JSON.stringify(data.produtos), execucaoId, config.id);
+        salvarPrecos(data.produtos, config.site);
+      }
+    } catch (err: unknown) {
+      const error = err as Error;
+      db.prepare(
+        `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
+      ).run(error.message, execucaoId, config.id);
+    }
+  }
+
+  db.prepare(
+    `UPDATE auto_execucoes SET finalizada_em = datetime('now', 'localtime'), status = 'concluido' WHERE id = ?`
+  ).run(execucaoId);
+
+  schedulerStatus = 'agendado';
+  proximaExecucao = calcularProximoHorario().toISOString();
+}
+
+function iniciarScheduler(): void {
+  const ultimaExec = db.prepare(
+    `SELECT iniciada_em, status FROM auto_execucoes ORDER BY id DESC LIMIT 1`
+  ).get() as { iniciada_em: string; status: string } | undefined;
+
+  let deveExecutarImediatamente = false;
+
+  if (ultimaExec) {
+    const ultimaDate = parseLocalDatetime(ultimaExec.iniciada_em);
+    const agora = new Date();
+    const diffMs = agora.getTime() - ultimaDate.getTime();
+    if (diffMs >= INTERVALO_MS || ultimaExec.status === 'executando') {
+      deveExecutarImediatamente = true;
+    }
+  } else {
+    const count = db.prepare('SELECT COUNT(*) as c FROM auto_config WHERE ativo = 1').get() as { c: number };
+    if (count.c > 0) {
+      deveExecutarImediatamente = true;
+    }
+  }
+
+  if (deveExecutarImediatamente) {
+    executarAutoBuscas();
+  }
+
+  const next = calcularProximoHorario();
+  const delay = Math.max(0, next.getTime() - Date.now());
+  proximaExecucao = next.toISOString();
+  if (schedulerStatus === 'idle') schedulerStatus = 'agendado';
+
+  setTimeout(() => {
+    executarAutoBuscas();
+    schedulerTimer = setInterval(executarAutoBuscas, INTERVALO_MS);
+  }, delay);
+}
+
+function getAutoStatus(): {
+  status: string;
+  ultima_execucao: string | null;
+  proxima_execucao: string | null;
+  total_configurados: number;
+} {
+  const ultimaExec = db.prepare(
+    `SELECT iniciada_em, finalizada_em, status FROM auto_execucoes ORDER BY id DESC LIMIT 1`
+  ).get() as { iniciada_em: string; finalizada_em: string | null; status: string } | undefined;
+
+  const totalConfig = db.prepare(
+    `SELECT COUNT(*) as c FROM auto_config WHERE ativo = 1`
+  ).get() as { c: number };
+
+  return {
+    status: schedulerStatus,
+    ultima_execucao: ultimaExec ? ultimaExec.iniciada_em : null,
+    proxima_execucao: proximaExecucao,
+    total_configurados: totalConfig.c,
+  };
+}
+
 const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
   const parsedUrl = new URL(req.url!, `http://localhost:${PORT}`);
   const pathname = parsedUrl.pathname;
@@ -83,7 +313,12 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
     res.writeHead(200, jsonHeaders());
 
     buscarProduto(site, q.trim())
-      .then((data) => res.end(JSON.stringify(data)))
+      .then((data) => {
+        if (!('erro' in data) || !data.erro) {
+          salvarPrecos(data.produtos, site);
+        }
+        res.end(JSON.stringify(data));
+      })
       .catch((err: unknown) => {
         const error = err as Error;
         res.end(JSON.stringify({ erro: true, mensagem: error.message }));
@@ -97,6 +332,183 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
     res.writeHead(200, jsonHeaders());
     const sites = Object.entries(SITES).map(([key, val]) => ({ key, nome: val.nome }));
     res.end(JSON.stringify(sites));
+    return;
+  }
+
+  // ─── API: auto-config (GET) ────────────────────────────────────
+  if (pathname === '/api/auto/config' && req.method === 'GET') {
+    const configs = db.prepare(
+      `SELECT id, termo, site, ordem FROM auto_config WHERE ativo = 1 ORDER BY ordem`
+    ).all();
+    sendJson(res, 200, configs);
+    return;
+  }
+
+  // ─── API: auto-config (POST) ──────────────────────────────────
+  if (pathname === '/api/auto/config' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        let entries: { termo: string; site: string }[] = JSON.parse(body);
+        if (!Array.isArray(entries)) {
+          sendJson(res, 400, { erro: true, mensagem: 'Body deve ser um array de { termo, site }' });
+          return;
+        }
+        entries = entries.filter(e => e.termo && e.termo.trim() && e.site && SITES[e.site]);
+        if (entries.length > 10) {
+          sendJson(res, 400, { erro: true, mensagem: 'Máximo de 10 produtos permitidos' });
+          return;
+        }
+
+        const del = db.prepare(`UPDATE auto_config SET ativo = 0 WHERE ativo = 1`);
+        const ins = db.prepare(
+          `INSERT INTO auto_config (termo, site, ordem) VALUES (?, ?, ?)`
+        );
+
+        const save = db.transaction((items: { termo: string; site: string }[]) => {
+          del.run();
+          items.forEach((item, idx) => {
+            ins.run(item.termo.trim(), item.site, idx);
+          });
+        });
+        save(entries);
+
+        const configs = db.prepare(
+          `SELECT id, termo, site, ordem FROM auto_config WHERE ativo = 1 ORDER BY ordem`
+        ).all();
+        sendJson(res, 200, configs);
+      } catch {
+        sendJson(res, 400, { erro: true, mensagem: 'JSON inválido' });
+      }
+    });
+    return;
+  }
+
+  // ─── API: auto-config (DELETE) ────────────────────────────────
+  const autoConfigDeleteMatch = pathname.match(/^\/api\/auto\/config\/(\d+)$/);
+  if (autoConfigDeleteMatch && req.method === 'DELETE') {
+    const id = parseInt(autoConfigDeleteMatch[1], 10);
+    db.prepare(`UPDATE auto_config SET ativo = 0 WHERE id = ? AND ativo = 1`).run(id);
+    sendJson(res, 200, { ok: true });
+    return;
+  }
+
+  // ─── API: auto-status ──────────────────────────────────────────
+  if (pathname === '/api/auto/status' && req.method === 'GET') {
+    sendJson(res, 200, getAutoStatus());
+    return;
+  }
+
+  // ─── API: auto-results ─────────────────────────────────────────
+  if (pathname === '/api/auto/results' && req.method === 'GET') {
+    const ultimaExec = db.prepare(
+      `SELECT id, iniciada_em, finalizada_em, status FROM auto_execucoes ORDER BY id DESC LIMIT 1`
+    ).get() as { id: number; iniciada_em: string; finalizada_em: string | null; status: string } | undefined;
+
+    if (!ultimaExec) {
+      sendJson(res, 200, { execucao: null, resultados: [] });
+      return;
+    }
+
+    const resultados = db.prepare(
+      `SELECT id, termo, site, status, total, produtos, erro
+       FROM auto_resultados WHERE execucao_id = ? ORDER BY id`
+    ).all(ultimaExec.id) as { id: number; termo: string; site: string; status: string; total: number; produtos: string | null; erro: string | null }[];
+
+    const parsed = resultados.map(r => ({
+      ...r,
+      produtos: r.produtos ? JSON.parse(r.produtos) : [],
+    }));
+
+    sendJson(res, 200, { execucao: ultimaExec, resultados: parsed });
+    return;
+  }
+
+  // ─── API: auto-run (manual) ──────────────────────────────────
+  if (pathname === '/api/auto/run' && req.method === 'POST') {
+    if (schedulerStatus === 'executando') {
+      sendJson(res, 409, { erro: true, mensagem: 'Já existe uma execução em andamento' });
+      return;
+    }
+    // Executa sem aguardar (fire-and-forget)
+    executarAutoBuscas();
+    sendJson(res, 202, { ok: true, mensagem: 'Execução iniciada' });
+    return;
+  }
+
+  // ─── API: price history summary ──────────────────────────────
+  if (pathname === '/api/history/summary' && req.method === 'GET') {
+    const url = parsedUrl.searchParams.get('url');
+    const site = parsedUrl.searchParams.get('site') || 'kabum';
+    const days = parseInt(parsedUrl.searchParams.get('days') || '90', 10);
+
+    if (!url) {
+      sendJson(res, 400, { erro: true, mensagem: 'Parâmetro "url" é obrigatório' });
+      return;
+    }
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    const cutoffStr = cutoff.toISOString().replace('T', ' ').slice(0, 19);
+
+    const rows = db.prepare(
+      `SELECT price_cents, parcelamento, captured_at FROM price_history
+       WHERE url = ? AND site = ? AND captured_at >= ?
+       ORDER BY captured_at ASC`
+    ).all(url, site, cutoffStr) as { price_cents: number | null; parcelamento: string | null; captured_at: string }[];
+
+    if (rows.length === 0) {
+      sendJson(res, 404, { erro: true, mensagem: 'Nenhum histórico encontrado' });
+      return;
+    }
+
+    const cents = rows.map(r => r.price_cents).filter((c): c is number => c !== null);
+    const current = cents[cents.length - 1] ?? null;
+    const min = cents.length > 0 ? Math.min(...cents) : null;
+    const max = cents.length > 0 ? Math.max(...cents) : null;
+    const avg = cents.length > 0 ? Math.round(cents.reduce((a, b) => a + b, 0) / cents.length) : null;
+    const trendPct = cents.length >= 2 ? parseFloat((((current! - cents[0]) / cents[0]) * 100).toFixed(2)) : null;
+
+    sendJson(res, 200, {
+      records: rows.length,
+      trend_percent: trendPct,
+      current_price: current,
+      min_price: min,
+      max_price: max,
+      avg_price: avg,
+      first_seen: rows[0].captured_at,
+    });
+    return;
+  }
+
+  // ─── API: price history detail ──────────────────────────────
+  if (pathname === '/api/history' && req.method === 'GET') {
+    const url = parsedUrl.searchParams.get('url');
+    const site = parsedUrl.searchParams.get('site') || 'kabum';
+    const days = parseInt(parsedUrl.searchParams.get('days') || '90', 10);
+
+    if (!url) {
+      sendJson(res, 400, { erro: true, mensagem: 'Parâmetro "url" é obrigatório' });
+      return;
+    }
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    const cutoffStr = cutoff.toISOString().replace('T', ' ').slice(0, 19);
+
+    const rows = db.prepare(
+      `SELECT price_cents, parcelamento, captured_at FROM price_history
+       WHERE url = ? AND site = ? AND captured_at >= ?
+       ORDER BY captured_at ASC`
+    ).all(url, site, cutoffStr) as { price_cents: number | null; parcelamento: string | null; captured_at: string }[];
+
+    if (rows.length === 0) {
+      sendJson(res, 404, { erro: true, mensagem: 'Nenhum histórico encontrado' });
+      return;
+    }
+
+    sendJson(res, 200, rows);
     return;
   }
 
@@ -120,11 +532,12 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
 });
 
 server.listen(PORT, () => {
+  iniciarScheduler();
   console.log('');
   console.log('  ┌──────────────────────────────────────┐');
   console.log(`  │  🚀  ${String('http://localhost:' + String(PORT)).padEnd(26)}│`);
   console.log('  │                                      │');
-  console.log('  │  Pressione Ctrl+C para encerrar      │');
+  console.log('  │  ⏰  Auto-busca a cada 6h            │');
   console.log('  └──────────────────────────────────────┘');
   console.log('');
 });

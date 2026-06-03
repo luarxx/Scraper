@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Produto } from '../types';
+import { usePriceHistory } from '../hooks/usePriceHistory';
+import { PriceHistoryChart } from './PriceHistoryChart';
 
 interface ProductCardProps {
   produto: Produto;
   index: number;
   siteKey: string;
   isBestOption?: boolean;
+  isChartExpanded?: boolean;
+  onToggleChart?: () => void;
 }
 
 const SITE_COLORS: Record<string, { text: string; bg: string; btnBg: string }> = {
@@ -20,25 +24,74 @@ const SITE_NAMES: Record<string, string> = {
   pichau: 'Pichau',
 };
 
-export function ProductCard({ produto, index, siteKey, isBestOption }: ProductCardProps) {
+export function ProductCard({ produto, index, siteKey, isBestOption, isChartExpanded = false, onToggleChart }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const siteStyle = SITE_COLORS[siteKey] ?? SITE_COLORS.kabum;
   const siteName = SITE_NAMES[siteKey] ?? siteKey;
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const { loading, history, summary, erro, fetchSummary, fetchHistory } = usePriceHistory();
+  const fetchedRef = useRef(false);
+
+  // Busca o summary ao montar (apenas uma vez)
+  useEffect(() => {
+    if (!fetchedRef.current && produto.url) {
+      fetchedRef.current = true;
+      fetchSummary(produto.url, siteKey);
+    }
+  }, [produto.url, siteKey, fetchSummary]);
+
+  const handleExpand = useCallback(() => {
+    if (!historyLoaded) {
+      setHistoryLoaded(true);
+      fetchHistory(produto.url, siteKey);
+    }
+  }, [historyLoaded, fetchHistory, produto.url, siteKey]);
+
+  // Calcula tendência
+  const trendBadge = (() => {
+    if (!summary || summary.records < 2 || summary.trend_percent === null) return null;
+    const pct = summary.trend_percent;
+    const isDown = pct < 0;
+    return (
+      <span
+        className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded"
+        style={{
+          color: isDown ? '#34d399' : '#ef4444',
+          background: isDown ? 'rgba(52, 211, 153, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+        }}
+      >
+        {isDown ? '▼' : '▲'} {Math.abs(pct).toFixed(1)}%
+      </span>
+    );
+  })();
 
   return (
     <div
-      className="group bg-slate-900 border border-slate-800/90 rounded-2xl shadow-2xl flex flex-col overflow-hidden opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:border-slate-700/80 hover:-translate-y-0.5"
+      className="group bg-slate-900 border border-slate-800/90 rounded-2xl shadow-2xl flex flex-col overflow-hidden opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:border-slate-700/80 hover:-translate-y-0.5 min-h-[460px] sm:min-h-[480px]"
+      data-expanded={isChartExpanded ? 'true' : 'false'}
       style={{ animationDelay: `${index * 0.05}s` }}
     >
       <div className="bg-white p-5 flex items-center justify-center border-b border-slate-200 shadow-inner overflow-hidden relative min-h-[160px]">
         {produto.image && !imgError ? (
-          <img
-            src={produto.image}
-            alt=""
-            loading="lazy"
-            className="max-w-full max-h-36 object-contain group-hover:scale-110 transition-transform duration-700 ease-out"
-            onError={() => setImgError(true)}
-          />
+          <>
+            {/* Shimmer placeholder */}
+            {!imgLoaded && (
+              <div
+                className="absolute inset-0 bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100 animate-[shimmer_1.5s_linear_infinite]"
+                style={{ backgroundSize: '200% 100%' }}
+              />
+            )}
+            <img
+              src={produto.image}
+              alt=""
+              loading="lazy"
+              className="max-w-full max-h-36 object-contain group-hover:scale-110 transition-transform duration-700 ease-out"
+              onError={() => setImgError(true)}
+              onLoad={() => setImgLoaded(true)}
+              style={{ opacity: imgLoaded ? 1 : 0 }}
+            />
+          </>
         ) : (
           <div className="flex items-center justify-center text-slate-300 text-2xl font-medium">
             ∅
@@ -83,6 +136,7 @@ export function ProductCard({ produto, index, siteKey, isBestOption }: ProductCa
             <span className="text-xl sm:text-2xl font-black tracking-tight text-emerald-400">
               {produto.price || 'Preço não informado'}
             </span>
+            {trendBadge}
           </div>
           {produto.parcelamento && (
             <div className="text-xs font-medium text-slate-400 mt-1.5 bg-slate-800/50 px-2.5 py-1 rounded-lg border border-slate-700/50 inline-block">
@@ -91,11 +145,22 @@ export function ProductCard({ produto, index, siteKey, isBestOption }: ProductCa
           )}
         </div>
 
+        <PriceHistoryChart
+          history={history}
+          siteColor={siteStyle.text}
+          loading={loading && historyLoaded}
+          erro={erro}
+          collapsed={!isChartExpanded}
+          onToggle={onToggleChart ?? (() => {})}
+          summary={summary}
+          onExpand={handleExpand}
+        />
+
         <a
           href={produto.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 w-full text-slate-950 font-bold text-sm px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl no-underline"
+          className="mt-3 w-full text-slate-950 font-bold text-sm px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl no-underline"
           style={{ background: siteStyle.btnBg }}
         >
           Ir para a Loja

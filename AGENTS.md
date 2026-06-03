@@ -22,18 +22,25 @@ Web scraper de e-commerces brasileiros usando Playwright. Busca produtos em múl
 
 ```
 Browser (React SPA)
-     │  GET /api/search?q=...&site=...
-     ▼
+     │  GET /api/search?q=...&site=...   │   ⏰ Aba "Automática"
+     ▼                                   ▼
 Server (server.ts — Node.js http)
      │
      ├── serve SPA from client/dist/ (production)
      │   └── fallback: serve from root (legacy)
      │
-     └── /api/search → scraper.ts:buscarProduto()
-                         │
-                         ├── KaBuM!      → DOM scraping (navega + evaluate)
-                         ├── Pichau      → DOM scraping (navega + evaluate)
-                         └── TerabyteShop → API scraping (fetch interna)
+     ├── /api/search → scraper.ts:buscarProduto()
+     │                    ├── KaBuM!      → DOM scraping
+     │                    ├── Pichau      → DOM scraping
+     │                    └── TerabyteShop → API scraping
+     │
+     ├── /api/auto/* → SQLite (data/scraper.db)
+     │    ├── auto_config      (até 10 produtos)
+     │    ├── auto_execucoes   (cada ciclo de 6h)
+     │    └── auto_resultados  (resultados por termo)
+     │
+     └── Scheduler (a cada 6h)
+          └── Itera auto_config → buscarProduto() sequencial → salva resultados
 ```
 
 ---
@@ -43,7 +50,7 @@ Server (server.ts — Node.js http)
 ```
 /
 ├── scraper.ts          # Core: tipos, config dos sites, lógica de scraping, CLI
-├── server.ts           # HTTP server: API endpoints + static file serving
+├── server.ts           # HTTP server: API endpoints + static + SQLite DB + scheduler 6h
 ├── AGENTS.md           # ← este arquivo
 ├── DESIGN.md           # Documentação do design system e UI/UX
 ├── opencode.json       # Config do opencode (default agent: scraper)
@@ -57,23 +64,32 @@ Server (server.ts — Node.js http)
 │   ├── tsconfig.json   # Project references
 │   ├── src/
 │   │   ├── main.tsx
-│   │   ├── App.tsx           # Layout + state machine
+│   │   ├── App.tsx           # Layout + state machine + toggle Manual/Auto
 │   │   ├── index.css         # Tailwind + custom CSS
-│   │   ├── types.ts          # Shared types (Produto, Site, Resultado)
+│   │   ├── types.ts          # Shared types (Produto, Site, Resultado, Auto*, PricePoint...)
 │   │   ├── hooks/
 │   │   │   ├── useSearch.ts         # API calls + search state
-│   │   │   └── useSearchHistory.ts  # localStorage history (max 5)
+│   │   │   ├── useSearchHistory.ts  # localStorage history (max 5)
+│   │   │   ├── useAutoConfig.ts     # CRUD configuração automática
+│   │   │   └── useAutoResults.ts    # Resultados execução automática
 │   │   └── components/
-│   │       ├── SearchForm.tsx       # Input + site dropdown + submit
+│   │       ├── SearchForm.tsx       # Input + site tabs + submit button
 │   │       ├── SearchHistory.tsx    # Recent searches pills
 │   │       ├── ProductGrid.tsx      # Grid layout + best-option logic
 │   │       ├── ProductCard.tsx      # Individual product card
-│   │       └── StateMessage.tsx     # Initial/loading/empty/error states
+│   │       ├── StateMessage.tsx     # Initial/loading/empty/error states
+│   │       ├── PriceHistoryChart.tsx # Gráfico de histórico de preços
+│   │       ├── AutoSearchPanel.tsx  # Container da aba Automática (status + sub-abas)
+│   │       ├── AutoConfigList.tsx   # Lista de até 10 produtos configurados
+│   │       └── AutoResultsView.tsx  # Resultados da última execução automática
 │   └── dist/            # Build output (served in production)
 │
 ├── data/
+│   ├── scraper.db       # SQLite: auto_config, auto_execucoes, auto_resultados
+│   ├── prices.db        # (legacy) Histórico de preços
 │   ├── resultado.json   # Último resultado do scraper (CLI)
-│   └── resultado.js     # Mesmo resultado, formato `window.__RESULT`
+│   ├── resultado.js     # Mesmo resultado, formato `window.__RESULT`
+│   └── cache/           # Cache de resultados (SHA256, TTL 10min)
 │
 └── .opencode/           # opencode config (plugin, etc.)
 ```
@@ -127,6 +143,12 @@ interface SiteConfig {
 |---|---|---|---|
 | `/api/search` | GET | `q` (termo), `site` (key, default `kabum`) | Executa busca e retorna `Resultado` |
 | `/api/sites` | GET | — | Lista sites disponíveis `[{ key, nome }]` |
+| `/api/auto/config` | GET | — | Lista produtos configurados para busca automática |
+| `/api/auto/config` | POST | Body: `[{ termo, site }]` | Salva configuração (substitui tudo, max 10) |
+| `/api/auto/config/:id` | DELETE | — | Remove um item (soft delete) |
+| `/api/auto/status` | GET | — | Status do scheduler + última/próxima execução |
+| `/api/auto/results` | GET | — | Última execução com resultados por termo |
+| `/api/auto/run` | POST | — | Dispara execução manual imediatamente |
 
 ### Static serving
 
@@ -144,32 +166,79 @@ App
 ├── SearchForm          # Input + site tabs + submit button
 ├── SearchHistory       # "Últimas buscas" pills (localStorage)
 ├── StateMessage        # initial | loading | empty | error
-└── ProductGrid
-    └── ProductCard[]   # Card com imagem no topo, store badge, preço, parcelamento e botão gradiente "Ir para a Loja"
+├── ProductGrid
+│   └── ProductCard[]   # Card com imagem, store badge, preço, botão "Ir para a Loja"
+└── AutoSearchPanel     # (quando modo='auto')
+    ├── AutoConfigList  # Lista de até 10 produtos configurados com add/remove
+    └── AutoResultsView # Resultados da última execução por termo com ProductGrid
 ```
 
 ### State Machine (App.tsx)
 
 ```
-initial → (search) → loading → results | empty | error
-                                ↑
-                            (new search)
+modo: 'manual' | 'auto'
+
+Manual:
+  initial → (search) → loading → results | empty | error
+                                  ↑
+                              (new search)
+
+Auto:
+  AutoSearchPanel
+    ├── tab 'config' → AutoConfigList (local edit → save → POST /api/auto/config)
+    └── tab 'results' → AutoResultsView (fetch /api/auto/results)
 ```
 
 ### Styling
 
 - **Tema escuro**: fundo `#020617` (slate-950), superfície `#0f172a` (slate-900), variáveis CSS customizadas via `@theme`
 - **Cor de destaque**: laranja (`--color-accent: #f97316`), aplicada em inputs, badges e botões
-- **Cores por loja**: KaBuM! laranja, Pichau vermelho, Terabyte verde — definidas em `App.tsx`, `ProductCard.tsx` e `SearchHistory.tsx`
-- **Fontes**: `system-ui` stack (nativas do sistema), sem dependência externa
-- **Background animado**: gradientes radiais fixos com `gradientShift` (30s infinite alternate)
-- **Animações**: `fadeIn`, `fadeInUp`, `badgePop`, `dotPulse`, `spinSlow`, `spinReverse`, `shimmer`, `breathe`, `tabActivate`, `radarRing`, `radarSweep`, `gradientShift` — definidas em `index.css`
+- **Cores por loja**: KaBuM! laranja, Pichau vermelho, Terabyte verde — definidas em `App.tsx`, `ProductCard.tsx`, `SearchHistory.tsx`, `AutoResultsView.tsx`
+- **Fontes**: **Inter** (UI, Google Fonts) + **DM Sans** (Display, Google Fonts) — carregadas via `<link>` em `index.html`
+- **Background animado**: gradientes radiais fixos com `gradientShift` (30s infinite alternate) + textura noise SVG `feTurbulence` overlay (35% opacity, `mix-blend-mode: overlay`)
+- **Scrollbar customizada**: 6px largura, thumb `rgba(249,115,22,0.25)` com hover mais claro
+- **Animações**: `fadeIn`, `fadeInUp`, `badgePop`, `dotPulse`, `spinSlow`, `spinReverse`, `shimmer`, `breathe`, `tabActivate`, `radarRing`, `radarSweep`, `gradientShift`, `numberTick`, `sparkDraw`, `panelSlideIn`, `kpiStagger`, `pulseGlow`, `dotPing` — definidas em `index.css`
 - Efeito vidro (`backdrop-blur-md`) no header sticky
+- **KPI cards**: grid de cards com ícone + label + valor + animação `kpiStagger` em cascata. Usado em status bar (`AutoSearchPanel`) e execution summary + per-termo (`AutoResultsView`)
+- **Termo sections**: gradient wash `linear-gradient(135deg, ${siteColor.light}, transparent 70%)` no background, com barra lateral e border highlight na cor da loja
 
 ### Hooks
 
 - **`useSearch`** (`client/src/hooks/useSearch.ts`): Gerencia estado da busca (loading, produtos, erro). `search(q, siteKey)` faz GET em `/api/search`. `fetchSites()` carrega lista de sites.
 - **`useSearchHistory`** (`client/src/hooks/useSearchHistory.ts`): Persiste últimas 5 buscas no `localStorage`. `addEntry()` evita duplicatas.
+- **`useAutoConfig`** (`client/src/hooks/useAutoConfig.ts`): CRUD da configuração automática. `fetchConfig()`, `saveConfig(entries)`, `removeConfig(id)`, `fetchStatus()`.
+- **`useAutoResults`** (`client/src/hooks/useAutoResults.ts`): Resultados automáticos. `fetchResults()` carrega última execução, `triggerRun()` dispara execução manual.
+
+---
+
+## Auto-Search (a cada 6h)
+
+O scraper pode ser configurado para buscar até 10 produtos automaticamente a cada 6 horas.
+
+### Database
+
+SQLite em `data/scraper.db` com 3 tabelas:
+
+| Tabela | Descrição |
+|---|---|
+| `auto_config` | Produtos configurados (termo + site + ordem + soft delete) |
+| `auto_execucoes` | Cada ciclo de busca (início, fim, status) |
+| `auto_resultados` | Resultados individuais por termo em cada execução |
+
+### Scheduler
+
+- Inicializado junto com o servidor
+- Executa a cada 6h nos horários 00:00, 06:00, 12:00, 18:00
+- Na inicialização, verifica se está atrasado (>6h desde última execução) e executa imediatamente
+- Recuperação de crash: se última execução tem status 'executando', executa novamente
+- Buscas são sequenciais (1 por vez) para evitar múltiplos browsers simultâneos
+
+### Frontend (Aba "Automática")
+
+- Toggle "🔍 Manual" / "⏰ Automática" no header (state `modo` em App.tsx)
+- **AutoSearchPanel**: container com barra de status (status + próxima execução + contagem) e botão "Executar agora"
+  - **Sub-aba "⚙️ Configurar"**: AutoConfigList — formulário inline para adicionar/remover produtos com termo + site selector
+  - **Sub-aba "📊 Resultados"**: AutoResultsView — lista da última execução com ProductGrid por termo
 
 ---
 
@@ -198,6 +267,11 @@ npm run typecheck     # TypeScript check (root + client via npm -w)
 - **Novos sites** seguem o pattern `SiteConfig` — adicionar entrada em `SITES` e implementar `extrairProdutos` (DOM) ou `extrairProdutosViaApi` (API)
 - **Site badge colors** — ao adicionar um novo site, registrar sua cor em `SITE_COLORS` no `App.tsx` e `ProductCard.tsx`, e adicionar variáveis CSS em `index.css`
 - **TypeScript strict mode** — rodar `npm run typecheck` após qualquer alteração em `.ts`
+- **Server-side SQLite** — usar `better-sqlite3` com db preparado via `db.prepare()`, transações com `db.transaction()`
+- **Auto-search** — toda lógica de scheduler fica em `server.ts`; frontend de auto-busca fica em `client/src/components/Auto*.tsx`
+- **Soft delete** — items de configuração usam `ativo = 0` em vez de DELETE físico
+- **Resultados automáticos** — armazenados como JSON text no SQLite (coluna `produtos`)
+- **Scheduler** — execução sequencial (1 busca por vez), recuperação de crash na inicialização
 - **Após editar `client/`**, rebuildar com `cd client && npm run build` — o servidor serve arquivos estáticos de `client/dist/`
 - **Exports nomeados** (evitar `export default` em componentes utilitários)
 - **Sem comentários em linha** no código-fonte (documentação concentrada aqui)

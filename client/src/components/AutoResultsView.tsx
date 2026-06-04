@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, memo, useEffect, useRef } from 'react';
 import type { AutoExecucao, AutoResultadoItem, Produto } from '../types';
 import { ProductGrid } from './ProductGrid';
 
@@ -38,8 +38,8 @@ function formatBRL(centsOrString: number | string | null): string {
 
 function getTermoStats(produtos: Produto[]): { minPrice: number; avgPrice: number } {
   const prices = produtos
-    .map(p => parsePrice(p.price))
-    .filter(p => p !== Infinity);
+    .map((p) => parsePrice(p.price))
+    .filter((p) => p !== Infinity);
   if (prices.length === 0) return { minPrice: 0, avgPrice: 0 };
   return {
     minPrice: Math.min(...prices),
@@ -57,12 +57,12 @@ interface KpiCardProps {
   sub?: string;
 }
 
-function KpiCard({ icon, label, value, accent, index, sub }: KpiCardProps) {
+const KpiCard = memo(function KpiCard({ icon, label, value, accent, index, sub }: KpiCardProps) {
   return (
     <div
       className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] min-w-0"
       style={{
-        animation: `kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) ${index * 0.06}s both`,
+        animation: `kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) ${Math.min(index, 4) * 0.06}s both`,
       }}
     >
       <span className="text-lg shrink-0">{icon}</span>
@@ -84,12 +84,169 @@ function KpiCard({ icon, label, value, accent, index, sub }: KpiCardProps) {
       </div>
     </div>
   );
+});
+
+/* ─── Termo Section (memoized) ───────────────────────────── */
+interface TermoSectionProps {
+  resultado: AutoResultadoItem;
+  isOpen: boolean;
+  onToggle: (id: number) => void;
 }
+
+const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle }: TermoSectionProps) {
+  const siteColor = SITE_COLORS[r.site] || SITE_COLORS.kabum;
+  const stats = useMemo(
+    () => (r.status === 'ok' ? getTermoStats(r.produtos) : null),
+    [r.status, r.produtos]
+  );
+
+  return (
+    <section
+      className="rounded-xl border overflow-hidden"
+      style={{
+        borderColor: isOpen ? `${siteColor.text}22` : 'rgba(255,255,255,0.06)',
+        background: isOpen
+          ? `linear-gradient(135deg, ${siteColor.light}, transparent 70%), var(--color-surface)`
+          : 'var(--color-surface)',
+        boxShadow: isOpen ? `0 0 0 1px ${siteColor.glow}` : 'none',
+        transition: 'border-color 0.3s, background 0.3s, box-shadow 0.3s',
+        contentVisibility: 'auto',
+        containIntrinsicSize: 'auto 72px',
+      }}
+    >
+      <button
+        onClick={() => onToggle(r.id)}
+        className="flex items-center justify-between w-full px-4 py-3 text-left group"
+        style={{
+          borderBottom: isOpen ? `1px solid ${siteColor.text}18` : '1px solid rgba(255,255,255,0.06)',
+          transition: 'border-color 0.3s',
+        }}
+      >
+        <div className="flex items-center gap-3 min-w-0">
+          <div
+            className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-all duration-200"
+            style={{
+              background: isOpen ? `${siteColor.text}15` : 'transparent',
+              transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
+            }}
+          >
+            <svg
+              className="w-3.5 h-3.5 transition-colors"
+              style={{ color: isOpen ? siteColor.text : '#64748b' }}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
+
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span
+              className="text-sm sm:text-base font-display font-bold uppercase tracking-wider truncate"
+              style={{ color: siteColor.text }}
+            >
+              {r.termo}
+            </span>
+            <span
+              className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 border"
+              style={{
+                color: siteColor.text,
+                backgroundColor: `${siteColor.text}12`,
+                borderColor: `${siteColor.text}25`,
+              }}
+            >
+              {r.site}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0 ml-2">
+          {r.status === 'ok' && stats && (
+            <span className="text-xs font-semibold tabular-nums text-text-muted hidden sm:block">
+              a partir de <span style={{ color: siteColor.text }}>R$ {formatBRL(stats.minPrice)}</span>
+            </span>
+          )}
+          {r.status === 'pendente' && (
+            <span className="text-xs text-yellow-400 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
+              Buscando...
+            </span>
+          )}
+          {r.status === 'erro' && (
+            <span className="text-xs text-red-400 truncate max-w-[160px]" title={r.erro || ''}>
+              ⚠ {r.erro?.slice(0, 40) || 'Erro'}
+            </span>
+          )}
+          {r.status === 'ok' && (
+            <div className="flex items-center gap-1.5 text-xs">
+              <span className="text-text-muted tabular-nums">{r.total}</span>
+              <svg className="w-3 h-3 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+          )}
+        </div>
+      </button>
+
+      <div
+        className="grid transition-[grid-template-rows] duration-300 ease-out"
+        style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
+      >
+        <div className="overflow-hidden">
+          {isOpen && (
+            <div
+              className="px-2 sm:px-4 py-4 animate-[fadeIn_0.25s_ease-out]"
+            >
+              {r.status === 'ok' && r.produtos.length > 0 ? (
+                <>
+                  {stats && stats.minPrice > 0 && (
+                    <div className="flex items-center gap-4 mb-3 px-2 text-xs text-text-muted/70">
+                      <span>
+                        💰 Menor preço: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.minPrice)}</span>
+                      </span>
+                      <span className="hidden sm:inline">
+                        📊 Média: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.avgPrice)}</span>
+                      </span>
+                    </div>
+                  )}
+                  <ProductGrid produtos={r.produtos} siteKey={r.site} />
+                </>
+              ) : r.status === 'ok' && r.produtos.length === 0 ? (
+                <div className="px-4 py-8 text-center text-sm text-text-muted">
+                  <span className="text-2xl block mb-2">🔍</span>
+                  Nenhum produto encontrado para este termo
+                </div>
+              ) : null}
+
+              {r.status === 'erro' && (
+                <div className="px-4 py-8 text-center text-sm text-text-muted">
+                  <span className="text-2xl block mb-2">❌</span>
+                  {r.erro || 'Erro desconhecido ao buscar produtos'}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+});
 
 /* ─── Main Component ─────────────────────────────────────── */
 export function AutoResultsView({ execucao, resultados, loading, running, onRefresh }: AutoResultsViewProps) {
-  // Default: all open
-  const [expanded, setExpanded] = useState<Set<number>>(() => new Set(resultados.map(r => r.id)));
+  const [expanded, setExpanded] = useState<Set<number>>(() => new Set());
+  const initializedRef = useRef(false);
+
+  // Auto-expand first term on first data load (preview, sem renderizar todos de uma vez)
+  useEffect(() => {
+    if (!initializedRef.current && resultados.length > 0) {
+      initializedRef.current = true;
+      setExpanded(new Set([resultados[0].id]));
+    }
+  }, [resultados]);
+
   const allExpanded = resultados.length > 0 && resultados.every((r) => expanded.has(r.id));
 
   const toggleExpand = useCallback((id: number) => {
@@ -109,12 +266,12 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
     }
   }, [allExpanded, resultados]);
 
-  const okCount = useMemo(() => resultados.filter((r) => r.status === 'ok').length, [resultados]);
-  const erroCount = useMemo(() => resultados.filter((r) => r.status === 'erro').length, [resultados]);
-  const totalProdutos = useMemo(
-    () => resultados.reduce((sum, r) => sum + (r.produtos?.length || 0), 0),
-    [resultados]
-  );
+  const stats = useMemo(() => {
+    const okCount = resultados.filter((r) => r.status === 'ok').length;
+    const erroCount = resultados.filter((r) => r.status === 'erro').length;
+    const totalProdutos = resultados.reduce((sum, r) => sum + (r.produtos?.length || 0), 0);
+    return { okCount, erroCount, totalProdutos };
+  }, [resultados]);
 
   if (loading) {
     return (
@@ -148,7 +305,6 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
 
   return (
     <div className="space-y-5">
-      {/* ─── Execution Summary — KPI Cards ─────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <KpiCard
           icon="⏱"
@@ -179,21 +335,20 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
         <KpiCard
           icon="📦"
           label="Produtos"
-          value={String(totalProdutos)}
+          value={String(stats.totalProdutos)}
           accent="#34d399"
           index={2}
-          sub={`${okCount} termo${okCount !== 1 ? 's' : ''} ok`}
+          sub={`${stats.okCount} termo${stats.okCount !== 1 ? 's' : ''} ok`}
         />
         <KpiCard
-          icon={erroCount > 0 ? '⚠️' : '👍'}
-          label={erroCount > 0 ? 'Erros' : 'Sucesso'}
-          value={erroCount > 0 ? String(erroCount) : '100%'}
-          accent={erroCount > 0 ? '#ef4444' : '#34d399'}
+          icon={stats.erroCount > 0 ? '⚠️' : '👍'}
+          label={stats.erroCount > 0 ? 'Erros' : 'Sucesso'}
+          value={stats.erroCount > 0 ? String(stats.erroCount) : '100%'}
+          accent={stats.erroCount > 0 ? '#ef4444' : '#34d399'}
           index={3}
         />
       </div>
 
-      {/* ─── Running indicator ─────────────────────────── */}
       {running && (
         <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/8 border border-amber-500/15 text-amber-400 text-xs font-medium">
           <span className="relative flex h-2 w-2">
@@ -204,11 +359,10 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
         </div>
       )}
 
-      {/* ─── Toggle all ─────────────────────────────────── */}
       {resultados.length > 1 && (
         <div className="flex items-center justify-between">
           <span className="text-xs text-text-muted font-medium">
-            {resultados.length} termo{resultados.length !== 1 ? 's' : ''} de busca
+            {resultados.length} termo{resultados.length !== 1 ? 's' : ''} de busca · {expanded.size} aberto{expanded.size !== 1 ? 's' : ''}
           </span>
           <button
             onClick={toggleAll}
@@ -223,155 +377,19 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
         </div>
       )}
 
-      {/* ─── Results per termo ─────────────────────────── */}
       {resultados.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-sm text-text-muted">Nenhum resultado disponível</p>
         </div>
       ) : (
-        resultados.map((r) => {
-          const siteColor = SITE_COLORS[r.site] || SITE_COLORS.kabum;
-          const isOpen = expanded.has(r.id);
-          const stats = r.status === 'ok' ? getTermoStats(r.produtos) : null;
-
-          return (
-            <section
-              key={r.id}
-              className="rounded-xl border overflow-hidden"
-              style={{
-                borderColor: isOpen ? `${siteColor.text}22` : 'rgba(255,255,255,0.06)',
-                background: isOpen
-                  ? `linear-gradient(135deg, ${siteColor.light}, transparent 70%), var(--color-surface)`
-                  : 'var(--color-surface)',
-                boxShadow: isOpen ? `0 0 0 1px ${siteColor.glow}` : 'none',
-                transition: 'border-color 0.3s, background 0.3s, box-shadow 0.3s',
-              }}
-            >
-              {/* ── Termo header ─────────────────────────── */}
-              <button
-                onClick={() => toggleExpand(r.id)}
-                className="flex items-center justify-between w-full px-4 py-3 text-left group"
-                style={{
-                  borderBottom: isOpen ? `1px solid ${siteColor.text}18` : '1px solid rgba(255,255,255,0.06)',
-                  transition: 'border-color 0.3s',
-                }}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  {/* Chevron */}
-                  <div
-                    className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-all duration-200"
-                    style={{
-                      background: isOpen ? `${siteColor.text}15` : 'transparent',
-                      transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
-                    }}
-                  >
-                    <svg
-                      className="w-3.5 h-3.5 transition-colors"
-                      style={{ color: isOpen ? siteColor.text : '#64748b' }}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-
-                  {/* Termo name + site badge */}
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span
-                      className="text-sm sm:text-base font-display font-bold uppercase tracking-wider truncate"
-                      style={{ color: siteColor.text }}
-                    >
-                      {r.termo}
-                    </span>
-                    <span
-                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 border"
-                      style={{
-                        color: siteColor.text,
-                        backgroundColor: `${siteColor.text}12`,
-                        borderColor: `${siteColor.text}25`,
-                      }}
-                    >
-                      {r.site}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Right side: status + meta */}
-                <div className="flex items-center gap-3 shrink-0 ml-2">
-                  {r.status === 'ok' && stats && (
-                    <span className="text-xs font-semibold tabular-nums text-text-muted hidden sm:block">
-                      a partir de <span style={{ color: siteColor.text }}>R$ {formatBRL(stats.minPrice)}</span>
-                    </span>
-                  )}
-                  {r.status === 'pendente' && (
-                    <span className="text-xs text-yellow-400 flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" />
-                      Buscando...
-                    </span>
-                  )}
-                  {r.status === 'erro' && (
-                    <span className="text-xs text-red-400 truncate max-w-[160px]" title={r.erro || ''}>
-                      ⚠ {r.erro?.slice(0, 40) || 'Erro'}
-                    </span>
-                  )}
-                  {r.status === 'ok' && (
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <span className="text-text-muted tabular-nums">{r.total}</span>
-                      <svg className="w-3 h-3 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-              </button>
-
-              {/* ── Products (collapsible) ─────────────────── */}
-              <div
-                className="overflow-hidden transition-all duration-400 ease-in-out"
-                style={{
-                  maxHeight: isOpen ? `${Math.min(r.produtos.length, 50) * 520 + 120}px` : '0px',
-                  opacity: isOpen ? 1 : 0,
-                }}
-              >
-                {r.status === 'ok' && r.produtos.length > 0 ? (
-                  <div
-                    className="px-2 sm:px-4 py-4"
-                    style={{
-                      animation: isOpen ? 'panelSlideIn 0.35s cubic-bezier(0.16,1,0.3,1)' : 'none',
-                    }}
-                  >
-                    {/* Per-termo quick stats */}
-                    {stats && stats.minPrice > 0 && (
-                      <div className="flex items-center gap-4 mb-3 px-2 text-xs text-text-muted/70">
-                        <span>
-                          💰 Menor preço: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.minPrice)}</span>
-                        </span>
-                        <span className="hidden sm:inline">
-                          📊 Média: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.avgPrice)}</span>
-                        </span>
-                      </div>
-                    )}
-                    <ProductGrid produtos={r.produtos} siteKey={r.site} />
-                  </div>
-                ) : r.status === 'ok' && r.produtos.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-sm text-text-muted">
-                    <span className="text-2xl block mb-2">🔍</span>
-                    Nenhum produto encontrado para este termo
-                  </div>
-                ) : null}
-
-                {r.status === 'erro' && (
-                  <div className="px-4 py-8 text-center text-sm text-text-muted">
-                    <span className="text-2xl block mb-2">❌</span>
-                    {r.erro || 'Erro desconhecido ao buscar produtos'}
-                  </div>
-                )}
-              </div>
-            </section>
-          );
-        })
+        resultados.map((r) => (
+          <TermoSection
+            key={r.id}
+            resultado={r}
+            isOpen={expanded.has(r.id)}
+            onToggle={toggleExpand}
+          />
+        ))
       )}
     </div>
   );

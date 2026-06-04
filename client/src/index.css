@@ -181,6 +181,16 @@ body::after {
 
 .tabular-nums { font-variant-numeric: tabular-nums; }
 
+/* ─── Recharts price-dot hover ───────────────────────────── */
+.price-dot-group:hover .dot-glow {
+  stroke-width: 2 !important;
+  opacity: 0.45 !important;
+}
+.price-dot-group:hover circle:nth-child(2) {
+  stroke-width: 2.5 !important;
+  filter: brightness(1.3);
+}
+
 /* ─── Utility classes ────────────────────────────────────── */
 .font-ui { font-family: var(--font-ui); }
 .font-display { font-family: var(--font-display); }

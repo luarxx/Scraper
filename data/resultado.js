@@ -1,489 +1,297 @@
 window.__RESULT = {
-  "termo": "teclado",
-  "site": "kabum",
-  "siteNome": "KaBuM!",
-  "timestamp": "2026-06-03T15:07:49.357Z",
-  "total": 60,
+  "termo": "ssd sata",
+  "site": "pichau",
+  "siteNome": "Pichau",
+  "timestamp": "2026-06-04T03:33:41.082Z",
+  "total": 36,
   "produtos": [
     {
-      "title": "Teclado e Mouse Rise Mode Office OF 01, USB, ABNT2, Preto - RM-TM-01-FB",
-      "price": "R$25,90",
-      "parcelamento": "No PIX ou 1x de R$ 27,42",
-      "image": "https://images.kabum.com.br/produtos/fotos/380826/teclado-e-mouse-rise-mode-office-of-01-usb-abnt2-preto-rm-tm-01-fb_1681233151_m.jpg",
-      "url": "https://www.kabum.com.br/produto/380826/teclado-e-mouse-rise-mode-office-of-01-usb-abnt2-preto-rm-tm-01-fb",
-      "relevancia": 1
+      "title": "SSD Sandisk, 1TB, Sata III 6GB/s, Leitura 535 MB/s, Gravacao 350 MB/s, SDSSDA-1T00-G27",
+      "price": "R$ 1,059.99",
+      "parcelamento": "12x de R$ 103.92",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/d/sdssda-1t00-g27.jpg",
+      "url": "https://www.pichau.com.br/ssd-sandisk-1tb-sata-iii-6gb-s-leitura-535-mb-s-gravacao-350-mb-s-sdssda-1t00-g27",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Semi Mecânico Gamer Rise Mode G1 Full, Membrana, USB, Preto - RM-TG-01-FB",
-      "price": "R$32,99",
-      "parcelamento": "No PIX ou 1x de R$ 34,93",
-      "image": "https://images.kabum.com.br/produtos/fotos/416202/teclado-gamer-rise-mode-g1-full-usb-preto-rm-tg-01-fb_1715018384_m.jpg",
-      "url": "https://www.kabum.com.br/produto/416202/teclado-semi-mecanico-gamer-rise-mode-g1-full-membrana-usb-preto-rm-tg-01-fb",
-      "relevancia": 1
+      "title": "SSD WD Green, 1TB, 2.5, Sata III 6GB/s, Leitura 545MB/s, Gravacao 515MB/s, WDS100T5G0A",
+      "price": "R$ 1,079.99",
+      "parcelamento": "12x de R$ 105.88",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds100t5g0a.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-1tb-2-5-sata-iii-6gb-s-leitura-545mb-s-gravacao-515mb-s-wds100t5g0a",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Semi Mecânico Gamer Rise Mode G1 Full, Membrana, USB, Branco - RM-TG-01-FW",
-      "price": "R$33,99",
-      "parcelamento": "No PIX ou 1x de R$ 35,99",
-      "image": "https://images.kabum.com.br/produtos/fotos/416203/teclado-gamer-rise-mode-g1-full-rgb-rainbow-usb-branco-rm-tg-01-fw_1683740597_m.jpg",
-      "url": "https://www.kabum.com.br/produto/416203/teclado-semi-mecanico-gamer-rise-mode-g1-full-membrana-usb-branco-rm-tg-01-fw",
-      "relevancia": 1
+      "title": "SSD Sandisk Plus, 1TB, 2.5, Sata III 6GB/s, Leitura 545MB/s, Gravacao 515/MBs, SDSSDA-1T00-G28",
+      "price": "R$ 1,199.99",
+      "parcelamento": "12x de R$ 117.65",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/d/sdssda-250g-g28_1.jpg",
+      "url": "https://www.pichau.com.br/ssd-sandisk-plus-1tb-2-5-sata-iii-6gb-s-leitura-545mb-s-gravacao-515-mbs-sdssda-1t00-g28",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Semi-Mecânico Gamer Rise Mode G1, Rainbow, USB, Preto e Cinza - RM-TG-01-BG",
-      "price": "R$39,99",
-      "parcelamento": "No PIX ou 1x de R$ 42,34",
-      "image": "https://images.kabum.com.br/produtos/fotos/588421/teclado-semi-mecanico-gamer-rise-mode-g1-rainbow-usb-preto-e-cinza-rm-tg-01-bg_1730978282_m.jpg",
-      "url": "https://www.kabum.com.br/produto/588421/teclado-semi-mecanico-gamer-rise-mode-g1-rainbow-usb-preto-e-cinza-rm-tg-01-bg",
-      "relevancia": 1
+      "title": "SSD Lexar NQ100, 1TB, 2.5, Sata III 6GB/s, Leitura 550MB/s, Gravacao 500MB/s, LNQ100X001T-RNNNG",
+      "price": "R$ 1,259.99",
+      "parcelamento": "12x de R$ 123.53",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnq100x001t-rnnng.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nq100-1tb-2-5-sata-iii-6gb-s-leitura-550mb-s-gravacao-500mb-s-lnq100x001t-rnnng",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Semi Mecânico Gamer Rise Mode G2 Mini, RGB, USB-C, Layout 60%, Preto - RM-TG-02-B",
-      "price": "R$60,90",
-      "parcelamento": "No PIX ou 2x de R$ 35,82",
-      "image": "https://images.kabum.com.br/produtos/fotos/506054/teclado-gamer-semi-mecanico-rise-mode-g2-mini-rgb-layout-60-rm-tg-02-b_1742575004_m.jpg",
-      "url": "https://www.kabum.com.br/produto/506054/teclado-semi-mecanico-gamer-rise-mode-g2-mini-rgb-usb-c-layout-60-preto-rm-tg-02-b",
-      "relevancia": 1
+      "title": "SSD Mancer Reaper C, 1TB, 2.5, Sata III 6GB/s, Leitura 500MB/s, Gravacao 400MB/s, MCR-RPRC-1TB",
+      "price": "R$ 1,299.99",
+      "parcelamento": "12x de R$ 127.45",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/c/mcr-rprc-1tb554552.jpg",
+      "url": "https://www.pichau.com.br/ssd-mancer-reaper-c-1tb-2-5-sata-iii-6gb-s-leitura-500mb-s-gravacao-400mb-s-mcr-rprc-1tb",
+      "relevancia": 2
     },
     {
-      "title": "Teclado com fio USB Logitech K120 Resistente à Respingos e Layout ABNT2 -920-004423",
-      "price": "R$64,90",
-      "parcelamento": "No PIX ou 3x de R$ 25,44",
-      "image": "https://images.kabum.com.br/produtos/fotos/20866/teclado-logitech-k120-abnt2-920-004423_1614628451_m.jpg",
-      "url": "https://www.kabum.com.br/produto/20866/teclado-com-fio-usb-logitech-k120-resistente-a-respingos-e-layout-abnt2-920-004423",
-      "relevancia": 1
+      "title": "SSD Adata SU650, 1TB, 2.5, SATA III 6GB/s, Leituras 520MB/s, Gravacao 450MB/s, ASU650SS-1TT-R",
+      "price": "R$ 1,299.99",
+      "parcelamento": "12x de R$ 127.45",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/s/asu650ss-1tt-r15505.jpg",
+      "url": "https://www.pichau.com.br/ssd-adata-su650-1tb-2-5-sata-iii-6gb-s-leituras-520mb-s-gravacao-450mb-s-asu650ss-1tt-r",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Slim Rise Mode, USB, Preto e Prata - RM-TS-BS",
-      "price": "R$81,90",
-      "parcelamento": "No PIX ou 3x de R$ 32,11",
-      "image": "https://images.kabum.com.br/produtos/fotos/519370/teclado-slim-rise-mode-usb-preto-e-prata-rm-ts-bs_1747137330_m.jpg",
-      "url": "https://www.kabum.com.br/produto/519370/teclado-slim-rise-mode-usb-preto-e-prata-rm-ts-bs",
-      "relevancia": 1
+      "title": "SSD Mancer Reaper 1TB, 2.5, Sata III 6GB/s, Leitura 550 MB/s, Gravacao 500 MB/s, MCR-RPRPN-1TB",
+      "price": "R$ 1,499.99",
+      "parcelamento": "12x de R$ 147.06",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/c/mcr-rprpn-1tb13241551.jpg",
+      "url": "https://www.pichau.com.br/ssd-mancer-reaper-1tb-2-5-sata-iii-6gb-s-leitura-550-mb-s-gravacao-500-mb-s-mcr-rprpn-1tb",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Gamer GXTrust GXT 836 Evocx, USB 2.0, US, Preto - 24722",
-      "price": "R$93,99",
-      "parcelamento": "No PIX ou 4x de R$ 27,64",
-      "image": "https://images.kabum.com.br/produtos/fotos/614101/teclado-gamer-trust-gxt-836-evocx-usb-us-24722_1728399235_m.jpg",
-      "url": "https://www.kabum.com.br/produto/614101/teclado-gamer-gxtrust-gxt-836-evocx-usb-2-0-us-preto-24722",
-      "relevancia": 1
+      "title": "SSD Team Group CX2, 2TB, 2.5, Sata III 6GB/s, Leitura 540 MB/s, Gravacao 490 MB/s, T253X6002T0C101",
+      "price": "R$ 1,629.99",
+      "parcelamento": "12x de R$ 159.80",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/2/t253x6002t0c1011.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-cx2-2tb-2-5-sata-iii-6gb-s-leitura-540-mb-s-gravacao-490-mb-s-t253x6002t0c101",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Rise Mode GM1 Black, RGB, Switch Outemu Brown - RM-TCM-GM1-BBRO",
-      "price": "R$99,99",
-      "parcelamento": "No PIX ou 4x de R$ 29,40",
-      "image": "https://images.kabum.com.br/produtos/fotos/506048/teclado-mecanico-gamer-rise-mode-gm1-black-rgb-switch-outemu-brown-rm-tcm-gm1-bbro_1715631747_m.jpg",
-      "url": "https://www.kabum.com.br/produto/506048/teclado-mecanico-gamer-rise-mode-gm1-black-rgb-switch-outemu-brown-rm-tcm-gm1-bbro",
-      "relevancia": 1
+      "title": "SSD WD Green, 2TB, 2.5, Sata III 6GB/s, Leitura 545MB/s, Gravacao 515MB/s, WDS200T5G0A",
+      "price": "R$ 1,999.99",
+      "parcelamento": "12x de R$ 196.08",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds200t5g0a1.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-2tb-2-5-sata-iii-6gb-s-leitura-545mb-s-gravacao-515mb-s-wds200t5g0a",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Rise Mode GM1 White, RGB, Switch Outemu Brown - RM-TCM-GM1-WBRO",
-      "price": "R$101,90",
-      "parcelamento": "No PIX ou 4x de R$ 29,96",
-      "image": "https://images.kabum.com.br/produtos/fotos/506051/teclado-mecanico-gamer-rise-mode-gm1-white-rgb-switch-outemu-brown-rm-tcm-gm1-wbro_1719261036_m.jpg",
-      "url": "https://www.kabum.com.br/produto/506051/teclado-mecanico-gamer-rise-mode-gm1-white-rgb-switch-outemu-brown-rm-tcm-gm1-wbro",
-      "relevancia": 1
+      "title": "SSD Mancer Reaper, 2TB, SATA III 6GB/s, Leitura 500MB/s, Gravacao 450MB/s, MCR-RPRPN-2TB",
+      "price": "R$ 2,399.99",
+      "parcelamento": "12x de R$ 235.29",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/c/mcr-rprpn-2tb3.jpg",
+      "url": "https://www.pichau.com.br/ssd-mancer-reaper-2tb-sata-iii-6gb-s-leitura-500mb-s-gravacao-450mb-s-mcr-rprpn-2tb",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Rise Mode GM1 White, RGB, Switch Outemu Red - RM-TCM-GM1-WRED",
-      "price": "R$104,99",
-      "parcelamento": "No PIX ou 4x de R$ 30,87",
-      "image": "https://images.kabum.com.br/produtos/fotos/506052/teclado-mecanico-gamer-rise-mode-gm1-white-rgb-switch-outemu-red-rm-tcm-gm1-wred_1719261604_m.jpg",
-      "url": "https://www.kabum.com.br/produto/506052/teclado-mecanico-gamer-rise-mode-gm1-white-rgb-switch-outemu-red-rm-tcm-gm1-wred",
-      "relevancia": 1
+      "title": "SSD Mancer Blink BM100, 128GB, 2.5, Sata III 6GB, Leitura 500MB/s, Gravacao 450MB/s, MCR-BM100-128",
+      "price": "R$ 249.99",
+      "parcelamento": "12x de R$ 24.51",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/c/mcr-bm100-128465445552.jpg",
+      "url": "https://www.pichau.com.br/ssd-mancer-blink-bm100-128gb-2-5-sata-iii-6gb-leitura-500mb-s-gravacao-450mb-s-mcr-bm100-128",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Machenike K500B-B87, Switch Brown, Abnt, Azul - REF JJ02G200A",
-      "price": "R$125,90",
-      "parcelamento": "No PIX ou 5x de R$ 29,62",
-      "image": "https://images.kabum.com.br/produtos/fotos/531158/teclado-mecanico-gamer-machenike-k500b-b87-switch-brown-abnt-azul-k500b-b87bbr_1724095692_m.jpg",
-      "url": "https://www.kabum.com.br/produto/531158/teclado-mecanico-gamer-machenike-k500b-b87-switch-brown-abnt-azul-ref-jj02g200a",
-      "relevancia": 1
+      "title": "SSD TGT Seal ST, 120GB, Sata III 6GB/s, Leitura 500 MB/s, Gravacao 450 MB/s, TGT-SLST-120",
+      "price": "R$ 259.99",
+      "parcelamento": "12x de R$ 25.49",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/g/tgt-slst-12003.jpg",
+      "url": "https://www.pichau.com.br/ssd-tgt-seal-st-120gb-sata-iii-6gb-s-leitura-500-mb-s-gravacao-450-mb-s-tgt-slst-120",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Gamer Redragon Lakshmi, Switch Brown,  Layout 60%, ABNT2, Preto - K606-OG&BK&GY (PT-BROWN)",
-      "price": "R$129,99",
-      "parcelamento": "No PIX ou 6x de R$ 25,48",
-      "image": "https://images.kabum.com.br/produtos/fotos/401376/teclado-gamer-redragon-lakshmi-switch-brown-layout-60-abnt2-preto-k606-og-bk-gy-pt-brown-_1700577178_m.jpg",
-      "url": "https://www.kabum.com.br/produto/401376/teclado-gamer-redragon-lakshmi-switch-brown-layout-60-abnt2-preto-k606-og-bk-gy-pt-brown",
-      "relevancia": 1
+      "title": "SSD Patriot Burst Elite, 240GB, Sata III 6GB/s, Leitura 450 MB/s, Gravacao 320 MB/s, PBE240GS25SSDR",
+      "price": "R$ 299.99",
+      "parcelamento": "12x de R$ 29.41",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/b/pbe240gs25ssdr2.jpg",
+      "url": "https://www.pichau.com.br/ssd-patriot-burst-elite-240gb-sata-iii-6gb-s-leitura-450-mb-s-gravacao-320-mb-s-pbe240gs25ssdr",
+      "relevancia": 2
     },
     {
-      "title": "Teclado e Mouse Sem Fio Dell KM3322W, USB, ABNT2, Preto - 580-BBBB",
-      "price": "R$132,99",
-      "parcelamento": "No PIX ou 6x de R$ 26,07",
-      "image": "https://images.kabum.com.br/produtos/fotos/415702/teclado-e-mouse-sem-fio-dell-km3322w-usb-abnt2-preto-580-bbbb_1672416930_m.jpg",
-      "url": "https://www.kabum.com.br/produto/415702/teclado-e-mouse-sem-fio-dell-km3322w-usb-abnt2-preto-580-bbbb",
-      "relevancia": 1
+      "title": "SSD Adata Ultimate SU650, 240GB, 2.5, 3D NAND Sata III, Leitura 520MB/s, Gravacao 430MB/s, ASU650SS-240GT-R",
+      "price": "R$ 349.99",
+      "parcelamento": "12x de R$ 34.31",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/s/asu650ss-240gt-r155103.jpg",
+      "url": "https://www.pichau.com.br/ssd-adata-ultimate-su650-240gb-2-5-3d-nand-sata-iii-leitura-520mb-s-gravacao-430mb-s-asu650ss-240gt-r",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Machenike K500-B61, Switch Huano Brown, ABNT, Branco - K500-B61BBR",
-      "price": "R$134,90",
-      "parcelamento": "No PIX ou 6x de R$ 26,45",
-      "image": "https://images.kabum.com.br/produtos/fotos/535604/teclado-mecanico-gamer-machenike-k500-b61-switch-brown-abnt-branco-k500-b61bbr_1769021519_m.jpg",
-      "url": "https://www.kabum.com.br/produto/535604/teclado-mecanico-gamer-machenike-k500-b61-switch-huano-brown-abnt-branco-k500-b61bbr",
-      "relevancia": 1
+      "title": "SSD Team Group GX2 256GB, 2.5, Sata III 6GB/s, Leitura 500MB/s, Gravacao 400MB/s, T253X2256G0C101",
+      "price": "R$ 358.99",
+      "parcelamento": "12x de R$ 35.20",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/2/t253x2256g0c1011321212.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-gx2-256gb-2-5-sata-iii-6gb-s-leitura-500mb-s-gravacao-400mb-s-t253x2256g0c101",
+      "relevancia": 2
     },
     {
-      "title": "Combo Teclado e Mouse sem fio Logitech MK235 com Conexão USB, Pilhas Inclusas e Layout ABNT2 - 920-007903",
-      "price": "R$139,99",
-      "parcelamento": "No PIX ou 6x de R$ 27,44",
-      "image": "https://images.kabum.com.br/produtos/fotos/79357/teclado-e-mouse-logitech-mk235-sem-fio-resistente-a-agua-cinza-abnt2-920-007903_1614610674_m.jpg",
-      "url": "https://www.kabum.com.br/produto/79357/combo-teclado-e-mouse-sem-fio-logitech-mk235-com-conexao-usb-pilhas-inclusas-e-layout-abnt2-920-007903",
-      "relevancia": 1
+      "title": "SSD Adata SU650, 256GB, 2.5, Sata III 6GB/s, Leituras 520MB/s, Gravacao 450MB/s, ASU650SS-256GT-R",
+      "price": "R$ 399.99",
+      "parcelamento": "12x de R$ 39.22",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/s/asu650ss-256gt-r5546563.jpg",
+      "url": "https://www.pichau.com.br/ssd-adata-su650-256gb-2-5-sata-iii-6gb-s-leituras-520mb-s-gravacao-450mb-s-asu650ss-256gt-r",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Gamer Redragon Lakshmi, Switch Brown,  Layout 60%, ABNT2 , Preto - K606-OG&GY&BK (PT-BROWN)",
-      "price": "R$149,99",
-      "parcelamento": "No PIX ou 7x de R$ 25,20",
-      "image": "https://images.kabum.com.br/produtos/fotos/401375/teclado-gamer-redragon-lakshmi-switch-brown-layout-60-abnt2-verde-k606-og-gy-bk-pt-brown-_1671624936_m.jpg",
-      "url": "https://www.kabum.com.br/produto/401375/teclado-gamer-redragon-lakshmi-switch-brown-layout-60-abnt2-preto-k606-og-gy-bk-pt-brown",
-      "relevancia": 1
+      "title": "SSD Kingston A400, 240GB, 2.5, Sata III 6GB/s, Leitura 500MB/s, Gravacao 350MB/s, SA400S37-240G",
+      "price": "R$ 489.99",
+      "parcelamento": "12x de R$ 48.04",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/a/sa400s37240g4123.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-a400-240gb-2-5-sata-iii-6gb-s-leitura-500mb-s-gravacao-350mb-s-sa400s37-240g",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer PCYes Kuromori, Rainbow, Switch Red, Layout 60%, ABNT2, Tricolor - PTKM60RD",
-      "price": "R$155,90",
-      "parcelamento": "No PIX ou 7x de R$ 26,20",
-      "image": "https://images.kabum.com.br/produtos/fotos/542958/teclado-mecanico-gamer-pcyes-kuromori-rainbow-switch-red-layout-60-abnt2-tricolor-ptkm60rd_1735819844_m.jpg",
-      "url": "https://www.kabum.com.br/produto/542958/teclado-mecanico-gamer-pcyes-kuromori-rainbow-switch-red-layout-60-abnt2-tricolor-ptkm60rd",
-      "relevancia": 1
+      "title": "SSD Kingston A400, 480GB, 2.5, Sata III 6GB/s, Leitura 500MB/s, Gravacao 450MB/s, SA400S37-480G",
+      "price": "R$ 569.99",
+      "parcelamento": "12x de R$ 55.88",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/a/sa400s37480g321.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-a400-480gb-2-5-sata-iii-6gb-s-leitura-500mb-s-gravacao-450mb-s-sa400s37-480g",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Redragon Kumara, Anti-Ghosting, LED Vermelho, Switch Red, ABNT2, Preto - K552-2 (PT-RED)",
-      "price": "R$155,99",
-      "parcelamento": "No PIX ou 7x de R$ 26,21",
-      "image": "https://images.kabum.com.br/produtos/fotos/93162/93162_2_1523620408_m.jpg",
-      "url": "https://www.kabum.com.br/produto/93162/teclado-mecanico-gamer-redragon-kumara-anti-ghosting-led-vermelho-switch-red-abnt2-preto-k552-2-pt-red",
-      "relevancia": 1
+      "title": "SSD Team Group CX2, 512GB, 2.5, Sata III 6GB/s, Leitura 530MB/s, Gravacao 490MB/s, T253X6512G0C101",
+      "price": "R$ 569.99",
+      "parcelamento": "12x de R$ 55.88",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/2/t253x6512g0c1013.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-cx2-512gb-2-5-sata-iii-6gb-s-leitura-530mb-s-gravacao-490mb-s-t253x6512g0c101",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Redragon Kumara, Anti-Ghosting, RGB, Switch Outemu Brown, ABNT2, Preto, PT - K552RGB-1 (PT-BROWN)",
-      "price": "R$159,90",
-      "parcelamento": "No PIX ou 7x de R$ 26,87",
-      "image": "https://images.kabum.com.br/produtos/fotos/93160/93160_1523969683_index_m.jpg",
-      "url": "https://www.kabum.com.br/produto/93160/teclado-mecanico-gamer-redragon-kumara-anti-ghosting-rgb-switch-outemu-brown-abnt2-preto-pt-k552rgb-1-pt-brown",
-      "relevancia": 1
+      "title": "SSD WD Green, 480GB, 2.5, SATA III 6GB/s, Leitura de 545 MB/s, Gravacao de 430 MB/s, WDS480G3G0A",
+      "price": "R$ 569.99",
+      "parcelamento": "12x de R$ 55.88",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds480g3g0a2.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-480gb-2-5-sata-iii-6gb-s-leitura-de-545-mb-s-gravacao-de-430-mb-s-wds480g3g0a",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Gamer Redragon Lakshmi, Switch Brown, Layout 60%, ABNT2, Cinza - K606-YL&WT&GY (PT-BROWN)",
-      "price": "R$159,99",
-      "parcelamento": "No PIX ou 7x de R$ 26,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/401374/teclado-gamer-redragon-lakshmi-switch-brown-layout-60-abnt2-cinza-k606-yl-wt-gy-pt-brown-_1671624168_m.jpg",
-      "url": "https://www.kabum.com.br/produto/401374/teclado-gamer-redragon-lakshmi-switch-brown-layout-60-abnt2-cinza-k606-yl-wt-gy-pt-brown",
-      "relevancia": 1
+      "title": "SSD Adata Ultimate SU650, 480GB, 2.5, 3D NAND Sata III, Leitura 520MB/s, Gravacao 450MB/s, ASU650SS-480GT-R",
+      "price": "R$ 579.99",
+      "parcelamento": "12x de R$ 56.86",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/s/asu650ss-480gt-r2165453.jpg",
+      "url": "https://www.pichau.com.br/ssd-adata-ultimate-su650-480gb-2-5-3d-nand-sata-iii-leitura-520mb-s-gravacao-450mb-s-asu650ss-480gt-r",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Machenike K500B-B87 RGB, Switch RED, Layout 80%, Usb-C, Abnt2, Branco E Azul - REF JJ02GZ009",
-      "price": "R$163,90",
-      "parcelamento": "No PIX ou 6x de R$ 27,31",
-      "image": "https://images.kabum.com.br/produtos/fotos/531157/teclado-mecanico-gamer-machenike-k500b-b87-rgb-switch-red-layout-80-usb-c-abnt2-branco-e-azul-ref-jj02gz009_1769523642_m.jpg",
-      "url": "https://www.kabum.com.br/produto/531157/teclado-mecanico-gamer-machenike-k500b-b87-rgb-switch-red-layout-80-usb-c-abnt2-branco-e-azul-ref-jj02gz009",
-      "relevancia": 1
+      "title": "SSD Hawking HSTV, 480GB, 2.5, Sata III 6GB/s, Leitura 500MB/s, Gravacao 450MB/s, HSTV-SATA480W",
+      "price": "R$ 579.99",
+      "parcelamento": "12x de R$ 56.86",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/h/s/hstv-sata480wv.jpg",
+      "url": "https://www.pichau.com.br/ssd-hawking-hstv-480gb-2-5-sata-iii-6gb-s-leitura-500mb-s-gravacao-450mb-s-hstv-sata480w",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Redragon Kumara, Anti-Ghosting, LED Vermelho, Switch Outemu Brown, ABNT2, Preto - K552-2 (PT-BROWN)",
-      "price": "R$164,99",
-      "parcelamento": "No PIX ou 7x de R$ 27,73",
-      "image": "https://images.kabum.com.br/produtos/fotos/93163/93163_1_1523620161_m.jpg",
-      "url": "https://www.kabum.com.br/produto/93163/teclado-mecanico-gamer-redragon-kumara-anti-ghosting-led-vermelho-switch-outemu-brown-abnt2-preto-k552-2-pt-brown",
-      "relevancia": 1
+      "title": "SSD Adata SU650, 512GB, 2.5, SATA III 6GB/s, Leituras 520MB/s, Gravacao 450MB/s, ASU650SS-512GT-R",
+      "price": "R$ 599.99",
+      "parcelamento": "12x de R$ 58.82",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/s/asu650ss-512gt-r15503.jpg",
+      "url": "https://www.pichau.com.br/ssd-adata-su650-512gb-2-5-sata-iii-6gb-s-leituras-520mb-s-gravacao-450mb-s-asu650ss-512gt-r",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Redragon Kumara, Anti-Ghosting, RGB, Switch Outemu Red,  ABNT2, Preto, PT - K552RGB-1 (PT-RED)",
-      "price": "R$169,99",
-      "parcelamento": "No PIX ou 7x de R$ 28,57",
-      "image": "https://images.kabum.com.br/produtos/fotos/93159/93159_1523969962_index_m.jpg",
-      "url": "https://www.kabum.com.br/produto/93159/teclado-mecanico-gamer-redragon-kumara-anti-ghosting-rgb-switch-outemu-red-abnt2-preto-pt-k552rgb-1-pt-red",
-      "relevancia": 1
+      "title": "SSD Lexar NS100, 512GB, Sata III 6GB/s, Leitura 550MB/s, Gravacao 520MB/s, LNS100-512RBNA",
+      "price": "R$ 619.99",
+      "parcelamento": "12x de R$ 60.78",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lns100-512rbna.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-ns100-512gb-sata-iii-6gb-s-leitura-550mb-s-gravacao-520mb-s-lns100-512rbna",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Redragon Kumara, Anti-Ghosting, RGB, Switch Outemu Blue, ABNT2, Preto, PT - K552RGB-1 (PT-BLUE)",
-      "price": "R$175,99",
-      "parcelamento": "No PIX ou 8x de R$ 25,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/93157/93157_1523969490_index_m.jpg",
-      "url": "https://www.kabum.com.br/produto/93157/teclado-mecanico-gamer-redragon-kumara-anti-ghosting-rgb-switch-outemu-blue-abnt2-preto-pt-k552rgb-1-pt-blue",
-      "relevancia": 1
+      "title": "SSD Patriot Burst Elite, 480GB, Sata III 6GB/s, Leitura 450 MB/s, Gravacao 320 MB/s, PBE480GS25SSDR",
+      "price": "R$ 629.99",
+      "parcelamento": "12x de R$ 61.76",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/b/pbe480gs25ssdr1.jpg",
+      "url": "https://www.pichau.com.br/ssd-patriot-burst-elite-480gb-sata-iii-6gb-s-leitura-450-mb-s-gravacao-320-mb-s-pbe480gs25ssdr",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Redragon APS, RGB, Switch Redragon Blue, ABNT2, Preto - Low Profile - K607 RGB (PT-BLUE)",
-      "price": "R$179,90",
-      "parcelamento": "No PIX ou 7x de R$ 25,69",
-      "image": "https://images.kabum.com.br/produtos/fotos/310983/teclado-gamer-k607-swtich-blue-k607_1654809971_m.jpg",
-      "url": "https://www.kabum.com.br/produto/310983/teclado-mecanico-gamer-redragon-aps-rgb-switch-redragon-blue-abnt2-preto-low-profile-k607-rgb-pt-blue",
-      "relevancia": 1
+      "title": "SSD Sandisk Plus, 500GB, 2.5, Sata III 6GB/s, Leitura 545MB/s, Gravacao 505/MBs, SDSSDA-500G-G28",
+      "price": "R$ 649.99",
+      "parcelamento": "12x de R$ 63.72",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/d/sdssda-500g-g281.jpg",
+      "url": "https://www.pichau.com.br/ssd-sandisk-plus-500gb-2-5-sata-iii-6gb-s-leitura-545mb-s-gravacao-505-mbs-sdssda-500g-g28",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Husky Anchorage Full Size, RGB, Switch Gateron EF Brown, ABNT2, Preto - HTG200PTMA",
-      "price": "R$179,99",
-      "parcelamento": "No PIX ou 7x de R$ 28,57",
-      "image": "https://images.kabum.com.br/produtos/fotos/538690/teclado-mecanico-gamer-husky-anchorage-full-size-preto-abnt2-rgb-switch-gateron-ef-brown-htg200ptma_1744640937_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538690/teclado-mecanico-gamer-husky-anchorage-full-size-rgb-switch-gateron-ef-brown-abnt2-preto-htg200ptma",
-      "relevancia": 1
+      "title": "SSD Lexar NQ100, 512GB, 2.5, Sata III 6GB/s, Leitura 550MB/s, Gravacao 500MB/s, LNQ100X512G-RNNNG",
+      "price": "R$ 659.99",
+      "parcelamento": "12x de R$ 64.71",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnq100x512g-rnnng14542.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nq100-512gb-2-5-sata-iii-6gb-s-leitura-550mb-s-gravacao-500mb-s-lnq100x512g-rnnng",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Husky Anchorage Full Size, RGB, Switch Gateron EF Red, ABNT2, Preto - HTG200PTVR",
-      "price": "R$179,99",
-      "parcelamento": "No PIX ou 7x de R$ 28,57",
-      "image": "https://images.kabum.com.br/produtos/fotos/538689/teclado-mecanico-gamer-husky-anchorage-full-size-preto-abnt2-rgb-switch-gateron-ef-red-htg200ptvr_1744722012_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538689/teclado-mecanico-gamer-husky-anchorage-full-size-rgb-switch-gateron-ef-red-abnt2-preto-htg200ptvr",
-      "relevancia": 1
+      "title": "SSD Team Group QX, 512GB, 2.5, Sata III 6GB/s, Leitura 560 MB/s, Gravacao 500 MB/s, T253X7512G0C101",
+      "price": "R$ 669.99",
+      "parcelamento": "12x de R$ 65.69",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/2/t253x7512g0c1013.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-qx-512gb-2-5-sata-iii-6gb-s-leitura-560-mb-s-gravacao-500-mb-s-t253x7512g0c101",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Husky Anchorage Full Size, RGB, Switch Gateron EF Brown, ABNT2, Branco - HTG200BRMA",
-      "price": "R$179,99",
-      "parcelamento": "No PIX ou 7x de R$ 28,57",
-      "image": "https://images.kabum.com.br/produtos/fotos/538693/teclado-mecanico-gamer-husky-anchorage-full-size-branco-abnt2-rgb-switch-gateron-ef-brown-htg200brma_1744722260_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538693/teclado-mecanico-gamer-husky-anchorage-full-size-rgb-switch-gateron-ef-brown-abnt2-branco-htg200brma",
-      "relevancia": 1
+      "title": "SSD Mancer Reaper RF, 1TB, 2.5, Sata III 6GB/s, Leitura 500MB/s, Gravacao 450MB/s, MCR-RPRF-1TB",
+      "price": "R$ 699.99",
+      "parcelamento": "12x de R$ 68.63",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/c/mcr-rprf-1tbv24521.jpg",
+      "url": "https://www.pichau.com.br/ssd-mancer-reaper-rf-1tb-2-5-sata-iii-6gb-s-leitura-500mb-s-gravacao-450mb-s-mcr-rprf-1tb",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Husky Anchorage Full Size, RGB, Switch Gateron EF Red, ABNT2, Branco - HTG200BRVR",
-      "price": "R$179,99",
-      "parcelamento": "No PIX ou 7x de R$ 28,57",
-      "image": "https://images.kabum.com.br/produtos/fotos/538692/teclado-mecanico-gamer-husky-anchorage-full-size-branco-abnt2-rgb-switch-gateron-ef-red-htg200brvr_1744641257_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538692/teclado-mecanico-gamer-husky-anchorage-full-size-rgb-switch-gateron-ef-red-abnt2-branco-htg200brvr",
-      "relevancia": 1
+      "title": "SSD WD Green, 500GB, 2.5, Sata III 6GB/s, Leitura 545MB/s, Gravacao 505MB/s, WDS500G5G0A",
+      "price": "R$ 729.99",
+      "parcelamento": "12x de R$ 71.57",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds500g5g0a1.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-500gb-2-5-sata-iii-6gb-s-leitura-545mb-s-gravacao-505mb-s-wds500g5g0a",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Redragon Valheim Rainbow, Switch Brown, ABNT2, Preto - K608-R (PT-BROWN)",
-      "price": "R$189,90",
-      "parcelamento": "No PIX ou 8x de R$ 27,92",
-      "image": "https://images.kabum.com.br/produtos/fotos/630628/teclado-mecanico-gamer-redragon-valheim-rainbow-switch-brown-abnt2-preto-k608-r-pt-brown-_1727264706_m.jpg",
-      "url": "https://www.kabum.com.br/produto/630628/teclado-mecanico-gamer-redragon-valheim-rainbow-switch-brown-abnt2-preto-k608-r-pt-brown",
-      "relevancia": 1
+      "title": "SSD WD Blue SA510, 500GB, 2.5, Sata III 6GB/s, Leitura 560 MB/s, Gravacao 510 MB/s, WDS500G3B0A",
+      "price": "R$ 769.99",
+      "parcelamento": "12x de R$ 75.49",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds500g3b0a.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-blue-sa510-500gb-2-5-sata-iii-6gb-s-leitura-560-mb-s-gravacao-510-mb-s-wds500g3b0a",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Attack Shark X98, Layout 98 Teclas, RGB, Star Black, Preto - AS-X98-STAR-BK",
-      "price": "R$195,90",
-      "parcelamento": "No PIX ou 8x de R$ 27,20",
-      "image": "https://images.kabum.com.br/produtos/fotos/904380/teclado-mecanico-gamer-attack-shark-x98-star-black-_1771445041_m.jpg",
-      "url": "https://www.kabum.com.br/produto/904380/teclado-mecanico-gamer-attack-shark-x98-layout-98-teclas-rgb-star-black-preto-as-x98-star-bk",
-      "relevancia": 1
+      "title": "SSD Team Group MS30, 1TB, M.2 2280, Sata III 6GB/s, Leitura 530MB/s, Gravacao 430MB/s, TM8PS7001T0C101",
+      "price": "R$ 879.99",
+      "parcelamento": "12x de R$ 86.27",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/m/tm8ps7001t0c101.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-ms30-1tb-m-2-2280-sata-iii-6gb-s-leitura-530mb-s-gravacao-430mb-s-tm8ps7001t0c101",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Sem Fio Logitech, Bluetooth e USB, Pebble Keys 2 K380s, Easy-Switch e Pilha Inclusa, Branco - 920-011790",
-      "price": "R$199,99",
-      "parcelamento": "No PIX ou 9x de R$ 26,14",
-      "image": "https://images.kabum.com.br/produtos/fotos/495499/teclado-sem-fio-logitech-bluetooth-e-usb-pebble-keys-2-k380s-easy-switch-e-pilha-inclusa-branco-920-011790_1697657660_m.jpg",
-      "url": "https://www.kabum.com.br/produto/495499/teclado-sem-fio-logitech-bluetooth-e-usb-pebble-keys-2-k380s-easy-switch-e-pilha-inclusa-branco-920-011790",
-      "relevancia": 1
+      "title": "SSD Team Group GX2, 1TB, 2.5, Sata III 6GB/s, Leitura 530MB/s, Gravacao 480MB/s, T253X2001T0C101",
+      "price": "R$ 949.99",
+      "parcelamento": "12x de R$ 93.14",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/2/t253x2001t0c10103211221.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-gx2-1tb-2-5-sata-iii-6gb-s-leitura-530mb-s-gravacao-480mb-s-t253x2001t0c101",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Sem Fio Logitech, Bluetooth e USB, Pebble Keys 2 K380s, Easy-Switch e Pilha Inclusa, Grafite - 920-011789",
-      "price": "R$199,99",
-      "parcelamento": "No PIX ou 9x de R$ 26,14",
-      "image": "https://images.kabum.com.br/produtos/fotos/495497/teclado-sem-fio-logitech-bluetooth-e-usb-pebble-keys-2-k380s-easy-switch-e-pilha-inclusa-grafite-920-011789_1697455370_m.jpg",
-      "url": "https://www.kabum.com.br/produto/495497/teclado-sem-fio-logitech-bluetooth-e-usb-pebble-keys-2-k380s-easy-switch-e-pilha-inclusa-grafite-920-011789",
-      "relevancia": 1
+      "title": "SSD WD Green, 1TB, 2.5, Sata III 6GB/s, Leitura 545 MB/s, Gravacao 430 MB/s, WDS100T3G0A",
+      "price": "R$ 959.99",
+      "parcelamento": "12x de R$ 94.12",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds100t3g0a2.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-1tb-2-5-sata-iii-6gb-s-leitura-545-mb-s-gravacao-430-mb-s-wds100t3g0a",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Attack Shark X87, TKL, RGB, Blackberry, Roxo/Preto - AS-X87-BB-RY",
-      "price": "R$205,90",
-      "parcelamento": "No PIX ou 9x de R$ 25,41",
-      "image": "https://images.kabum.com.br/produtos/fotos/904379/teclado-mecanico-gamer-attack-shark-x87-blackberry_1771441797_m.jpg",
-      "url": "https://www.kabum.com.br/produto/904379/teclado-mecanico-gamer-attack-shark-x87-tkl-rgb-blackberry-roxo-preto-as-x87-bb-ry",
-      "relevancia": 1
+      "title": "SSD Kingston A400, 960GB, 2.5\", Sata III 6GB/s, Leitura 500MB/s, Gravacao 450MB/s, SA400S37/960G",
+      "price": "R$ 969.99",
+      "parcelamento": "12x de R$ 95.10",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/a/sa400s37960g126122.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-a400-960gb-2-5-sata-iii-6gb-s-leitura-500mb-s-gravacao-450mb-s-sa400s37-960g",
+      "relevancia": 2
     },
     {
-      "title": "Teclado Mecânico Gamer Attack Shark X98, Layout 98 Teclas, RGB, Starlight White, Branco - AS-X98-SL-WT",
-      "price": "R$205,90",
-      "parcelamento": "No PIX ou 9x de R$ 25,41",
-      "image": "https://images.kabum.com.br/produtos/fotos/904382/teclado-mecanico-gamer-attack-shark-x98-starlight-white_1771446376_m.jpg",
-      "url": "https://www.kabum.com.br/produto/904382/teclado-mecanico-gamer-attack-shark-x98-layout-98-teclas-rgb-starlight-white-branco-as-x98-sl-wt",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer Redragon Dragonborn, RGB, Switch Marrom, Preto - K630rgb-1",
-      "price": "R$215,90",
-      "parcelamento": "No PIX ou 8x de R$ 26,98",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/416706/medium/Teclado-Mec-nico-Gamer-Redragon-Dragonborn-RGB-Switch-Marrom-Preto-K630rgb-1_1779118420.jpg",
-      "url": "https://www.kabum.com.br/produto/416706/teclado-mecanico-gamer-redragon-dragonborn-rgb-switch-marrom-preto-k630rgb-1",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Gamer Magnético Redragon Kumara Pro V2, RGB, Switch Vermelho, ABNT2, Preto - K552RGB-PRO (PT-RED) V2",
-      "price": "R$219,99",
-      "parcelamento": "No PIX ou 9x de R$ 27,15",
-      "image": "https://images.kabum.com.br/produtos/fotos/1007705/teclado-gamer-magnetico-redragon-kumara-pro-v2-rgb-switch-vermelho-abnt2-preto-k552rgb-pro-pt-red-v2_1774015177_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1007705/teclado-gamer-magnetico-redragon-kumara-pro-v2-rgb-switch-vermelho-abnt2-preto-k552rgb-pro-pt-red-v2",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer KBM! GAMING TG700, Branco, 65% e ABNT2, RGB, Switch Gateron Red - KGTG700BRVR",
-      "price": "R$222,90",
-      "parcelamento": "No PIX ou 9x de R$ 27,51",
-      "image": "https://images.kabum.com.br/produtos/fotos/471958/teclado-mecanico-gamer-kbm-gaming-tg700-branco-65-e-abnt2-rgb-switch-gateron-red-kgtg700brvr_1726086170_m.jpg",
-      "url": "https://www.kabum.com.br/produto/471958/teclado-mecanico-gamer-kbm-gaming-tg700-branco-65-e-abnt2-rgb-switch-gateron-red-kgtg700brvr",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer Redragon Kala, RGB, Switch Red, PT Com Fio - K557RGB",
-      "price": "R$232,00",
-      "parcelamento": "No PIX ou 10x de R$ 25,77",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/152237/medium/Teclado-Mec-nico-Gamer-Redragon-Kala-RGB-Switch-Red-PT-Com-Fio-K557RGB_1779280417.jpg",
-      "url": "https://www.kabum.com.br/produto/152237/teclado-mecanico-gamer-redragon-kala-rgb-switch-red-pt-com-fio-k557rgb",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Magnético Gamer Rise Mode GM1 Pro, ARGB, Magnético OTK PRO, USB 3.0, Branco - RM-TCM-GM1M-PRO-W",
-      "price": "R$239,90",
-      "parcelamento": "No PIX ou 10x de R$ 26,65",
-      "image": "https://images.kabum.com.br/produtos/fotos/669703/teclado-mecanico-gamer-rise-mode-gm1-pro-rgb-magnetico-hejin-usb-c-branco-rm-tcm-gm1m-pro-w_1763381200_m.jpg",
-      "url": "https://www.kabum.com.br/produto/669703/teclado-magnetico-gamer-rise-mode-gm1-pro-argb-magnetico-otk-pro-usb-3-0-branco-rm-tcm-gm1m-pro-w",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer Husky Sled, TKL, Preto, ABNT2, RGB, Switch Gateron G Pro Red - HTG500PTVR",
-      "price": "R$239,99",
-      "parcelamento": "No PIX ou 10x de R$ 26,66",
-      "image": "https://images.kabum.com.br/produtos/fotos/538695/teclado-mecanico-gamer-husky-sled-tkl-preto-abnt2-rgb-switch-gateron-g-pro-red-htg500ptvr_1759409957_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538695/teclado-mecanico-gamer-husky-sled-tkl-preto-abnt2-rgb-switch-gateron-g-pro-red-htg500ptvr",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer Husky Sled, TKL, Branco, ABNT2, RGB, Switch Gateron G Pro Red - HTG500BRVR",
-      "price": "R$239,99",
-      "parcelamento": "No PIX ou 10x de R$ 26,66",
-      "image": "https://images.kabum.com.br/produtos/fotos/538698/teclado-mecanico-gamer-husky-sled-tkl-branco-abnt2-rgb-switch-gateron-g-pro-red-htg500brvr_1759409575_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538698/teclado-mecanico-gamer-husky-sled-tkl-branco-abnt2-rgb-switch-gateron-g-pro-red-htg500brvr",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer Husky Sled, TKL, Preto, ABNT2, RGB, Switch Gateron G Pro Brown - HTG500PTMA",
-      "price": "R$239,99",
-      "parcelamento": "No PIX ou 10x de R$ 26,66",
-      "image": "https://images.kabum.com.br/produtos/fotos/538696/teclado-mecanico-gamer-husky-sled-tkl-preto-abnt2-rgb-switch-gateron-g-pro-brown-htg500ptma_1759409695_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538696/teclado-mecanico-gamer-husky-sled-tkl-preto-abnt2-rgb-switch-gateron-g-pro-brown-htg500ptma",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Gamer Razer Ornata V3 X, Chroma RGB, US, Preto - RZ0304470200R3U",
-      "price": "R$265,90",
-      "parcelamento": "No PIX ou 10x de R$ 31,28",
-      "image": "https://images.kabum.com.br/produtos/fotos/521046/teclado-gamer-razer-ornata-v3-x-chroma-rgb-us-preto-rz0304470200r3u_1708950987_m.jpg",
-      "url": "https://www.kabum.com.br/produto/521046/teclado-gamer-razer-ornata-v3-x-chroma-rgb-us-preto-rz0304470200r3u",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer Husky Blizzard, 60%, RGB, Switch Gateron Brown, ABNT2, Branco - HTG001BRMA",
-      "price": "R$269,99",
-      "parcelamento": "No PIX ou 10x de R$ 29,99",
-      "image": "https://images.kabum.com.br/produtos/fotos/163972/teclado-mecanico-gamer-husky-gaming-blizzard-rgb-switch-gateron-brown-abnt2-branco-hgmo023_1635794107_m.jpg",
-      "url": "https://www.kabum.com.br/produto/163972/teclado-mecanico-gamer-husky-blizzard-60-rgb-switch-gateron-brown-abnt2-branco-htg001brma",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer HyperX Alloy MKW100, RGB, Switch Red, Full Size, US, Preto - 4P5E1AA#ABA",
-      "price": "R$279,99",
-      "parcelamento": "No PIX ou 10x de R$ 31,11",
-      "image": "https://images.kabum.com.br/produtos/fotos/371586/teclado-mecanico-gamer-hyperx-alloy-mkw100-rgb-switch-red-full-size-us-preto-4p5e1aa-aba_1722882381_m.jpg",
-      "url": "https://www.kabum.com.br/produto/371586/teclado-mecanico-gamer-hyperx-alloy-mkw100-rgb-switch-red-full-size-us-preto-4p5e1aa-aba",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Sem Fio Mecânico Gamer Husky Nomadic, RGB, Switch Gateron G Pro Brown, Bluetooth, ABNT2, Preto - HTG800PTMA",
-      "price": "R$289,99",
-      "parcelamento": "No PIX ou 10x de R$ 32,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/538702/teclado-mecanico-gamer-husky-nomadic-preto-abnt2-rgb-switch-gateron-g-pro-brown-htg800ptma_1747742139_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538702/teclado-sem-fio-mecanico-gamer-husky-nomadic-rgb-switch-gateron-g-pro-brown-bluetooth-abnt2-preto-htg800ptma",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Sem Fio Mecânico Gamer Husky Nomadic, RGB, Switch Gateron G Pro Red, Bluetooth, ABNT2, Preto - HTG800PTVR",
-      "price": "R$289,99",
-      "parcelamento": "No PIX ou 10x de R$ 32,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/538701/teclado-mecanico-gamer-husky-nomadic-preto-abnt2-rgb-switch-gateron-g-pro-red-htg800ptvr_1747741915_m.jpg",
-      "url": "https://www.kabum.com.br/produto/538701/teclado-sem-fio-mecanico-gamer-husky-nomadic-rgb-switch-gateron-g-pro-red-bluetooth-abnt2-preto-htg800ptvr",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Gamer HyperX Alloy Core, RGB, ABNT2 - HX-KB5ME2-BR",
-      "price": "R$299,99",
-      "parcelamento": "No PIX ou 10x de R$ 35,29",
-      "image": "https://images.kabum.com.br/produtos/fotos/99696/teclado-gamer-hyperx-alloy-core-rgb-membrana-hx-kb5me2-br__1547726580_m.jpg",
-      "url": "https://www.kabum.com.br/produto/99696/teclado-gamer-hyperx-alloy-core-rgb-abnt2-hx-kb5me2-br",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Magnético Gamer Rise Mode GM1 Pro, ARGB, Magnético OTK PRO, USB-C, Preto - RM-TCM-GM1M-PRO-B",
-      "price": "R$299,99",
-      "parcelamento": "No PIX ou 10x de R$ 33,33",
-      "image": "https://images.kabum.com.br/produtos/fotos/669702/teclado-mecanico-gamer-rise-mode-gm1-pro-rgb-magnetico-hejin-usb-c-preto-rm-tcm-gm1m-pro-b_1763380959_m.jpg",
-      "url": "https://www.kabum.com.br/produto/669702/teclado-magnetico-gamer-rise-mode-gm1-pro-argb-magnetico-otk-pro-usb-c-preto-rm-tcm-gm1m-pro-b",
-      "relevancia": 1
-    },
-    {
-      "title": "Kit Gamer Redragon Teclado Mecânico Kumara, RGB, Switch Outemu Blue, PT + Mouse Cobra M711, Chroma, 10000DPI, Preto - S118",
-      "price": "R$304,99",
-      "parcelamento": "No PIX ou 10x de R$ 35,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/120674/kit-gamer-redragon-teclado-mecanico-kumara-rgb-switch-outemu-blue-pt-mouse-cobra-m711-chroma-10000dpi-s118_1599051245_m.jpg",
-      "url": "https://www.kabum.com.br/produto/120674/kit-gamer-redragon-teclado-mecanico-kumara-rgb-switch-outemu-blue-pt-mouse-cobra-m711-chroma-10000dpi-preto-s118",
-      "relevancia": 1
-    },
-    {
-      "title": "Kit Gamer Redragon Teclado Mecânico Kumara, RGB, Switch Outemu Blue, PT, Branco + Mouse Cobra M711, Chroma, 10000DPI, Branco - S118W",
-      "price": "R$307,90",
-      "parcelamento": "No PIX ou 10x de R$ 36,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/128031/kit-gamer-redragon-teclado-mecanico-kumara-rgb-switch-outemu-blue-pt-branco-mouse-cobra-m711-chroma-10000dpi-branco-s118w_1600804255_m.jpg",
-      "url": "https://www.kabum.com.br/produto/128031/kit-gamer-redragon-teclado-mecanico-kumara-rgb-switch-outemu-blue-pt-branco-mouse-cobra-m711-chroma-10000dpi-branco-s118w",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecanico Gamer Harry Potter Amsa Hogwart's, RGB, Full Size, ABNT2, USB, Preto - HP-592RGB",
-      "price": "R$399,99",
-      "parcelamento": "No PIX ou 10x de R$ 39,99",
-      "image": "https://images.kabum.com.br/produtos/fotos/926434/teclado-mecanico-gamer-harry-potter-amsa-hogwart-s-rgb-full-size-abnt2-usb-preto-hp-592rgb_1758120938_m.jpg",
-      "url": "https://www.kabum.com.br/produto/926434/teclado-mecanico-gamer-harry-potter-amsa-hogwart-s-rgb-full-size-abnt2-usb-preto-hp-592rgb",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer HyperX Alloy Origins Core, RGB, Switch HyperX Red, USB Tipo-C, ABNT2, Preto - 4P5P3A2#AC4",
-      "price": "R$499,90",
-      "parcelamento": "No PIX ou 10x de R$ 58,81",
-      "image": "https://images.kabum.com.br/produtos/fotos/105009/teclado-mecanico-gamer-hyperx-alloy-origins-core-rgb-hx-kb7rdx-br_1574693479_m.jpg",
-      "url": "https://www.kabum.com.br/produto/105009/teclado-mecanico-gamer-hyperx-alloy-origins-core-rgb-switch-hyperx-red-usb-tipo-c-abnt2-preto-4p5p3a2-ac4",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer Razer BlackWidow V3, Chroma RGB, Switch Green, Edição Especial, Layout US - RZ03-03543300-R3U1",
-      "price": "R$599,99",
-      "parcelamento": "No PIX ou 10x de R$ 66,66",
-      "image": "https://images.kabum.com.br/produtos/fotos/921187/teclado-mecanico-gamer-razer-blackwidow-v3-chroma-rgb-switch-green-edicao-especial-layout-us-rz03-03543300-r3u1_1764164837_m.jpg",
-      "url": "https://www.kabum.com.br/produto/921187/teclado-mecanico-gamer-razer-blackwidow-v3-chroma-rgb-switch-green-edicao-especial-layout-us-rz03-03543300-r3u1",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Sem Fio Mecânico Gamer Logitech G515, RGB, Bluetooth, com Design TKL,Tecnologia Lightspeed, Preto - 920-012423",
-      "price": "R$659,90",
-      "parcelamento": "No PIX ou 10x de R$ 77,63",
-      "image": "https://images.kabum.com.br/produtos/fotos/629752/teclado-sem-fio-mecanico-gamer-logitech-g515-rgb-bluetooth-com-design-tkl-tecnologia-lightspeed-preto-920-012423_1725459444_m.jpg",
-      "url": "https://www.kabum.com.br/produto/629752/teclado-sem-fio-mecanico-gamer-logitech-g515-rgb-bluetooth-com-design-tkl-tecnologia-lightspeed-preto-920-012423",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Gamer HyperX Alloy Origins, RGB, Switch HyperX Red, ABNT2, Preto - 4P4F6A2#AC4",
-      "price": "R$659,99",
-      "parcelamento": "No PIX ou 10x de R$ 77,64",
-      "image": "https://images.kabum.com.br/produtos/fotos/102433/teclado-mecanico-gamer-hyperx-alloy-origins-hx-kb6rdx-br_teclado-mecanico-gamer-hyperx-alloy-origins-hx-kb6rdx-br_1569421286_m.jpg",
-      "url": "https://www.kabum.com.br/produto/102433/teclado-mecanico-gamer-hyperx-alloy-origins-rgb-switch-hyperx-red-abnt2-preto-4p4f6a2-ac4",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Mecânico Sem Fio Gamer Machenike KT84 Pro, Gasket, RGB, Switch Gateron Yellow, Preto - JJ02G2012",
-      "price": "R$699,90",
-      "parcelamento": "No PIX ou 10x de R$ 82,34",
-      "image": "https://images.kabum.com.br/produtos/fotos/621207/teclado-mecanico-gamer-machenike-kt84-b84w-pro-com-pixel-screan-tft-screan-switch-gateron-north-pole-yellow-linear_1757612847_m.jpg",
-      "url": "https://www.kabum.com.br/produto/621207/teclado-mecanico-sem-fio-gamer-machenike-kt84-pro-gasket-rgb-switch-gateron-yellow-preto-jj02g2012",
-      "relevancia": 1
-    },
-    {
-      "title": "Teclado Gamer Logitech G PRO X TKL RAPID, Switches Magnético-analógicos, Modo Rapid Trigger, Layout US, Preto - 920-013131",
-      "price": "R$1.049,99",
-      "parcelamento": "No PIX ou 10x de R$ 123,52",
-      "image": "https://images.kabum.com.br/produtos/fotos/703012/teclado-gamer-logitech-g-pro-x-tkl-rapid-switches-magnetico-analogicos-modo-rapid-trigger-layout-us-preto-920-013131_1779715812_m.jpg",
-      "url": "https://www.kabum.com.br/produto/703012/teclado-gamer-logitech-g-pro-x-tkl-rapid-switches-magnetico-analogicos-modo-rapid-trigger-layout-us-preto-920-013131",
-      "relevancia": 1
+      "title": "SSD Team Group CX2, 1TB, 2.5, Sata III 6GB/s, Leitura 540 MB/s, Gravacao 490 MB/s, T253X6001T0C101",
+      "price": "R$ 979.99",
+      "parcelamento": "12x de R$ 96.08",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/2/t253x6001t0c1011.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-cx2-1tb-2-5-sata-iii-6gb-s-leitura-540-mb-s-gravacao-490-mb-s-t253x6001t0c101",
+      "relevancia": 2
     }
   ]
 };

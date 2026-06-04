@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Site } from '../types';
 import { useAutoConfig } from '../hooks/useAutoConfig';
 import { useAutoResults } from '../hooks/useAutoResults';
@@ -24,15 +24,25 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
     refreshAll();
   }, [refreshAll]);
 
-  // Poll status/results while running
+  // Poll leve: só status (sem refetch de results) enquanto executa.
+  // Refetch de results acontece apenas na transição de "executando" -> outro estado.
   useEffect(() => {
     if (status?.status !== 'executando') return;
     const id = setInterval(() => {
       fetchStatus();
-      fetchResults();
     }, 5000);
     return () => clearInterval(id);
-  }, [status?.status, fetchStatus, fetchResults]);
+  }, [status?.status, fetchStatus]);
+
+  const prevStatusRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    const curr = status?.status;
+    if (prev === 'executando' && curr !== 'executando') {
+      fetchResults();
+    }
+    prevStatusRef.current = curr;
+  }, [status?.status, fetchResults]);
 
   const isExecutando = status?.status === 'executando';
   const isAgendado = status?.status === 'agendado';

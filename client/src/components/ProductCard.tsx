@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import type { Produto } from '../types';
 import { usePriceHistory } from '../hooks/usePriceHistory';
 import { PriceHistoryChart } from './PriceHistoryChart';
@@ -8,8 +8,6 @@ interface ProductCardProps {
   index: number;
   siteKey: string;
   isBestOption?: boolean;
-  isChartExpanded?: boolean;
-  onToggleChart?: () => void;
 }
 
 const SITE_COLORS: Record<string, { text: string; bg: string; btnBg: string }> = {
@@ -24,29 +22,22 @@ const SITE_NAMES: Record<string, string> = {
   pichau: 'Pichau',
 };
 
-export function ProductCard({ produto, index, siteKey, isBestOption, isChartExpanded = false, onToggleChart }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ produto, index, siteKey, isBestOption }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const siteStyle = SITE_COLORS[siteKey] ?? SITE_COLORS.kabum;
   const siteName = SITE_NAMES[siteKey] ?? siteKey;
-  const [historyLoaded, setHistoryLoaded] = useState(false);
   const { loading, history, summary, erro, fetchSummary, fetchHistory } = usePriceHistory();
   const fetchedRef = useRef(false);
 
-  // Busca o summary ao montar (apenas uma vez)
+  // Busca summary + histórico ao montar (apenas uma vez)
   useEffect(() => {
     if (!fetchedRef.current && produto.url) {
       fetchedRef.current = true;
       fetchSummary(produto.url, siteKey);
-    }
-  }, [produto.url, siteKey, fetchSummary]);
-
-  const handleExpand = useCallback(() => {
-    if (!historyLoaded) {
-      setHistoryLoaded(true);
       fetchHistory(produto.url, siteKey);
     }
-  }, [historyLoaded, fetchHistory, produto.url, siteKey]);
+  }, [produto.url, siteKey, fetchSummary, fetchHistory]);
 
   // Calcula tendência
   const trendBadge = (() => {
@@ -69,8 +60,7 @@ export function ProductCard({ produto, index, siteKey, isBestOption, isChartExpa
   return (
     <div
       className="group bg-slate-900 border border-slate-800/90 rounded-2xl shadow-2xl flex flex-col overflow-hidden opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:border-slate-700/80 hover:-translate-y-0.5 min-h-[460px] sm:min-h-[480px]"
-      data-expanded={isChartExpanded ? 'true' : 'false'}
-      style={{ animationDelay: `${index * 0.05}s` }}
+      style={{ animationDelay: `${Math.min(index, 8) * 0.04}s` }}
     >
       <div className="bg-white p-5 flex items-center justify-center border-b border-slate-200 shadow-inner overflow-hidden relative min-h-[160px]">
         {produto.image && !imgError ? (
@@ -148,12 +138,9 @@ export function ProductCard({ produto, index, siteKey, isBestOption, isChartExpa
         <PriceHistoryChart
           history={history}
           siteColor={siteStyle.text}
-          loading={loading && historyLoaded}
+          loading={loading}
           erro={erro}
-          collapsed={!isChartExpanded}
-          onToggle={onToggleChart ?? (() => {})}
           summary={summary}
-          onExpand={handleExpand}
         />
 
         <a
@@ -168,4 +155,4 @@ export function ProductCard({ produto, index, siteKey, isBestOption, isChartExpa
       </div>
     </div>
   );
-}
+});

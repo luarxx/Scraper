@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, memo } from 'react';
 import type { Produto } from '../types';
 import { ProductCard } from './ProductCard';
 
@@ -12,25 +12,22 @@ function parsePrice(price: string | null): number {
   return parseFloat(price.replace(/[^\d,]/g, '').replace(',', '.'));
 }
 
-export function ProductGrid({ produtos, siteKey }: ProductGridProps) {
-  const [expandedUrl, setExpandedUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    setExpandedUrl(null);
-  }, [produtos[0]?.url, siteKey]);
-
-  const handleToggleChart = useCallback((url: string) => {
-    setExpandedUrl(prev => (prev === url ? null : url));
-  }, []);
-
-  const maxRelevancia = Math.max(...produtos.map((p) => p.relevancia));
-  const topCandidates = produtos.filter((p) => p.relevancia === maxRelevancia);
-  const minPrice = Math.min(...topCandidates.map((p) => parsePrice(p.price)));
+function ProductGridInner({ produtos, siteKey }: ProductGridProps) {
+  const { maxRelevancia, minPrice } = useMemo(() => {
+    if (produtos.length === 0) return { maxRelevancia: 0, minPrice: Infinity };
+    let maxRel = produtos[0].relevancia;
+    for (const p of produtos) if (p.relevancia > maxRel) maxRel = p.relevancia;
+    const topCandidates = produtos.filter((p) => p.relevancia === maxRel);
+    let min = parsePrice(topCandidates[0].price);
+    for (const p of topCandidates) {
+      const v = parsePrice(p.price);
+      if (v < min) min = v;
+    }
+    return { maxRelevancia: maxRel, minPrice: min };
+  }, [produtos]);
 
   return (
-    <div
-      className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-sm:gap-3 ${expandedUrl !== null ? 'items-start' : ''}`}
-    >
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-sm:gap-3">
       {produtos.map((p, i) => (
         <ProductCard
           key={p.url}
@@ -40,10 +37,10 @@ export function ProductGrid({ produtos, siteKey }: ProductGridProps) {
           isBestOption={
             p.relevancia === maxRelevancia && parsePrice(p.price) === minPrice
           }
-          isChartExpanded={expandedUrl === p.url}
-          onToggleChart={() => handleToggleChart(p.url)}
         />
       ))}
     </div>
   );
 }
+
+export const ProductGrid = memo(ProductGridInner);

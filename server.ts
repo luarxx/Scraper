@@ -6,8 +6,11 @@ import { buscarProduto, SITES } from './scraper';
 
 const ROOT = path.basename(__dirname) === 'dist' ? path.resolve(__dirname, '..') : __dirname;
 loadEnv();
+process.env.TZ = 'America/Sao_Paulo';
 
 const PORT = process.env.PORT || 3000;
+const APP_TIME_ZONE = 'America/Sao_Paulo';
+const APP_TIME_OFFSET = '-03:00';
 const CLIENT_DIST = path.join(ROOT, 'client', 'dist');
 const hasReactBuild = fs.existsSync(path.join(CLIENT_DIST, 'index.html'));
 
@@ -88,11 +91,38 @@ function sendJson(res: http.ServerResponse, status: number, data: unknown): void
   res.end(JSON.stringify(data));
 }
 
+function getBrazilParts(date: Date): Record<string, string> {
+  return Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: APP_TIME_ZONE,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(date).map((part) => [part.type, part.value])
+  );
+}
+
+function formatDbDatetime(date = new Date()): string {
+  const p = getBrazilParts(date);
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second}`;
+}
+
+function formatApiDatetime(date = new Date()): string {
+  return `${formatDbDatetime(date).replace(' ', 'T')}${APP_TIME_OFFSET}`;
+}
+
+function dbDatetimeToApi(value: string | null): string | null {
+  if (!value) return null;
+  if (/[zZ]|[+-]\d{2}:\d{2}$/.test(value)) return value;
+  return `${value.replace(' ', 'T')}${APP_TIME_OFFSET}`;
+}
+
 function parseLocalDatetime(s: string): Date {
-  const [datePart, timePart] = s.split(' ');
-  const [y, m, d] = datePart.split('-').map(Number);
-  const [hh, mm, ss] = timePart.split(':').map(Number);
-  return new Date(y, m - 1, d, hh, mm, ss);
+  return new Date(dbDatetimeToApi(s)!);
 }
 
 function brlToCents(price: string | null): number | null {
@@ -112,11 +142,12 @@ function brlToCents(price: string | null): number | null {
 function salvarPrecos(produtos: { title: string; price: string | null; parcelamento: string | null; image: string; url: string; relevancia: number }[], site: string): void {
   if (produtos.length === 0) return;
   const insert = db.prepare(
-    `INSERT INTO price_history (url, site, price_cents, parcelamento) VALUES (?, ?, ?, ?)`
+    `INSERT INTO price_history (url, site, price_cents, parcelamento, captured_at) VALUES (?, ?, ?, ?, ?)`
   );
   const saveMany = db.transaction((items: { url: string; price: string | null; parcelamento: string | null }[]) => {
+    const capturedAt = formatDbDatetime();
     for (const p of items) {
-      insert.run(p.url, site, brlToCents(p.price), p.parcelamento);
+      insert.run(p.url, site, brlToCents(p.price), p.parcelamento, capturedAt);
     }
   });
   saveMany(produtos);
@@ -138,12 +169,12 @@ function initDatabase(): void {
       site TEXT NOT NULL,
       ordem INTEGER NOT NULL DEFAULT 0,
       ativo INTEGER NOT NULL DEFAULT 1,
-      criado_em TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+      criado_em TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours'))
     );
 
     CREATE TABLE IF NOT EXISTS auto_execucoes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      iniciada_em TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
+      iniciada_em TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours')),
       finalizada_em TEXT,
       status TEXT NOT NULL DEFAULT 'executando'
     );
@@ -167,7 +198,7 @@ function initDatabase(): void {
       site TEXT NOT NULL,
       price_cents INTEGER,
       parcelamento TEXT,
-      captured_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+      captured_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours'))
     );
 
     CREATE INDEX IF NOT EXISTS idx_price_history_url ON price_history(url, site);
@@ -214,14 +245,14 @@ async function executarAutoBuscas(): Promise<void> {
 
   if (configs.length === 0) {
     schedulerStatus = 'agendado';
-    proximaExecucao = calcularProximoHorario().toISOString();
+    proximaExecucao = formatApiDatetime(calcularProximoHorario());
     return;
   }
 
   const insertExec = db.prepare(
-    `INSERT INTO auto_execucoes (iniciada_em, status) VALUES (datetime('now', 'localtime'), 'executando')`
+    `INSERT INTO auto_execucoes (iniciada_em, status) VALUES (?, 'executando')`
   );
-  const execResult = insertExec.run();
+  const execResult = insertExec.run(formatDbDatetime());
   const execucaoId = execResult.lastInsertRowid as number;
 
   const insertResultado = db.prepare(
@@ -258,8 +289,8 @@ async function executarAutoBuscas(): Promise<void> {
   }
 
   db.prepare(
-    `UPDATE auto_execucoes SET finalizada_em = datetime('now', 'localtime'), status = 'concluido' WHERE id = ?`
-  ).run(execucaoId);
+    `UPDATE auto_execucoes SET finalizada_em = ?, status = 'concluido' WHERE id = ?`
+  ).run(formatDbDatetime(), execucaoId);
 
   const resultados = db.prepare(
     `SELECT termo, site, status, total FROM auto_resultados WHERE execucao_id = ?`
@@ -272,7 +303,7 @@ async function executarAutoBuscas(): Promise<void> {
   console.log(`[Busca Automática] Concluída — ${resultados.length} termo(s), ${ok} ok, ${erros} erro(s), ${totalProdutos} produto(s) no total`);
 
   schedulerStatus = 'agendado';
-  proximaExecucao = calcularProximoHorario().toISOString();
+  proximaExecucao = formatApiDatetime(calcularProximoHorario());
 }
 
 function iniciarScheduler(): void {
@@ -302,7 +333,7 @@ function iniciarScheduler(): void {
 
   const next = calcularProximoHorario();
   const delay = Math.max(0, next.getTime() - Date.now());
-  proximaExecucao = next.toISOString();
+  proximaExecucao = formatApiDatetime(next);
   if (schedulerStatus === 'idle') schedulerStatus = 'agendado';
 
   setTimeout(() => {
@@ -327,7 +358,7 @@ function getAutoStatus(): {
 
   return {
     status: schedulerStatus,
-    ultima_execucao: ultimaExec ? ultimaExec.iniciada_em : null,
+    ultima_execucao: ultimaExec ? dbDatetimeToApi(ultimaExec.iniciada_em) : null,
     proxima_execucao: proximaExecucao,
     total_configurados: totalConfig.c,
   };
@@ -469,7 +500,14 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
       produtos: r.produtos ? JSON.parse(r.produtos) : [],
     }));
 
-    sendJson(res, 200, { execucao: ultimaExec, resultados: parsed });
+    sendJson(res, 200, {
+      execucao: {
+        ...ultimaExec,
+        iniciada_em: dbDatetimeToApi(ultimaExec.iniciada_em),
+        finalizada_em: dbDatetimeToApi(ultimaExec.finalizada_em),
+      },
+      resultados: parsed,
+    });
     return;
   }
 
@@ -498,7 +536,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
 
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
-    const cutoffStr = cutoff.toISOString().replace('T', ' ').slice(0, 19);
+    const cutoffStr = formatDbDatetime(cutoff);
 
     const rows = db.prepare(
       `SELECT price_cents, parcelamento, captured_at FROM price_history
@@ -525,7 +563,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
       min_price: min,
       max_price: max,
       avg_price: avg,
-      first_seen: rows[0].captured_at,
+      first_seen: dbDatetimeToApi(rows[0].captured_at),
     });
     return;
   }
@@ -543,7 +581,7 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
 
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - days);
-    const cutoffStr = cutoff.toISOString().replace('T', ' ').slice(0, 19);
+    const cutoffStr = formatDbDatetime(cutoff);
 
     const rows = db.prepare(
       `SELECT price_cents, parcelamento, captured_at FROM price_history
@@ -556,7 +594,10 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
       return;
     }
 
-    sendJson(res, 200, rows);
+    sendJson(res, 200, rows.map((row) => ({
+      ...row,
+      captured_at: dbDatetimeToApi(row.captured_at),
+    })));
     return;
   }
 

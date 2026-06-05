@@ -239,6 +239,7 @@ SQLite em `data/scraper.db` com 3 tabelas:
 
 - Inicializado junto com o servidor
 - Executa em grades baseadas no intervalo configurado. Com `AUTO_INTERVAL_HOURS=3`: 00:00, 03:00, 06:00, 09:00...
+- Usa fuso fixo `America/Sao_Paulo` para agendamento, persistência de execução e exibição no frontend, independente do timezone da VPS
 - Na inicialização, verifica se está atrasado além do intervalo configurado e executa imediatamente
 - Recuperação de crash: se última execução tem status 'executando', executa novamente
 - Buscas são sequenciais (1 por vez) para evitar múltiplos browsers simultâneos
@@ -294,6 +295,7 @@ npm run typecheck     # TypeScript check (root + client via npm -w)
 - **Soft delete** — items de configuração usam `ativo = 0` em vez de DELETE físico
 - **Resultados automáticos** — armazenados como JSON text no SQLite (coluna `produtos`)
 - **Scheduler** — execução sequencial (1 busca por vez), recuperação de crash na inicialização
+- **Horários** — usar `America/Sao_Paulo` no backend e nos formatadores do frontend para evitar diferença de fuso em VPS UTC
 - **Intervalo automático** — usar `AUTO_INTERVAL_HOURS` no `.env`; valores abaixo de 3 são elevados para 3
 - **Após editar `client/`**, rebuildar com `cd client && npm run build` — o servidor serve arquivos estáticos de `client/dist/`
 - **Exports nomeados** (evitar `export default` em componentes utilitários)

@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import type { PricePoint, HistorySummary } from '../types';
 import { Icon } from './Icon';
+import { BRAZIL_TIME_ZONE, formatBrazilDateShort, formatBrazilMonthYear } from '../utils/date';
 
 interface PriceHistoryChartProps {
   history: PricePoint[];
@@ -33,11 +34,12 @@ function formatBRLAxis(value: number): string {
 }
 
 function formatDateShort(iso: string): string {
-  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  return formatBrazilDateShort(iso);
 }
 
 function formatDateFull(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR', {
+    timeZone: BRAZIL_TIME_ZONE,
     day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit',
   });
 }
@@ -291,7 +293,7 @@ export function PriceHistoryChart({ history, siteColor, loading, erro, summary }
           </span>
           {summary?.first_seen && (
             <span className="text-[10px] text-slate-600 tabular-nums truncate">
-              · desde {new Date(summary.first_seen).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' })}
+              · desde {formatBrazilMonthYear(summary.first_seen)}
             </span>
           )}
         </div>

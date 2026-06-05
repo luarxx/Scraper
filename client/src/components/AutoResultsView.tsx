@@ -3,6 +3,7 @@ import { AlertTriangle, BadgeDollarSign, BarChart, Search, XCircle, Radio, Timer
 import type { AutoExecucao, AutoResultadoItem, Produto } from '../types';
 import { ProductGrid } from './ProductGrid';
 import { Icon } from './Icon';
+import { formatBrazilDateMonth, formatBrazilTime } from '../utils/date';
 
 const SITE_COLORS: Record<string, { text: string; light: string; glow: string }> = {
   kabum: { text: '#f97316', light: 'rgba(249,115,22,0.08)', glow: 'rgba(249,115,22,0.15)' },
@@ -16,11 +17,6 @@ interface AutoResultsViewProps {
   loading: boolean;
   running: boolean;
   onRefresh: () => void;
-}
-
-function formatTime(iso: string): string {
-  const dt = new Date(iso);
-  return dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 }
 
 function parsePrice(price: string | null): number {
@@ -305,19 +301,19 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
         <KpiCard
           icon={<Icon icon={Timer} size={18} />}
           label="Início"
-          value={formatTime(execucao.iniciada_em)}
+          value={formatBrazilTime(execucao.iniciada_em)}
           accent="#94a3b8"
           index={0}
-          sub={new Date(execucao.iniciada_em).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+          sub={formatBrazilDateMonth(execucao.iniciada_em)}
         />
         {execucao.finalizada_em ? (
           <KpiCard
             icon={<Icon icon={CheckCircle} size={18} />}
             label="Fim"
-            value={formatTime(execucao.finalizada_em)}
+            value={formatBrazilTime(execucao.finalizada_em)}
             accent="#94a3b8"
             index={1}
-            sub={new Date(execucao.finalizada_em).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+            sub={formatBrazilDateMonth(execucao.finalizada_em)}
           />
         ) : (
           <KpiCard

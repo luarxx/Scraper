@@ -26,7 +26,7 @@ Browser (React SPA)
      ▼                                   ▼
 Server (server.ts — Node.js http)
      │
-     ├── serve SPA from client/dist/ (production)
+     ├── serve SPA from client/dist/ (production, even when running dist/server.js)
      │   └── fallback: serve from root (legacy)
      │
      ├── /api/search → scraper.ts:buscarProduto()
@@ -39,7 +39,7 @@ Server (server.ts — Node.js http)
      │    ├── auto_execucoes   (cada ciclo de 6h)
      │    └── auto_resultados  (resultados por termo)
      │
-     └── Scheduler (a cada 6h)
+     └── Scheduler (configurável via AUTO_INTERVAL_HOURS, mínimo 3h)
           └── Itera auto_config → buscarProduto() sequencial → salva resultados
 ```
 
@@ -50,9 +50,14 @@ Server (server.ts — Node.js http)
 ```
 /
 ├── scraper.ts          # Core: tipos, config dos sites, lógica de scraping, CLI
-├── server.ts           # HTTP server: API endpoints + static + SQLite DB + scheduler 6h
+├── server.ts           # HTTP server: API endpoints + static + SQLite DB + scheduler configurável
 ├── AGENTS.md           # ← este arquivo
 ├── DESIGN.md           # Documentação do design system e UI/UX
+├── DEPLOY_ORACLE_VPS.md # Guia de deploy na Oracle VPS com FileZilla, Nginx e PM2
+├── COMANDOS_VPS.md     # Comandos operacionais para administrar a VPS em produção
+├── ATUALIZAR_SITE_VPS.md # Fluxo curto para atualizar a VPS após mudanças locais
+├── .env                # Configuração local/produção (AUTO_INTERVAL_HOURS)
+├── .env.example        # Exemplo das variáveis de ambiente
 ├── opencode.json       # Config do opencode (default agent: scraper)
 ├── tsconfig.json       # TS config (root, CommonJS)
 ├── package.json        # Scripts: dev, dev:server, typecheck, build
@@ -80,7 +85,7 @@ Server (server.ts — Node.js http)
 │   │       ├── StateMessage.tsx     # Initial/loading/empty/error states
 │   │       ├── PriceHistoryChart.tsx # Gráfico de histórico de preços
 │   │       ├── AutoSearchPanel.tsx  # Container da aba Automática (status + sub-abas)
-│   │       ├── AutoConfigList.tsx   # Lista de até 10 produtos configurados
+│   │       ├── AutoConfigList.tsx   # Lista/reordenação de até 10 produtos configurados
 │   │       └── AutoResultsView.tsx  # Resultados da última execução automática
 │   └── dist/            # Build output (served in production)
 │
@@ -120,7 +125,7 @@ interface SiteConfig {
 | Modo | Como funciona | Sites |
 |---|---|---|
 | **DOM** | Navega até `searchUrl()`, espera `waitStrategy`, faz `page.evaluate(extrairProdutos)`. O callback roda no contexto do navegador e extrai do DOM. | KaBuM!, Pichau |
-| **API** | Navega até `urlBase` (se `precisaHomePrimeiro`), depois faz `fetch()` interno via `page.evaluate()` chamando `apiUrl()`. | TerabyteShop |
+| **API** | Consulta o endpoint via `page.request.get()` com o contexto Playwright, sem abrir a home quando `precisaHomePrimeiro` é `false`. | TerabyteShop |
 
 ### Anti-detecção
 
@@ -154,6 +159,7 @@ interface SiteConfig {
 
 - Se `client/dist/index.html` existir → SPA mode (serve tudo do `client/dist/`, fallback SPA para rotas sem extensão)
 - Senão → Legacy mode (serve arquivos da raiz do projeto)
+- Em produção, `dist/server.js` resolve caminhos persistentes a partir da raiz do projeto, não de `dist/`
 
 ---
 
@@ -169,7 +175,7 @@ App
 ├── ProductGrid
 │   └── ProductCard[]   # Card com imagem, store badge, preço, botão "Ir para a Loja"
 └── AutoSearchPanel     # (quando modo='auto')
-    ├── AutoConfigList  # Lista de até 10 produtos configurados com add/remove
+    ├── AutoConfigList  # Lista de até 10 produtos configurados com add/remove/reorder
     └── AutoResultsView # Resultados da última execução por termo com ProductGrid
 ```
 
@@ -185,7 +191,7 @@ Manual:
 
 Auto:
   AutoSearchPanel
-    ├── tab 'config' → AutoConfigList (local edit → save → POST /api/auto/config)
+    ├── tab 'config' → AutoConfigList (local edit/reorder → save → POST /api/auto/config)
     └── tab 'results' → AutoResultsView (fetch /api/auto/results)
 ```
 
@@ -209,14 +215,14 @@ Auto:
 
 - **`useSearch`** (`client/src/hooks/useSearch.ts`): Gerencia estado da busca (loading, produtos, erro). `search(q, siteKey)` faz GET em `/api/search`. `fetchSites()` carrega lista de sites.
 - **`useSearchHistory`** (`client/src/hooks/useSearchHistory.ts`): Persiste últimas 5 buscas no `localStorage`. `addEntry()` evita duplicatas.
-- **`useAutoConfig`** (`client/src/hooks/useAutoConfig.ts`): CRUD da configuração automática. `fetchConfig()`, `saveConfig(entries)`, `removeConfig(id)`, `fetchStatus()`.
+- **`useAutoConfig`** (`client/src/hooks/useAutoConfig.ts`): CRUD da configuração automática. `fetchConfig()`, `saveConfig(entries)`, `removeConfig(id)`, `fetchStatus()`. A ordem visual editada em `AutoConfigList` é persistida pela posição enviada ao `saveConfig`.
 - **`useAutoResults`** (`client/src/hooks/useAutoResults.ts`): Resultados automáticos. `fetchResults()` carrega última execução, `triggerRun()` dispara execução manual.
 
 ---
 
-## Auto-Search (a cada 6h)
+## Auto-Search (intervalo configurável)
 
-O scraper pode ser configurado para buscar até 10 produtos automaticamente a cada 6 horas.
+O scraper pode ser configurado para buscar até 10 produtos automaticamente. O intervalo padrão é 6 horas, configurável por `AUTO_INTERVAL_HOURS` no `.env`, com mínimo obrigatório de 3 horas.
 
 ### Database
 
@@ -231,8 +237,8 @@ SQLite em `data/scraper.db` com 3 tabelas:
 ### Scheduler
 
 - Inicializado junto com o servidor
-- Executa a cada 6h nos horários 00:00, 06:00, 12:00, 18:00
-- Na inicialização, verifica se está atrasado (>6h desde última execução) e executa imediatamente
+- Executa em grades baseadas no intervalo configurado. Com `AUTO_INTERVAL_HOURS=3`: 00:00, 03:00, 06:00, 09:00...
+- Na inicialização, verifica se está atrasado além do intervalo configurado e executa imediatamente
 - Recuperação de crash: se última execução tem status 'executando', executa novamente
 - Buscas são sequenciais (1 por vez) para evitar múltiplos browsers simultâneos
 
@@ -240,7 +246,7 @@ SQLite em `data/scraper.db` com 3 tabelas:
 
 - Toggle "🔍 Manual" / "⏰ Automática" no header (state `modo` em App.tsx)
 - **AutoSearchPanel**: container com barra de status (status + próxima execução + contagem) e botão "Executar agora"
-  - **Sub-aba "⚙️ Configurar"**: AutoConfigList — formulário inline para adicionar/remover produtos com termo + site selector
+  - **Sub-aba "⚙️ Configurar"**: AutoConfigList — formulário inline para adicionar/remover/reordenar produtos com termo + site selector
   - **Sub-aba "📊 Resultados"**: AutoResultsView — lista da última execução com ProductGrid por termo
 
 ---
@@ -253,6 +259,7 @@ npm run dev:server    # Apenas servidor (tsx watch server.ts)
 npm run dev:client    # Apenas client (Vite dev server)
 npm run build         # Compila TypeScript (tsc, para deploy)
 npm run build:client  # Build do frontend React → client/dist/
+npm run build:prod    # Build completo para VPS/FileZilla: client/dist + dist/
 npm run start         # Node production (dist/server.js)
 npm run typecheck     # TypeScript check (root + client via npm -w)
 ```
@@ -268,6 +275,11 @@ npm run typecheck     # TypeScript check (root + client via npm -w)
 2. `npm run dev:server` — testar servidor servindo o build
 3. Ou `npm run dev` — desenvolvimento com HMR
 
+**Deploy VPS/FileZilla:**
+1. `npm run build:prod` — gera `client/dist/` e `dist/`
+2. Subir para a VPS os arquivos do projeto sem `node_modules/`
+3. Na VPS, executar `npm install`, `npx playwright install chromium` e `npm start` ou PM2 apontando para `dist/server.js`
+
 ---
 
 ## Conventions
@@ -281,6 +293,7 @@ npm run typecheck     # TypeScript check (root + client via npm -w)
 - **Soft delete** — items de configuração usam `ativo = 0` em vez de DELETE físico
 - **Resultados automáticos** — armazenados como JSON text no SQLite (coluna `produtos`)
 - **Scheduler** — execução sequencial (1 busca por vez), recuperação de crash na inicialização
+- **Intervalo automático** — usar `AUTO_INTERVAL_HOURS` no `.env`; valores abaixo de 3 são elevados para 3
 - **Após editar `client/`**, rebuildar com `cd client && npm run build` — o servidor serve arquivos estáticos de `client/dist/`
 - **Exports nomeados** (evitar `export default` em componentes utilitários)
 - **Sem comentários em linha** no código-fonte (documentação concentrada aqui)

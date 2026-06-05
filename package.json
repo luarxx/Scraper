@@ -9,6 +9,7 @@
     "dev:client": "cd client && npx vite",
     "build": "tsc",
     "build:client": "cd client && npm run build",
+    "build:prod": "npm run build:client && npm run build",
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typecheck": "tsc --noEmit"

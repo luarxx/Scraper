@@ -112,7 +112,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
           {siteName}
         </span>
 
-        <h3 className="text-sm sm:text-base font-semibold text-white leading-snug line-clamp-3">
+        <h3 className="text-sm sm:text-base font-semibold text-white leading-snug line-clamp-3 min-h-[3.6rem] sm:min-h-[4.125rem]">
           {produto.title}
         </h3>
 

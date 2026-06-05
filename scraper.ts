@@ -58,7 +58,8 @@ type Resultado = ResultadoSucesso | ResultadoErro;
 const HEADLESS = true;
 const TIMEOUT = 30000;
 const CACHE_TTL = 10 * 60 * 1000;
-const CACHE_DIR = path.join(__dirname, 'data', 'cache');
+const ROOT = path.basename(__dirname) === 'dist' ? path.resolve(__dirname, '..') : __dirname;
+const CACHE_DIR = path.join(ROOT, 'data', 'cache');
 
 // ─── FINGERPRINT ──────────────────────────────────────────────────────────
 
@@ -371,17 +372,26 @@ const SITES: Record<string, SiteConfig> = {
     urlBase: 'https://www.terabyteshop.com.br',
     searchUrl: null,
     waitStrategy: null,
-    precisaHomePrimeiro: true,
+    precisaHomePrimeiro: false,
     selectors: null,
     usaApi: true,
     apiUrl: (termo) => `https://www.terabyteshop.com.br/api/tss-proxy/?q=${encodeURIComponent(termo)}&limit=20`,
     async extrairProdutosViaApi(page, termo) {
       const url = `https://www.terabyteshop.com.br/api/tss-proxy/?q=${encodeURIComponent(termo)}&limit=20`;
-      const data: any[] = await page.evaluate(async (apiUrl) => {
-        const resp = await fetch(apiUrl);
-        const json = await resp.json();
-        return json.products || [];
-      }, url);
+      const response = await page.request.get(url, {
+        headers: {
+          accept: 'application/json, text/plain, */*',
+          referer: 'https://www.terabyteshop.com.br/',
+        },
+        timeout: TIMEOUT,
+      });
+
+      if (!response.ok()) {
+        throw new Error(`TerabyteShop API retornou HTTP ${response.status()}`);
+      }
+
+      const json = await response.json();
+      const data: any[] = Array.isArray(json?.products) ? json.products : [];
 
       return data.map((p: any) => ({
         title: p.nome,
@@ -640,7 +650,7 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
       produtos = ordenarPorRelevancia(produtos, termoBusca);
     }
 
-    const dataDir = path.join(__dirname, 'data');
+    const dataDir = path.join(ROOT, 'data');
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }

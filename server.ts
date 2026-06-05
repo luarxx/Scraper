@@ -4,8 +4,10 @@ import * as path from 'path';
 import Database from 'better-sqlite3';
 import { buscarProduto, SITES } from './scraper';
 
+const ROOT = path.basename(__dirname) === 'dist' ? path.resolve(__dirname, '..') : __dirname;
+loadEnv();
+
 const PORT = process.env.PORT || 3000;
-const ROOT = __dirname;
 const CLIENT_DIST = path.join(ROOT, 'client', 'dist');
 const hasReactBuild = fs.existsSync(path.join(CLIENT_DIST, 'index.html'));
 
@@ -30,6 +32,25 @@ function jsonHeaders(): Record<string, string> {
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function loadEnv(): void {
+  const envPath = path.join(ROOT, '.env');
+  if (!fs.existsSync(envPath)) return;
+
+  const content = fs.readFileSync(envPath, 'utf-8');
+  for (const line of content.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const equalsIndex = trimmed.indexOf('=');
+    if (equalsIndex === -1) continue;
+
+    const key = trimmed.slice(0, equalsIndex).trim();
+    const value = trimmed.slice(equalsIndex + 1).trim().replace(/^["']|["']$/g, '');
+    if (key && process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  }
 }
 
 function sendStatic(res: http.ServerResponse, filePath: string, fallback?: () => void): void {
@@ -155,9 +176,15 @@ function initDatabase(): void {
 
 initDatabase();
 
-// ─── Scheduler (a cada 6h) ──────────────────────────────────────
+// ─── Scheduler ──────────────────────────────────────────────────
 
-const INTERVALO_MS = 6 * 60 * 60 * 1000;
+const MIN_AUTO_INTERVAL_HOURS = 3;
+const DEFAULT_AUTO_INTERVAL_HOURS = 6;
+const configuredIntervalHours = Number(process.env.AUTO_INTERVAL_HOURS);
+const AUTO_INTERVAL_HOURS = Number.isFinite(configuredIntervalHours)
+  ? Math.max(MIN_AUTO_INTERVAL_HOURS, Math.floor(configuredIntervalHours))
+  : DEFAULT_AUTO_INTERVAL_HOURS;
+const INTERVALO_MS = AUTO_INTERVAL_HOURS * 60 * 60 * 1000;
 let schedulerStatus: 'idle' | 'executando' | 'agendado' = 'idle';
 let proximaExecucao: string | null = null;
 let schedulerTimer: ReturnType<typeof setInterval> | null = null;
@@ -165,7 +192,7 @@ let schedulerTimer: ReturnType<typeof setInterval> | null = null;
 function calcularProximoHorario(): Date {
   const now = new Date();
   const hours = now.getHours();
-  const nextHour = (Math.floor(hours / 6) + 1) * 6;
+  const nextHour = (Math.floor(hours / AUTO_INTERVAL_HOURS) + 1) * AUTO_INTERVAL_HOURS;
   const next = new Date(now);
   if (nextHour >= 24) {
     next.setDate(next.getDate() + 1);
@@ -544,7 +571,7 @@ server.listen(PORT, () => {
   console.log('  ┌──────────────────────────────────────┐');
   console.log(`  │  🚀  ${String('http://localhost:' + String(PORT)).padEnd(26)}│`);
   console.log('  │                                      │');
-  console.log('  │  ⏰  Auto-busca a cada 6h            │');
+  console.log(`  │  ⏰  Auto-busca a cada ${String(AUTO_INTERVAL_HOURS + 'h').padEnd(13)}│`);
   console.log('  └──────────────────────────────────────┘');
   console.log('');
 });

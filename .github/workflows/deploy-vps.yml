@@ -30,13 +30,23 @@ jobs:
       - name: Build production
         run: npm run build:prod
 
+      - name: Validate deploy secrets
+        run: |
+          test -n "$VPS_HOST" || (echo "Missing secret: VPS_HOST" && exit 1)
+          test -n "$VPS_USER" || (echo "Missing secret: VPS_USER" && exit 1)
+          test -n "$VPS_SSH_KEY" || (echo "Missing secret: VPS_SSH_KEY" && exit 1)
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+
       - name: Upload build to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          port: ${{ secrets.VPS_PORT || '22' }}
           target: /home/ubuntu/Scraper
           overwrite: true
           source: dist,client/dist,package.json,package-lock.json,client/package.json,client/package-lock.json,.env,.env.example
@@ -47,7 +57,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT || 22 }}
+          port: ${{ secrets.VPS_PORT || '22' }}
           script: |
             set -e
             cd /home/ubuntu/Scraper

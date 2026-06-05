@@ -1,489 +1,169 @@
 {
-  "termo": "rtx 5050",
-  "site": "kabum",
-  "siteNome": "KaBuM!",
-  "timestamp": "2026-06-05T02:04:52.013Z",
-  "total": 60,
+  "termo": "processador amd ryzen 5 5600",
+  "site": "terabyteshop",
+  "siteNome": "TerabyteShop",
+  "timestamp": "2026-06-05T18:51:01.596Z",
+  "total": 20,
   "produtos": [
     {
-      "title": "Placa De Vídeo MSI GeForce RTX 5050 Gaming OC, Nvidia, 8GB, GDDR6, 128-Bit - G5050-8GC",
-      "price": "R$2.089,99",
-      "parcelamento": "No PIX ou 10x de R$ 232,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/1012611/placa-de-video-msi-geforce-rtx-5050-gaming-oc-nvidia-8gb-gddr7-128-bit-g5050-8gc_1775759170_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1012611/placa-de-video-msi-geforce-rtx-5050-gaming-oc-nvidia-8gb-gddr6-128-bit-g5050-8gc",
+      "title": "Processador AMD Ryzen 5 5600GT, 3.6GHz (4.6GHz Turbo), 6-Cores 12-Threads, Cooler Wraith Stealth, AM4, 100-100001488BOX",
+      "price": "R$ 879,9",
+      "parcelamento": "18x de R$ 57,51",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-5-5600gt-36ghz-46ghz-turbo-6-cores-12-threads-cooler-wraith-stealth-am4-100-100001488box_186129.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/27314/processador-amd-ryzen-5-5600gt-36ghz-46ghz-turbo-6-cores-12-threads-cooler-wraith-stealth-am4-100-100001488box",
+      "relevancia": 5
+    },
+    {
+      "title": "Processador AMD Ryzen 5 5500 3.6GHz (4.2GHz Turbo), 6-Cores 12-Threads, Cooler Wraith Stealth, AM4, Sem Vídeo Integrado, 100-100000457BOX",
+      "price": "R$ 578,99",
+      "parcelamento": "18x de R$ 37,84",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-5-5500-36ghz-42ghz-turbo-6-cores-12-threads-cooler-wraith-stealth-am4-100-100000457box_138946.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/20782/processador-amd-ryzen-5-5500-36ghz-42ghz-turbo-6-cores-12-threads-cooler-wraith-stealth-am4-100-100000457box",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 5 8500G, 3.5GHz (5.0GHz Turbo), 6-Cores 12-Threads, AM5, Com Cooler AMD Wraith Stealth, 100-100000931BOX",
+      "price": "R$ 729,99",
+      "parcelamento": "18x de R$ 47,71",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-5-8500g-35ghz-50ghz-turbo-6-cores-12-threads-am5-com-cooler-amd-wraith-stealth-100-100001491box_186183.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/27321/processador-amd-ryzen-5-8500g-35ghz-50ghz-turbo-6-cores-12-threads-am5-com-cooler-amd-wraith-stealth-100-100001491box",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 5 8400F, 4.2GHz (4.7GHz Turbo), 6-Cores 12-Threads, AM5, Com Cooler AMD Wraith Stealth, 100-100001591BOX",
+      "price": "R$ 799,99",
+      "parcelamento": "18x de R$ 52,29",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-5-8400f-42ghz-47ghz-turbo-6-cores-12-threads-am5-com-cooler-amd-wraith-stealth-100-100001591box_197084.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/28768/processador-amd-ryzen-5-8400f-42ghz-47ghz-turbo-6-cores-12-threads-am5-com-cooler-amd-wraith-stealth-100-100001591box",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 7 5700, 3.7GHz (4.6GHz Turbo), 8-Cores 16-Threads, AM4, Com Cooler AMD Wraith Stealth, 100-100000743SBX",
+      "price": "R$ 939,99",
+      "parcelamento": "18x de R$ 61,44",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-7-5700-37ghz-46ghz-turbo-8-cores-16-threads-am4-com-cooler-amd-wraith-stealth-100-100000743sbx_257447.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/39817/processador-amd-ryzen-7-5700-37ghz-46ghz-turbo-8-cores-16-threads-am4-com-cooler-amd-wraith-stealth-100-100000743sbx",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 5 8600G, 4.3GHz (5.0GHz Turbo), 6-Cores 12-Threads, AM5, Com Cooler AMD Wraith Stealth, 100-100001237BOX",
+      "price": "R$ 949,99",
+      "parcelamento": "18x de R$ 62,09",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-5-8600g-43ghz-50ghz-turbo-6-cores-12-threads-am5-com-cooler-amd-wraith-stealth-100-100001237box_186206.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/27326/processador-amd-ryzen-5-8600g-43ghz-50ghz-turbo-6-cores-12-threads-am5-com-cooler-amd-wraith-stealth-100-100001237box",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 7 8700F, 4.1GHz (5.0GHz Turbo), 8-Cores 16-Threads, AM5, Com Cooler AMD Wraith Stealth, 100-100001590BOX",
+      "price": "R$ 1049,99",
+      "parcelamento": "18x de R$ 68,63",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-7-8700f-41ghz-50ghz-turbo-8-cores-16-threads-am5-com-cooler-amd-wraith-stealth-100-100001590box_197081.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/28769/processador-amd-ryzen-7-8700f-41ghz-50ghz-turbo-8-cores-16-threads-am5-com-cooler-amd-wraith-stealth-100-100001590box",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 7 5700G, 3.8GHz (4.6GHz Turbo), 8-Cores 16-Threads, Cooler Wraith Stealth, AM4, Com vídeo integrado, 100-100000263BOX",
+      "price": "R$ 1199,99",
+      "parcelamento": "18x de R$ 78,43",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-7-5700g-38ghz-46ghz-turbo-8-cores-16-threads-cooler-wraith-stealth-am4-com-video-integrado-100-100000263box_127633.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/18973/processador-amd-ryzen-7-5700g-38ghz-46ghz-turbo-8-cores-16-threads-cooler-wraith-stealth-am4-com-video-integrado-100-100000263box",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 7 5700X 3.4GHz (4.6GHz Turbo), 8-Cores 16-Threads, AM4, Sem Cooler, 100-100000926WOF",
+      "price": "R$ 1299,99",
+      "parcelamento": "18x de R$ 84,97",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-7-5700x-34ghz-46ghz-turbo-8-cores-16-threads-am4-sem-cooler-100-100000926wof_211497.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/20813/processador-amd-ryzen-7-5700x-34ghz-46ghz-turbo-8-cores-16-threads-am4-sem-cooler-100-100000926wof",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 5 7600X 4.7GHz (5.3GHz Turbo), 6-Cores 12-Threads, AM5, Sem Cooler, 100-100000593WOF",
+      "price": "R$ 1299,99",
+      "parcelamento": "18x de R$ 84,97",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-5-7600x-47ghz-53ghz-turbo-6-cores-12-threads-am5-100-100000593wof_151058.png",
+      "url": "https://www.terabyteshop.com.br/produto/22262/processador-amd-ryzen-5-7600x-47ghz-53ghz-turbo-6-cores-12-threads-am5-100-100000593wof",
+      "relevancia": 4
+    },
+    {
+      "title": "Kit Upgrade, AMD Ryzen 5 5600GT, Placa Mãe Chipset A520, Air Cooler",
+      "price": "R$ 1402,32",
+      "parcelamento": "18x de R$ 91,66",
+      "image": "https://img.terabyteshop.com.br/produto/m/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-chipset-a520-air-cooler_268052.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/41572/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-chipset-a520-air-cooler",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 7 7700X 4.5GHz (5.4GHz Turbo), 8-Cores 16-Threads, AM5, Sem Cooler, 100-100000591WOF",
+      "price": "R$ 1849,99",
+      "parcelamento": "18x de R$ 120,91",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-7-7700x-45ghz-54ghz-turbo-8-cores-16-threads-am5-100-100000591wof_151060.png",
+      "url": "https://www.terabyteshop.com.br/produto/22264/processador-amd-ryzen-7-7700x-45ghz-54ghz-turbo-8-cores-16-threads-am5-100-100000591wof",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 9 7900X 4.7GHz (5.6GHz Turbo), 12-Cores 24-Threads, AM5, Sem Cooler, 100-100000589WOF",
+      "price": "R$ 1959,9",
+      "parcelamento": "18x de R$ 128,1",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-9-7900x-47ghz-56ghz-turbo-12-cores-24-threads-am5-100-100000589wof_149279.png",
+      "url": "https://www.terabyteshop.com.br/produto/22266/processador-amd-ryzen-9-7900x-47ghz-56ghz-turbo-12-cores-24-threads-am5-100-100000589wof",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 9 7900 3.7GHz (5.4GHz Turbo), 12-Cores 24-Threads, AM5, Com Cooler Wraith Prism, 100-100000590BOX",
+      "price": "R$ 1999,9",
+      "parcelamento": "18x de R$ 130,71",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-9-7900-37ghz-54ghz-turbo-12-cores-24-threads-am5-com-cooler-wraith-prism-100-100000590box_158757.png",
+      "url": "https://www.terabyteshop.com.br/produto/23409/processador-amd-ryzen-9-7900-37ghz-54ghz-turbo-12-cores-24-threads-am5-com-cooler-wraith-prism-100-100000590box",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 7 7700 3.8GHz (5.3GHz Turbo), 8-Cores 16-Threads, AM5, Com Cooler AMD Wraith Prism, 100-100000592BOX",
+      "price": "R$ 1999,99",
+      "parcelamento": "18x de R$ 130,72",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-7-7700-38ghz-53ghz-turbo-8-cores-16-threads-am5-com-cooler-amd-wraith-prism-100-100000592box_158796.png",
+      "url": "https://www.terabyteshop.com.br/produto/23411/processador-amd-ryzen-7-7700-38ghz-53ghz-turbo-8-cores-16-threads-am5-com-cooler-amd-wraith-prism-100-100000592box",
+      "relevancia": 4
+    },
+    {
+      "title": "Kit Upgrade, AMD Ryzen 5 5600GT, Placa Mãe Chipset A520, 16GB (2X8GB) DDR4, Air Cooler",
+      "price": "R$ 2129,99",
+      "parcelamento": "18x de R$ 139,22",
+      "image": "https://img.terabyteshop.com.br/produto/m/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-chipset-a520-16gb-2x8gb-ddr4-air-cooler_268066.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/41573/kit-upgrade-amd-ryzen-5-5600gt-placa-mae-chipset-a520-16gb-2x8gb-ddr4-air-cooler",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 7 7800X3D, 4.2GHz (5.0GHz Turbo), 8-Cores 16-Threads, AM5, Sem Cooler, 100-100000910WOF",
+      "price": "R$ 2199,99",
+      "parcelamento": "18x de R$ 143,79",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-7-7800x3d-42ghz-50ghz-turbo-8-cores-16-threads-am5-sem-cooler-100-100000910wof_168345.png",
+      "url": "https://www.terabyteshop.com.br/produto/24769/processador-amd-ryzen-7-7800x3d-42ghz-50ghz-turbo-8-cores-16-threads-am5-sem-cooler-100-100000910wof",
+      "relevancia": 4
+    },
+    {
+      "title": "Processador AMD Ryzen 9 9900X, 4.4GHz (5.6GHz Turbo), 12-Cores 24-Threads, AM5, Sem Cooler, 100-100000662WOF",
+      "price": "R$ 2397,99",
+      "parcelamento": "18x de R$ 156,73",
+      "image": "https://img.terabyteshop.com.br/produto/m/processador-amd-ryzen-9-9900x-44ghz-56ghz-turbo-12-cores-24-threads-am5-sem-cooler-100-100000662wof_204885.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/30032/processador-amd-ryzen-9-9900x-44ghz-56ghz-turbo-12-cores-24-threads-am5-sem-cooler-100-100000662wof",
+      "relevancia": 4
+    },
+    {
+      "title": "Kit Upgrade, AMD Ryzen 5 5500, Placa Mãe Asus TUF Gaming A520M-PLUS II",
+      "price": "R$ 1179,99",
+      "parcelamento": "18x de R$ 77,12",
+      "image": "https://img.terabyteshop.com.br/produto/m/kit-upgrade-amd-ryzen-5-5500-placa-mae-asus-tuf-gaming-a520m-plus-ii_266400.jpg",
+      "url": "https://www.terabyteshop.com.br/produto/39601/kit-upgrade-amd-ryzen-5-5500-placa-mae-asus-tuf-gaming-a520m-plus-ii",
+      "relevancia": 3
+    },
+    {
+      "title": "Memória DDR5 Kingston Fury Beast EXPO, 8GB, 5600Mhz, Black, KF556C36BBE-8",
+      "price": "R$ 1079,9",
+      "parcelamento": "18x de R$ 70,58",
+      "image": "https://img.terabyteshop.com.br/produto/m/memoria-ddr5-kingston-fury-beast-expo-8gb-5600mhz-black-kf556c36bbe-8_165424.png",
+      "url": "https://www.terabyteshop.com.br/produto/24330/memoria-ddr5-kingston-fury-beast-expo-8gb-5600mhz-black-kf556c36bbe-8",
       "relevancia": 2
-    },
-    {
-      "title": "Placa de Vídeo MSI GeForce RTX 5050 8G VENTUS 2X OC NVIDIA GeForce, 8GB GDDR6, 128 bits, 2617 MHz, DLSS 4, Ray Tracing - G5050-8V2C",
-      "price": "R$2.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 238,63",
-      "image": "https://images.kabum.com.br/produtos/fotos/888165/placa-de-video-msi-geforce-rtx-5050-8g-ventus-2x-oc-nvidia-geforce-8gb-gddr6-128-bits-2617-mhz-dlss-4-ray-tracing-g5050-8v2c_1751287282_m.jpg",
-      "url": "https://www.kabum.com.br/produto/888165/placa-de-video-msi-geforce-rtx-5050-8g-ventus-2x-oc-nvidia-geforce-8gb-gddr6-128-bits-2617-mhz-dlss-4-ray-tracing-g5050-8v2c",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa de Vídeo MSI GeForce RTX5050 8GB GDDR6 128BITS VENTUS 2X OC 912-V538-010",
-      "price": "R$2.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 247,05",
-      "image": "https://images.kabum.com.br/produtos/fotos/997882/placa-de-video-msi-geforce-rtx5050-8gb-gddr6-128bits-ventus-2x-oc-912-v538-010_1770140052_m.jpg",
-      "url": "https://www.kabum.com.br/produto/997882/placa-de-video-msi-geforce-rtx5050-8gb-gddr6-128bits-ventus-2x-oc-912-v538-010",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Vídeo Msi Nvidia Geforce RTX 5050 Shadow 8GB Gdrr6 128 Bits - 912-v538-008",
-      "price": "R$2.199,00",
-      "parcelamento": "No PIX ou 10x de R$ 219,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/951242/medium/Placa-De-V-deo-Msi-Nvidia-Geforce-RTX-5050-Shadow-8GB-Gdrr6-128-Bits-912-v538-008_1779372236.jpg",
-      "url": "https://www.kabum.com.br/produto/951242/placa-de-video-msi-geforce-rtx-5050-shadow-2x-oc-8gb-gddr6-128bits-912-v538-008",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Video Gpu Inno3d Geforce RTX 5050 Twin X2 8GB 128bits Gddr6 N50502-08d6-174071n",
-      "price": "R$2.199,90",
-      "parcelamento": "No PIX ou 10x de R$ 244,43",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/925184/medium/Placa-De-Video-Gpu-Inno3d-Geforce-RTX-5050-Twin-X2-8GB-128bits-Gddr6-N50502-08d6-174071n_1779205419.jpg",
-      "url": "https://www.kabum.com.br/produto/925184/placa-de-video-gpu-inno3d-geforce-rtx-5050-twin-x2-8gb-128bits-gddr6-n50502-08d6-174071n",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Video RTX5050 8GB Gddr6 128bits Msi Ventus 2x Oc 912-v538-0",
-      "price": "R$2.224,99",
-      "parcelamento": "No PIX ou 10x de R$ 252,83",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/905341/medium/Placa-De-Video-RTX5050-8GB-Gddr6-128bits-Msi-Ventus-2x-Oc-912-v538-0_1776564520.png",
-      "url": "https://www.kabum.com.br/produto/905341/placa-de-video-rtx5050-8gb-gddr6-128bits-msi-ventus-2x-oc-912-v538-0",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa de Vídeo GALAX NVIDIA GeForce RTX 5050 1-Click OC, 8GB, GDDR6, 128-Bits, Ray Tracing, DLSS 4 - 55NSL8MHDXRE",
-      "price": "R$2.249,99",
-      "parcelamento": "No PIX ou 10x de R$ 264,70",
-      "image": "https://images.kabum.com.br/produtos/fotos/953957/placa-de-video-galax-nvidia-geforce-rtx-5050-1-click-oc-8gb-gddr6-128-bits-ray-tracing-dlss-4-55nsl8mhdxre_1768484145_m.jpg",
-      "url": "https://www.kabum.com.br/produto/953957/placa-de-video-galax-nvidia-geforce-rtx-5050-1-click-oc-8gb-gddr6-128-bits-ray-tracing-dlss-4-55nsl8mhdxre",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Video Zotac RTX 5050 Twin Edge Oc 8GB Gddr6 128bits - Zt-b50500h-10m",
-      "price": "R$2.386,99",
-      "parcelamento": "No PIX ou 10x de R$ 265,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/909826/medium/Placa-De-Video-Zotac-RTX-5050-Twin-Edge-Oc-8GB-Gddr6-128bits-Zt-b50500h-10m_1776182915.jpg",
-      "url": "https://www.kabum.com.br/produto/909826/placa-de-video-zotac-rtx-5050-twin-edge-oc-8gb-gddr6-128bits-zt-b50500h-10m",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Video Galax Geforce RTX 5050 1 Click Oc 2x 8GB - 128 Bits - 2 HDMI/2x Displayport - 55nsl8mhdxre",
-      "price": "R$2.386,99",
-      "parcelamento": "No PIX ou 10x de R$ 265,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/996427/medium/Placa-De-Video-Galax-Geforce-RTX-5050-1-Click-Oc-2x-8GB-128-Bits-2-HDMI-2x-Displayport-55nsl8mhdxre_1777553953.jpg",
-      "url": "https://www.kabum.com.br/produto/996427/placa-de-video-galax-geforce-rtx-5050-1-click-oc-2x-8gb-128-bits-2-hdmi-2x-displayport-55nsl8mhdxre",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Video Asus Dual RTX 5050-o 8GB Gddr6 128 Bits RTX5050-o8g",
-      "price": "R$2.408,90",
-      "parcelamento": "No PIX ou 10x de R$ 240,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/928105/medium/Placa-De-Video-Asus-Dual-RTX-5050-o-8GB-Gddr6-128-Bits-RTX5050-o8g_1780424620.jpg",
-      "url": "https://www.kabum.com.br/produto/928105/placa-de-video-asus-dual-rtx-5050-o-8gb-gddr6-128-bits-rtx5050-o8g",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Vídeo Msi Geforce RTX 5050 Gaming Oc, 8GB, Gddr6, PCie 4.0, 912-v538-009",
-      "price": "R$2.599,40",
-      "parcelamento": "No PIX ou 10x de R$ 259,93",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1008840/medium/Placa-De-V-deo-Msi-Geforce-RTX-5050-Gaming-Oc-8GB-Gddr6-PCie-4-0-912-v538-009_1773155011.webp",
-      "url": "https://www.kabum.com.br/produto/1008840/placa-de-video-msi-geforce-rtx-5050-gaming-oc-8gb-gddr6-pcie-4-0-912-v538-009",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Vídeo Geforce RTX 5050 Pegasus 8GB 128bits Gddr6 Gainward",
-      "price": "R$2.761,44",
-      "parcelamento": "No PIX ou 10x de R$ 324,87",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/988015/medium/Placa-De-V-deo-Geforce-RTX-5050-Pegasus-8GB-128bits-Gddr6-Gainward_1771985322.png",
-      "url": "https://www.kabum.com.br/produto/988015/placa-de-video-geforce-rtx-5050-pegasus-8gb-128bits-gddr6-gainward",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa Video 8GB RTX5050 Msi Shadow Gddr6 Dual Fan",
-      "price": "R$2.789,90",
-      "parcelamento": "No PIX ou 10x de R$ 278,98",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1042821/medium/Placa-Video-8GB-RTX5050-Msi-Shadow-Gddr6-Dual-Fan_1779882522.jpg",
-      "url": "https://www.kabum.com.br/produto/1042821/placa-video-8gb-rtx5050-msi-shadow-gddr6-dual-fan",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Video Pny Geforce RTX 5050 8GB Gddr6 128 Bits - Vcg50508sfxpb1",
-      "price": "R$2.799,00",
-      "parcelamento": "No PIX ou 10x de R$ 279,89",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1033743/medium/Placa-De-Video-Pny-Geforce-RTX-5050-8GB-Gddr6-128-Bits-Vcg50508sfxpb1_1780349323.jpg",
-      "url": "https://www.kabum.com.br/produto/1033743/placa-de-video-pny-geforce-rtx-5050-8gb-gddr6-128-bits-vcg50508sfxpb1",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa de Vídeo Asus DUAL RTX 5050 OC 8G NVIDIA GeForce, 8GB, GDDR6, 128-bit, OpenGL 4.6, DLSS 4, Ray Tracing - 90YV0N72-M0NA00",
-      "price": "R$2.999,99",
-      "parcelamento": "No PIX ou 10x de R$ 340,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/888146/placa-de-video-asus-dual-rtx-5050-oc-8g-nvidia-geforce-8gb-gddr6-128-bit-opengl-4-6-dlss-4-ray-tracing-90yv0n72-m0na00_1751285839_m.jpg",
-      "url": "https://www.kabum.com.br/produto/888146/placa-de-video-asus-dual-rtx-5050-oc-8g-nvidia-geforce-8gb-gddr6-128-bit-opengl-4-6-dlss-4-ray-tracing-90yv0n72-m0na00",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 4500, 16gb 3200mhz, (RTX 5050 8GB), A520m, SSD 480GB, 600w 80 Plus, 3 Fans RGB, Neologic - Nli90479 U Unica Unica",
-      "price": "R$5.399,99",
-      "parcelamento": "No PIX ou 10x de R$ 620,68",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/911436/medium/PC-Gamer-Ryzen-5-4500-16gb-3200mhz-RTX-5050-8GB-A520m-SSD-480GB-600w-80-Plus-3-Fans-RGB-Neologic-Nli90479-U-Unica-Unica_1776950920.jpg",
-      "url": "https://www.kabum.com.br/produto/911436/pc-gamer-ryzen-5-4500-16gb-3200mhz-rtx-5050-8gb-a520m-ssd-480gb-m-2-600w-80-plus-3-fans-rgb-neologic-nli90479-u-unica-unica",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 5500| 16gb 3200mhz| (RTX 5050 8GB)| SSD 480GB| 600w 80 Plus| 3 Fans RGB, Neologic - Nli90475",
-      "price": "R$5.699,99",
-      "parcelamento": "No PIX ou 10x de R$ 633,33",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/910863/medium/PC-Gamer-Ryzen-5-5500-16gb-3200mhz-RTX-5050-8GB-SSD-480GB-600w-80-Plus-3-Fans-RGB-Neologic-Nli90475_1779134650.jpg",
-      "url": "https://www.kabum.com.br/produto/910863/pc-gamer-ryzen-5-5500-16gb-3200mhz-rtx-5050-8gb-a520m-ssd-480gb-m-2-600w-80-plus-3-fans-rgb-neologic-nli90475-u-unica-unica",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 5500, 16gb 3200mhz, (RTX 5050 8GB), A520m, SSD 480GB, 600w 80 Plus, 3 Fans RGB, Neologic - Nli90476 U Unica Unica",
-      "price": "R$5.799,99",
-      "parcelamento": "No PIX ou 10x de R$ 644,44",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/910859/medium/PC-Gamer-Ryzen-5-5500-16gb-3200mhz-RTX-5050-8GB-A520m-SSD-480GB-600w-80-Plus-3-Fans-RGB-Neologic-Nli90476-U-Unica-Unica_1776950912.jpg",
-      "url": "https://www.kabum.com.br/produto/910859/pc-gamer-ryzen-5-5500-16gb-3200mhz-rtx-5050-8gb-a520m-ssd-480gb-m-2-600w-80-plus-3-fans-rgb-neologic-nli90476-u-unica-unica",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Vídeo Msi Shadow 2x Oc 8GB Geforce RTX5050 Gddr6 - 912-v538-018",
-      "price": "R$5.934,23",
-      "parcelamento": "No PIX ou 10x de R$ 593,42",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032423/medium/Placa-De-V-deo-Msi-Shadow-2x-Oc-8GB-Geforce-RTX5050-Gddr6-912-v538-018_1777285120.jpg",
-      "url": "https://www.kabum.com.br/produto/1032423/placa-de-video-msi-shadow-2x-oc-8gb-geforce-rtx5050-gddr6-912-v538-018",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Vídeo Zotac Solo Gaming 8GB Geforce RTX5050 Gddr6 - Zt-b50500g-10l",
-      "price": "R$6.331,44",
-      "parcelamento": "No PIX ou 10x de R$ 633,14",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032495/medium/Placa-De-V-deo-Zotac-Solo-Gaming-8GB-Geforce-RTX5050-Gddr6-Zt-b50500g-10l_1777285427.jpg",
-      "url": "https://www.kabum.com.br/produto/1032495/placa-de-video-zotac-solo-gaming-8gb-geforce-rtx5050-gddr6-zt-b50500g-10l",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Vídeo Zotac Gaming Twin Edge Oc 8GB Geforce RTX5050 Gddr6 - Zt-b50500h-10m",
-      "price": "R$6.490,33",
-      "parcelamento": "No PIX ou 10x de R$ 649,03",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032503/medium/Placa-De-V-deo-Zotac-Gaming-Twin-Edge-Oc-8GB-Geforce-RTX5050-Gddr6-Zt-b50500h-10m_1777285429.jpg",
-      "url": "https://www.kabum.com.br/produto/1032503/placa-de-video-zotac-gaming-twin-edge-oc-8gb-geforce-rtx5050-gddr6-zt-b50500h-10m",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa De Vídeo Palit Dual Oc 8GB Geforce RTX5050 Gddr6 - Ne65050s19p1-gb2070d",
-      "price": "R$6.947,11",
-      "parcelamento": "No PIX ou 10x de R$ 694,71",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032485/medium/Placa-De-V-deo-Palit-Dual-Oc-8GB-Geforce-RTX5050-Gddr6-Ne65050s19p1-gb2070d_1777285435.jpg",
-      "url": "https://www.kabum.com.br/produto/1032485/placa-de-video-palit-dual-oc-8gb-geforce-rtx5050-gddr6-ne65050s19p1-gb2070d",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i7 14650hx 8GB Ram 512gb SSD Linux Keepos Tela 16\" 165hz Nível Ips Cinza - Rv019",
-      "price": "R$7.649,00",
-      "parcelamento": "No PIX ou 10x de R$ 899,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/951740/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i7-14650hx-8GB-Ram-512gb-SSD-Linux-Keepos-Tela-16-165hz-N-vel-Ips-Cinza-Rv019_1765585720.jpg",
-      "url": "https://www.kabum.com.br/produto/951740/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i7-14650hx-8gb-ram-512gb-ssd-linux-keepos-tela-16-165hz-nivel-ips-cinza-rv019",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i5 14a 16gb Ram 512gb SSD Linux 16\" Ips LED Fhd 165hz Rv257",
-      "price": "R$7.649,00",
-      "parcelamento": "No PIX ou 10x de R$ 899,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1036743/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i5-14a-16gb-Ram-512gb-SSD-Linux-16-Ips-LED-Fhd-165hz-Rv257_1778612620.jpg",
-      "url": "https://www.kabum.com.br/produto/1036743/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i5-14a-16gb-ram-512gb-ssd-linux-16-ips-led-fhd-165hz-rv257",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i5 14a 16gb Ram 512gb SSD WINDOWS 11 Home Tela 16\" LED Fhd 165hz Gray - Rv122w",
-      "price": "R$8.499,15",
-      "parcelamento": "No PIX ou 10x de R$ 999,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1008856/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i5-14a-16gb-Ram-512gb-SSD-WINDOWS-11-Home-Tela-16-LED-Fhd-165hz-Gray-Rv122w_1775825918.jpg",
-      "url": "https://www.kabum.com.br/produto/1008856/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i5-14a-16gb-ram-512gb-ssd-windows-11-home-tela-16-led-fhd-165hz-gray-rv122w",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i7 14a 16gb Ram 512gb SSD Linux 16\" Ips LED Fhd  165hz Rv290",
-      "price": "R$8.499,15",
-      "parcelamento": "No PIX ou 10x de R$ 999,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1035235/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i7-14a-16gb-Ram-512gb-SSD-Linux-16-Ips-LED-Fhd-165hz-Rv290_1778163210.jpg",
-      "url": "https://www.kabum.com.br/produto/1035235/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i7-14a-16gb-ram-512gb-ssd-linux-16-ips-led-fhd-165hz-rv290",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 5500, 16gb 3200mhz, (RTX 5050 8GB), A520m, SSD 480GB, 600w 80 Plus, 3 Fans RGB, Neologic - Nli90474 U Unica Unica",
-      "price": "R$8.999,99",
-      "parcelamento": "No PIX ou 10x de R$ 999,99",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/910865/medium/PC-Gamer-Ryzen-5-5500-16gb-3200mhz-RTX-5050-8GB-A520m-SSD-480GB-600w-80-Plus-3-Fans-RGB-Neologic-Nli90474-U-Unica-Unica_1776950921.jpg",
-      "url": "https://www.kabum.com.br/produto/910865/pc-gamer-ryzen-5-5500-16gb-3200mhz-rtx-5050-8gb-a520m-ssd-480gb-m-2-600w-80-plus-3-fans-rgb-neologic-nli90474-u-unica-unica",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i7 14650hx 16gb Ram 512gb SSD WINDOWS 11 Home Tela 16\" 165hz Nível Ips Cinza - Rv016w",
-      "price": "R$9.349,15",
-      "parcelamento": "No PIX ou 10x de R$ 1099,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/895398/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i7-14650hx-16gb-Ram-512gb-SSD-WINDOWS-11-Home-Tela-16-165hz-N-vel-Ips-Cinza-Rv016w_1770929885.jpg",
-      "url": "https://www.kabum.com.br/produto/895398/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i7-14650hx-16gb-ram-512gb-ssd-windows-11-home-tela-16-165hz-nivel-ips-cinza-rv016w",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqm072-e",
-      "price": "R$9.484,14",
-      "parcelamento": "No PIX ou 10x de R$ 948,41",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046471/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqm072-e_1780514625.jpg",
-      "url": "https://www.kabum.com.br/produto/1046471/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqm072-e",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqp071-e",
-      "price": "R$9.541,71",
-      "parcelamento": "No PIX ou 10x de R$ 954,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046423/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqp071-e_1780514623.jpg",
-      "url": "https://www.kabum.com.br/produto/1046423/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqp071-e",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqp001-e",
-      "price": "R$9.541,71",
-      "parcelamento": "No PIX ou 10x de R$ 954,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046465/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqp001-e_1780514624.jpg",
-      "url": "https://www.kabum.com.br/produto/1046465/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqp001-e",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Gc1073-e",
-      "price": "R$9.780,06",
-      "parcelamento": "No PIX ou 10x de R$ 978,00",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046462/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Gc1073-e_1780514624.jpg",
-      "url": "https://www.kabum.com.br/produto/1046462/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-gc1073-e",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Gamer Dell Alienware 16 Aurora Ac16250 Ac16-c7240h-m50 16\" Wqxga Intel Core7 16gb 1TBssd Nvidia RTX5050 Win11",
-      "price": "R$10.070,00",
-      "parcelamento": "No PIX ou 10x de R$ 1060,00",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/927885/medium/Notebook-Gamer-Dell-Alienware-16-Aurora-Ac16250-Ac16-c7240h-m50-16-Wqxga-Intel-Core7-16gb-1TBssd-Nvidia-RTX5050-Win11_1771853187.jpg",
-      "url": "https://www.kabum.com.br/produto/927885/notebook-gamer-dell-alienware-16-aurora-ac16250-ac16-c7240h-m50-16-wqxga-intel-core7-16gb-1tbssd-nvidia-rtx5050-win11",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Completo Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqm037-e",
-      "price": "R$10.104,09",
-      "parcelamento": "No PIX ou 10x de R$ 1010,40",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046156/medium/PC-Gamer-Completo-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqm037-e_1780492725.jpg",
-      "url": "https://www.kabum.com.br/produto/1046156/pc-gamer-completo-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqm037-e",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Completo Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqp036-e",
-      "price": "R$10.175,06",
-      "parcelamento": "No PIX ou 10x de R$ 1017,50",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046117/medium/PC-Gamer-Completo-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqp036-e_1780492727.jpg",
-      "url": "https://www.kabum.com.br/produto/1046117/pc-gamer-completo-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqp036-e",
-      "relevancia": 2
-    },
-    {
-      "title": "PC Gamer Completo Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Gc1096-e",
-      "price": "R$10.413,40",
-      "parcelamento": "No PIX ou 10x de R$ 1041,34",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046174/medium/PC-Gamer-Completo-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Gc1096-e_1780492727.jpg",
-      "url": "https://www.kabum.com.br/produto/1046174/pc-gamer-completo-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-gc1096-e",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Asus Gaming V16 V3607vh Nvidia RTX 5050 Intel Core 5 16gb Ram 512gb SSD WINDOWS 11 Home 16\" Lcd LED Fhd Nível Ips Rp106w",
-      "price": "R$11.999,00",
-      "parcelamento": "No PIX ou 10x de R$ 1199,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1039197/medium/Notebook-Asus-Gaming-V16-V3607vh-Nvidia-RTX-5050-Intel-Core-5-16gb-Ram-512gb-SSD-WINDOWS-11-Home-16-Lcd-LED-Fhd-N-vel-Ips-Rp106w_1779132520.jpg",
-      "url": "https://www.kabum.com.br/produto/1039197/notebook-asus-gaming-v16-v3607vh-nvidia-rtx-5050-intel-core-5-16gb-ram-512gb-ssd-windows-11-home-16-lcd-led-fhd-nivel-ips-rp106w",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Gamer Alienware Aurora AC16250 Intel Core i7 240H, 32GB RAM, RTX 5050 8GB, SSD 1TB, Tela 16\" QHD, Windows 11 Home",
-      "price": "R$13.080,00",
-      "parcelamento": "No PIX ou 10x de R$ 1308,00",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1028264/medium/Notebook-Gamer-Alienware-Aurora-AC16250-Intel-Core-i7-240H-32GB-RAM-RTX-5050-8GB-SSD-1TB-Tela-16-QHD-Windows-11-Home_1775748213.jpg",
-      "url": "https://www.kabum.com.br/produto/1028264/notebook-gamer-alienware-aurora-ac16250-intel-core-i7-240h-32gb-ram-rtx-5050-8gb-ssd-1tb-tela-16-qhd-windows-11-home",
-      "relevancia": 2
-    },
-    {
-      "title": "Notebook Gamer Dell Alienware 16 Aurora Ac16250 Ac16-c7240h-m90 16\" Wqxga Intel Core7 32gb 1TBssd Nvidia RTX5050 Win11",
-      "price": "R$13.935,55",
-      "parcelamento": "No PIX ou 10x de R$ 1466,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/933226/medium/Notebook-Gamer-Dell-Alienware-16-Aurora-Ac16250-Ac16-c7240h-m90-16-Wqxga-Intel-Core7-32gb-1TBssd-Nvidia-RTX5050-Win11_1771853187.jpg",
-      "url": "https://www.kabum.com.br/produto/933226/notebook-gamer-dell-alienware-16-aurora-ac16250-ac16-c7240h-m90-16-wqxga-intel-core7-32gb-1tbssd-nvidia-rtx5050-win11",
-      "relevancia": 2
-    },
-    {
-      "title": "Placa de Vídeo PcYes Nvidia Geforce Rtx 3050 6Gb Gddr6 96Bits - Pvpcr30506Gb2F",
-      "price": "R$1.199,99",
-      "parcelamento": "No PIX ou 10x de R$ 141,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/998334/placa-de-video-pcyes-nvidia-geforce-rtx-3050-6gb-gddr6-96bits-pvpcr30506gb2f_1771421169_m.jpg",
-      "url": "https://www.kabum.com.br/produto/998334/placa-de-video-pcyes-nvidia-geforce-rtx-3050-6gb-gddr6-96bits-pvpcr30506gb2f",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Vídeo MSI RTX 3050 LP OC NVIDIA Geforce, 6GB, GDDR6, 96-Bit, Low Profile - G3050LP6C",
-      "price": "R$1.299,99",
-      "parcelamento": "No PIX ou 10x de R$ 144,44",
-      "image": "https://images.kabum.com.br/produtos/fotos/1012613/placa-de-video-msi-geforce-rtx-3050-lp-oc-nvidia-6gb-gddr6-96-bit-low-profile-g3050lp6c_1775759946_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1012613/placa-de-video-msi-rtx-3050-lp-oc-nvidia-geforce-6gb-gddr6-96-bit-low-profile-g3050lp6c",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Video MSI GeForce RTX 3050 Ventus OC 2X, 6GB, GDDR6, 96-bit, 912-V812-060",
-      "price": "R$1.308,90",
-      "parcelamento": "No PIX ou 10x de R$ 153,98",
-      "image": "https://images.kabum.com.br/produtos/fotos/997881/placa-de-video-msi-geforce-rtx-3050-ventus-oc-2x-6gb-gddr6-96-bit-912-v812-060_1770130439_m.jpg",
-      "url": "https://www.kabum.com.br/produto/997881/placa-de-video-msi-geforce-rtx-3050-ventus-oc-2x-6gb-gddr6-96-bit-912-v812-060",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Vídeo RTX 3050 ASUS 6G Dual OC NVIDIA GeForce, 6GB GDDR6, DLSS, Ray Tracing, G-Sync  - 90YV0K60-M0NA00",
-      "price": "R$1.399,99",
-      "parcelamento": "No PIX ou 10x de R$ 164,70",
-      "image": "https://images.kabum.com.br/produtos/fotos/520492/placa-de-video-rtx-3050-asus-o6g-dual-nvidia-geforce-dlss-ray-tracing-g-sync-90yv0k60-m0na00_1711648234_m.jpg",
-      "url": "https://www.kabum.com.br/produto/520492/placa-de-video-rtx-3050-asus-6g-dual-oc-nvidia-geforce-6gb-gddr6-dlss-ray-tracing-g-sync-90yv0k60-m0na00",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Vídeo Galax GeForce RTX 3050 EX V2, 6GB, GDDR6, 96 Bits - 35NRLDHP9OID",
-      "price": "R$1.459,99",
-      "parcelamento": "No PIX ou 10x de R$ 171,76",
-      "image": "https://images.kabum.com.br/produtos/fotos/703109/placa-de-video-galax-geforce-rtx-3050-ex-v2-6gb-gddr6-96-bits-35nrldhp9oid_1738068519_m.jpg",
-      "url": "https://www.kabum.com.br/produto/703109/placa-de-video-galax-geforce-rtx-3050-ex-v2-6gb-gddr6-96-bits-35nrldhp9oid",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Vídeo Pcyes Projeto Edge GPU RTX 3050 NVIDIA Geforce, 8GB, GDDR6, 128Bit, Branco - PVRTX30508WTPE",
-      "price": "R$1.499,99",
-      "parcelamento": "No PIX ou 10x de R$ 176,46",
-      "image": "https://images.kabum.com.br/produtos/fotos/716959/placa-de-video-pcyes-gpu-nvidia-geforce-rtx-3050-8gb-gddr6-128bit-projeto-edge-branco-pvrtx30508wtpe_1744386589_m.jpg",
-      "url": "https://www.kabum.com.br/produto/716959/placa-de-video-pcyes-projeto-edge-gpu-rtx-3050-nvidia-geforce-8gb-gddr6-128bit-branco-pvrtx30508wtpe",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Vídeo Gigabyte Geforce RTX 3050 Windforce Oc V2 6gb Gddr6 96 Bit",
-      "price": "R$1.699,27",
-      "parcelamento": "No PIX ou 10x de R$ 197,59",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/729052/medium/Placa-De-V-deo-Gigabyte-Geforce-RTX-3050-Windforce-Oc-V2-6gb-Gddr6-96-Bit_1747783178.jpg",
-      "url": "https://www.kabum.com.br/produto/729052/placa-de-video-gigabyte-geforce-rtx-3050-windforce-oc-v2-6gb-gddr6-96-bit",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Vídeo Pcyes Projeto Edge GPU RTX 3050 NVIDIA Geforce, 8GB, GDDR6, 128Bit - PVRTX30508BLPE",
-      "price": "R$1.999,99",
-      "parcelamento": "No PIX ou 10x de R$ 235,29",
-      "image": "https://images.kabum.com.br/produtos/fotos/716958/placa-de-video-pcyes-gpu-nvidia-geforce-rtx-3050-8gb-gddr6-128bit-projeto-edge-pvrtx30508blpe_1744384396_m.jpg",
-      "url": "https://www.kabum.com.br/produto/716958/placa-de-video-pcyes-projeto-edge-gpu-rtx-3050-nvidia-geforce-8gb-gddr6-128bit-pvrtx30508blpe",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Video Msi Geforce RTX 5060 Shadow 2x Oc 8GB Gddr7 128 Bits 912-v537-037",
-      "price": "R$2.499,00",
-      "parcelamento": "No PIX ou 10x de R$ 271,63",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/882316/medium/Placa-De-Video-Msi-Geforce-RTX-5060-Shadow-2x-Oc-8GB-Gddr7-128-Bits-912-v537-037_1779114525.jpg",
-      "url": "https://www.kabum.com.br/produto/882316/vga-msi-nv-gf-rtx5060-8gb-gddr7-128bits-shadow-2x-oc-912-v537-037",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Vídeo MSI RTX 5060 Shadow 2X OC NVIDIA GeForce, 8GB, GDDR7, 128-bit - 912-V537-038",
-      "price": "R$2.559,99",
-      "parcelamento": "No PIX ou 10x de R$ 301,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/1000741/placa-de-video-msi-rtx-5060-shadow-2x-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v537-038_1771333499_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1000741/placa-de-video-msi-rtx-5060-shadow-2x-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v537-038",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Vídeo ASUS RTX 5060 Dual NVIDIA GeForce, 8GB, GDDR7, 128-bit - DUAL-RTX5060-8G",
-      "price": "R$2.599,99",
-      "parcelamento": "No PIX ou 10x de R$ 305,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/1000487/placa-de-video-asus-rtx-5060-dual-nvidia-geforce-8gb-gddr7-128-bit-dual-rtx5060-8g_1770982522_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1000487/placa-de-video-asus-rtx-5060-dual-nvidia-geforce-8gb-gddr7-128-bit-dual-rtx5060-8g",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Vídeo MSI RTX 5060 Cyclone OC NVIDIA GeForce, 8GB, GDDR7, 128-bit - 912-V812-205",
-      "price": "R$2.849,99",
-      "parcelamento": "No PIX ou 10x de R$ 335,29",
-      "image": "https://images.kabum.com.br/produtos/fotos/1000742/placa-de-video-msi-rtx-5060-cyclone-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v812-205_1771004650_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1000742/placa-de-video-msi-rtx-5060-cyclone-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v812-205",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Vídeo MSI GeForce RTX 5060 Ti Shadow 2X OC Plus, Nvidia, 8GB, GDDR7, 128-Bit - G506T-8S2CP",
-      "price": "R$2.899,99",
-      "parcelamento": "No PIX ou 10x de R$ 322,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/1012610/placa-de-video-msi-geforce-rtx-5060-ti-shadow-2x-oc-plus-nvidia-8gb-gddr7-128-bit-g506t-8s2cp_1775757469_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1012610/placa-de-video-msi-geforce-rtx-5060-ti-shadow-2x-oc-plus-nvidia-8gb-gddr7-128-bit-g506t-8s2cp",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Video Palit GeForce RTX 5060 8GB INFINITY 2 OC GDDR7 128bits - NE75060V19P1-GB2063L",
-      "price": "R$2.999,99",
-      "parcelamento": "No PIX ou 10x de R$ 352,93",
-      "image": "https://images.kabum.com.br/produtos/fotos/988706/placa-de-video-palit-geforce-rtx-5060-8gb-infinity-2-oc-gddr7-128bits-ne75060v19p1-gb2063l_1771874345_m.jpg",
-      "url": "https://www.kabum.com.br/produto/988706/placa-de-video-palit-geforce-rtx-5060-8gb-infinity-2-oc-gddr7-128bits-ne75060v19p1-gb2063l",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Vídeo MSI RTX 5060 Ti Gaming OC NVIDIA GeForce, 8GB, GDDR7, 128-Bit - G506T-8GC",
-      "price": "R$3.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 344,44",
-      "image": "https://images.kabum.com.br/produtos/fotos/1013926/placa-de-video-msi-geforce-rtx-5060-ti-gaming-oc-nvidia-8gb-gddr7-128-bit-g506t-8gc_1776087485_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1013926/placa-de-video-msi-rtx-5060-ti-gaming-oc-nvidia-geforce-8gb-gddr7-128-bit-g506t-8gc",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Vídeo MSI GeForce RTX 5070 12G VENTUS 2X OC,12 GB GDDR7, 28Gbps, NVIDIA GeForce RTX 5070- G5070-12V2C",
-      "price": "R$4.599,99",
-      "parcelamento": "No PIX ou 10x de R$ 541,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/725587/placa-de-video-msi-geforce-rtx-5070-12g-ventus-2x-oc-g5070-12v2c_1741201246_m.jpg",
-      "url": "https://www.kabum.com.br/produto/725587/placa-de-video-msi-geforce-rtx-5070-12g-ventus-2x-oc-12-gb-gddr7-28gbps-nvidia-geforce-rtx-5070-g5070-12v2c",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa de Vídeo ASUS PRIME RTX 5070 OC 12G WHITE NVIDIA Geforce, 12GB, GDDR7, OpenGL 4.6, 2587 MHz, Triple Fan, DLSS 4 - 90YV0M19-M0NA00",
-      "price": "R$5.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 599,99",
-      "image": "https://images.kabum.com.br/produtos/fotos/870970/placa-de-video-asus-prime-rtx-5070-oc-12g-white-nvidia-geforce-12gb-gddr7-opengl-4-6-2587-mhz-triple-fan-dlss-4-90yv0m19-m0na00_1750943794_m.jpg",
-      "url": "https://www.kabum.com.br/produto/870970/placa-de-video-asus-prime-rtx-5070-oc-12g-white-nvidia-geforce-12gb-gddr7-opengl-4-6-2587-mhz-triple-fan-dlss-4-90yv0m19-m0na00",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa De Video Pny Nvidia Quadro RTX Pro6000 Blackwell Wkstation 96gb Gddr7 512bit VcnRTXpro6000b-pb",
-      "price": "R$89.093,72",
-      "parcelamento": "No PIX ou 10x de R$ 8909,37",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/927538/medium/Placa-De-Video-Pny-Nvidia-Quadro-RTX-Pro6000-Blackwell-Wkstation-96gb-Gddr7-512bit-VcnRTXpro6000b-pb_1757686179.jpg",
-      "url": "https://www.kabum.com.br/produto/927538/placa-de-video-pny-nvidia-quadro-rtx-pro6000-blackwell-wkstation-96gb-gddr7-512bit-vcnrtxpro6000b-pb",
-      "relevancia": 1
-    },
-    {
-      "title": "Placa-Mãe Husky Nexus B450, M.2 NVMe, DDR4 3200MHz, Ryzen 5000/3000/2000, Micro-ATX, 64GB Dual Channel - HPM450",
-      "price": "R$369,99",
-      "parcelamento": "No PIX ou 10x de R$ 43,52",
-      "image": "https://images.kabum.com.br/produtos/fotos/692459/placa-mae-husky-nexus-b450-m-2-nvme-ddr4-3200mhz-ryzen-5000-3000-2000-micro-atx-64gb-dual-channel-hpm450_1761574090_m.jpg",
-      "url": "https://www.kabum.com.br/produto/692459/placa-mae-husky-nexus-b450-m-2-nvme-ddr4-3200mhz-ryzen-5000-3000-2000-micro-atx-64gb-dual-channel-hpm450",
-      "relevancia": 0
-    },
-    {
-      "title": "Placa de Vídeo RX 7600 GAMING OC 8G AMD Radeon Gigabyte, 8GB, GDDR6, 128bits, RGB - GV-R76GAMING OC-8GD",
-      "price": "R$1.659,99",
-      "parcelamento": "No PIX ou 10x de R$ 195,29",
-      "image": "https://images.kabum.com.br/produtos/fotos/475647/placa-de-video-rx-7600-gaming-oc-8g-radeon-gigabyte-8gb-gddr6-128bits-rgb-gv-r76gaming-oc-8gd_1698435450_m.jpg",
-      "url": "https://www.kabum.com.br/produto/475647/placa-de-video-rx-7600-gaming-oc-8g-amd-radeon-gigabyte-8gb-gddr6-128bits-rgb-gv-r76gaming-oc-8gd",
-      "relevancia": 0
-    },
-    {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr-rv124 Jaeger Gray",
-      "price": "R$6.678,00",
-      "parcelamento": "No PIX ou 10x de R$ 795,00",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1004703/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-rv124-Jaeger-Gray_1775825919.jpg",
-      "url": "https://www.kabum.com.br/produto/1004703/notebook-asus-tuf-gaming-f16-fx608jhr-rv124-jaeger-gray",
-      "relevancia": 0
     }
   ]
 }

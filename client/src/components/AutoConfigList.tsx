@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Plus, AlertCircle, Check } from 'lucide-react';
+import type { KeyboardEvent, PointerEvent } from 'react';
+import { X, Plus, AlertCircle, Check, GripVertical } from 'lucide-react';
 import type { Site, AutoConfigEntry } from '../types';
 import { Icon } from './Icon';
 
@@ -25,14 +26,29 @@ interface LocalEntry {
   savedId?: number;
 }
 
+interface DragPreview {
+  sourceId: number;
+  sourceIndex: number;
+  targetIndex: number;
+  pointerY: number;
+  grabOffsetY: number;
+  itemHeight: number;
+  itemWidth: number;
+  itemLeft: number;
+}
+
 let nextTempId = Date.now();
 
 export function AutoConfigList({ sites, configs, onSave, saving, loading }: AutoConfigListProps) {
   const [entries, setEntries] = useState<LocalEntry[]>([]);
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<number | null>(null);
+  const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const initialized = useRef(false);
   const newEntryRef = useRef<HTMLInputElement>(null);
+  const draggingIdRef = useRef<number | null>(null);
+  const dragPreviewRef = useRef<DragPreview | null>(null);
 
   // Sync from server configs
   useEffect(() => {
@@ -41,6 +57,40 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
       initialized.current = true;
     }
   }, [configs, dirty]);
+
+  useEffect(() => {
+    dragPreviewRef.current = dragPreview;
+  }, [dragPreview]);
+
+  useEffect(() => {
+    if (!draggingId) return undefined;
+
+    function handleWindowPointerMove(event: globalThis.PointerEvent) {
+      const sourceId = draggingIdRef.current;
+      if (!sourceId) return;
+      event.preventDefault();
+      const targetIndex = getPointerTargetIndex(event.clientY, sourceId);
+      setDragPreview((prev) => (prev ? { ...prev, pointerY: event.clientY, targetIndex } : prev));
+    }
+
+    function handleWindowPointerUp() {
+      const preview = dragPreviewRef.current;
+      if (preview && preview.targetIndex !== preview.sourceIndex) {
+        moveEntryToIndex(preview.sourceId, preview.targetIndex);
+      }
+      draggingIdRef.current = null;
+      setDraggingId(null);
+      setDragPreview(null);
+    }
+
+    window.addEventListener('pointermove', handleWindowPointerMove);
+    window.addEventListener('pointerup', handleWindowPointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handleWindowPointerMove);
+      window.removeEventListener('pointerup', handleWindowPointerUp);
+    };
+  }, [draggingId]);
 
   const addEntry = useCallback(() => {
     if (entries.length >= 10) return;
@@ -63,6 +113,84 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
   function removeEntry(tempId: number) {
     setEntries((prev) => prev.filter((e) => e.tempId !== tempId));
     setDirty(true);
+  }
+
+  function moveEntryToIndex(sourceId: number, targetIndex: number) {
+    setEntries((prev) => {
+      const sourceIndex = prev.findIndex((e) => e.tempId === sourceId);
+      if (sourceIndex === -1) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(sourceIndex, 1);
+      const safeIndex = Math.max(0, Math.min(targetIndex, next.length));
+      next.splice(safeIndex, 0, moved);
+      return next;
+    });
+    setDirty(true);
+  }
+
+  function moveEntry(sourceId: number, targetId: number) {
+    if (sourceId === targetId) return;
+    setEntries((prev) => {
+      const sourceIndex = prev.findIndex((e) => e.tempId === sourceId);
+      const targetIndex = prev.findIndex((e) => e.tempId === targetId);
+      if (sourceIndex === -1 || targetIndex === -1) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(sourceIndex, 1);
+      next.splice(targetIndex, 0, moved);
+      return next;
+    });
+    setDirty(true);
+  }
+
+  function getPointerTargetIndex(clientY: number, sourceId: number) {
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-config-entry]'))
+      .filter((row) => Number(row.dataset.configEntry) !== sourceId);
+    let nextIndex = rows.length;
+    rows.some((row, index) => {
+      const rect = row.getBoundingClientRect();
+      if (clientY < rect.top + rect.height / 2) {
+        nextIndex = index;
+        return true;
+      }
+      return false;
+    });
+    return nextIndex;
+  }
+
+  function handlePointerDown(event: PointerEvent<HTMLButtonElement>, tempId: number) {
+    if (event.button !== 0) return;
+    const row = event.currentTarget.closest<HTMLElement>('[data-config-entry]');
+    if (!row) return;
+    const rect = row.getBoundingClientRect();
+    const sourceIndex = entries.findIndex((entry) => entry.tempId === tempId);
+    if (sourceIndex === -1) return;
+    draggingIdRef.current = tempId;
+    setDraggingId(tempId);
+    setDragPreview({
+      sourceId: tempId,
+      sourceIndex,
+      targetIndex: sourceIndex,
+      pointerY: event.clientY,
+      grabOffsetY: event.clientY - rect.top,
+      itemHeight: rect.height,
+      itemWidth: rect.width,
+      itemLeft: rect.left,
+    });
+    event.preventDefault();
+  }
+
+  function handlePointerCancel() {
+    draggingIdRef.current = null;
+    setDraggingId(null);
+    setDragPreview(null);
+  }
+
+  function handleHandleKeyDown(event: KeyboardEvent<HTMLButtonElement>, tempId: number, index: number) {
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+    event.preventDefault();
+    const targetIndex = event.key === 'ArrowUp' ? index - 1 : index + 1;
+    const target = entries[targetIndex];
+    if (target) moveEntry(tempId, target.tempId);
   }
 
   async function handleSave() {
@@ -91,6 +219,9 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
       </div>
     );
   }
+
+  const activeDragEntry = dragPreview ? entries.find((entry) => entry.tempId === dragPreview.sourceId) : null;
+  const visibleEntries = activeDragEntry ? entries.filter((entry) => entry.tempId !== activeDragEntry.tempId) : entries;
 
   return (
     <div className="space-y-3">
@@ -137,74 +268,138 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
         </div>
       ) : (
         <div className="space-y-2">
-          {entries.map((entry, idx) => {
+          {visibleEntries.map((entry, idx) => {
+            const isDragging = draggingId === entry.tempId;
+            const showDropSlot = dragPreview?.targetIndex === idx;
+            const displayIndex = dragPreview && dragPreview.targetIndex <= idx ? idx + 2 : idx + 1;
             return (
-              <div
-                key={entry.tempId}
-                className="flex items-center gap-2.5 p-3 rounded-xl bg-surface/40 border border-white/[0.06] hover:border-white/[0.12] transition-colors duration-200 group animate-[fadeInUp_0.25s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-                style={{ animationDelay: `${idx * 0.04}s` }}
-              >
-                {/* Drag handle visual */}
-                <div className="shrink-0 flex flex-col gap-0.5 opacity-20 group-hover:opacity-50 transition-opacity cursor-grab">
-                  <span className="block w-3 h-px bg-text-muted" />
-                  <span className="block w-3 h-px bg-text-muted" />
-                  <span className="block w-3 h-px bg-text-muted" />
-                </div>
-
-                {/* Number */}
-                <span className="text-[11px] text-text-muted w-4 shrink-0 font-mono tabular-nums">{idx + 1}</span>
-
-                {/* Termo input */}
-                <input
-                  ref={idx === entries.length - 1 ? newEntryRef : undefined}
-                  data-config-term
-                  type="text"
-                  value={entry.termo}
-                  onChange={(e) => updateEntry(entry.tempId, 'termo', e.target.value)}
-                  placeholder="Ex: RTX 4070"
-                  className="flex-1 min-w-0 bg-transparent border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/40 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-colors font-ui"
-                />
-
-                {/* Site selector — button group */}
-                <div className="shrink-0 flex items-center gap-0.5 p-0.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-                  {sites.map((site) => {
-                    const cfg = SITE_CONFIG[site.key] || SITE_CONFIG.kabum;
-                    const isActive = entry.site === site.key;
-                    return (
-                      <button
-                        key={site.key}
-                        type="button"
-                        onClick={() => updateEntry(entry.tempId, 'site', site.key)}
-                        aria-pressed={isActive}
-                        className={`px-2.5 py-1.5 rounded-md text-[11px] font-semibold transition-colors duration-200 ${
-                          isActive
-                            ? 'shadow-sm'
-                            : 'text-text-muted/60 hover:text-text-secondary'
-                        }`}
-                        style={
-                          isActive
-                            ? { color: cfg.text, backgroundColor: cfg.bg }
-                            : undefined
-                        }
-                      >
-                        {site.nome}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Remove */}
-                <button
-                  onClick={() => removeEntry(entry.tempId)}
-                  aria-label={`Remover ${entry.termo || `produto ${idx + 1}`}`}
-                  className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-text-muted/40 hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                  title="Remover"
+              <div key={entry.tempId} className="space-y-2">
+                {showDropSlot && (
+                  <div
+                    className="rounded-xl border border-accent/50 bg-accent/10 transition-all duration-150"
+                    style={{ height: dragPreview.itemHeight }}
+                    aria-hidden="true"
+                  />
+                )}
+                <div
+                  data-config-entry={entry.tempId}
+                  className={`flex items-center gap-2.5 p-3 rounded-xl bg-surface/40 border transition-colors duration-200 group ${
+                    isDragging
+                      ? 'border-accent/45 opacity-60'
+                      : 'border-white/[0.06] hover:border-white/[0.12]'
+                  }`}
                 >
-                  <Icon icon={X} size={14} />
-                </button>
+                  <button
+                    type="button"
+                    onPointerDown={(event) => handlePointerDown(event, entry.tempId)}
+                    onPointerCancel={handlePointerCancel}
+                    onKeyDown={(event) => handleHandleKeyDown(event, entry.tempId, idx)}
+                    aria-label={`Reordenar ${entry.termo || `produto ${displayIndex}`}`}
+                    className="shrink-0 w-6 h-7 flex items-center justify-center rounded-md text-text-muted/35 hover:text-text-secondary focus:text-text-secondary active:cursor-grabbing cursor-grab transition-colors touch-none"
+                    title="Arrastar para reordenar"
+                  >
+                    <Icon icon={GripVertical} size={15} />
+                  </button>
+
+                  {/* Number */}
+                  <span className="text-[11px] text-text-muted w-4 shrink-0 font-mono tabular-nums">{displayIndex}</span>
+
+                  {/* Termo input */}
+                  <input
+                    ref={idx === visibleEntries.length - 1 ? newEntryRef : undefined}
+                    data-config-term
+                    type="text"
+                    value={entry.termo}
+                    onChange={(e) => updateEntry(entry.tempId, 'termo', e.target.value)}
+                    placeholder="Ex: RTX 4070"
+                    className="flex-1 min-w-0 bg-transparent border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/40 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-colors font-ui"
+                  />
+
+                  {/* Site selector — button group */}
+                  <div className="shrink-0 flex items-center gap-0.5 p-0.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                    {sites.map((site) => {
+                      const cfg = SITE_CONFIG[site.key] || SITE_CONFIG.kabum;
+                      const isActive = entry.site === site.key;
+                      return (
+                        <button
+                          key={site.key}
+                          type="button"
+                          onClick={() => updateEntry(entry.tempId, 'site', site.key)}
+                          aria-pressed={isActive}
+                          className={`px-2.5 py-1.5 rounded-md text-[11px] font-semibold transition-colors duration-200 ${
+                            isActive
+                              ? 'shadow-sm'
+                              : 'text-text-muted/60 hover:text-text-secondary'
+                          }`}
+                          style={
+                            isActive
+                              ? { color: cfg.text, backgroundColor: cfg.bg }
+                              : undefined
+                          }
+                        >
+                          {site.nome}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Remove */}
+                  <button
+                    onClick={() => removeEntry(entry.tempId)}
+                    aria-label={`Remover ${entry.termo || `produto ${displayIndex}`}`}
+                    className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-text-muted/40 hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                    title="Remover"
+                  >
+                    <Icon icon={X} size={14} />
+                  </button>
+                </div>
               </div>
             );
           })}
+          {dragPreview && dragPreview.targetIndex === visibleEntries.length && (
+            <div
+              className="rounded-xl border border-accent/50 bg-accent/10 transition-all duration-150"
+              style={{ height: dragPreview.itemHeight }}
+              aria-hidden="true"
+            />
+          )}
+          {dragPreview && activeDragEntry && (
+            <div
+              className="fixed z-50 flex items-center gap-2.5 p-3 rounded-xl bg-surface-alt border border-accent/70 shadow-[0_10px_30px_rgba(0,0,0,0.35)] pointer-events-none"
+              style={{
+                left: dragPreview.itemLeft,
+                top: dragPreview.pointerY - dragPreview.grabOffsetY,
+                width: dragPreview.itemWidth,
+                height: dragPreview.itemHeight,
+              }}
+              aria-hidden="true"
+            >
+              <div className="shrink-0 w-6 h-7 flex items-center justify-center rounded-md text-text-secondary">
+                <Icon icon={GripVertical} size={15} />
+              </div>
+              <span className="text-[11px] text-text-muted w-4 shrink-0 font-mono tabular-nums">{dragPreview.targetIndex + 1}</span>
+              <div className="flex-1 min-w-0 border border-accent/30 rounded-lg px-3 py-2 text-sm text-text-primary font-ui truncate">
+                {activeDragEntry.termo || 'Novo produto'}
+              </div>
+              <div className="shrink-0 flex items-center gap-0.5 p-0.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                {sites.map((site) => {
+                  const cfg = SITE_CONFIG[site.key] || SITE_CONFIG.kabum;
+                  const isActive = activeDragEntry.site === site.key;
+                  return (
+                    <span
+                      key={site.key}
+                      className={`px-2.5 py-1.5 rounded-md text-[11px] font-semibold ${
+                        isActive ? '' : 'text-text-muted/60'
+                      }`}
+                      style={isActive ? { color: cfg.text, backgroundColor: cfg.bg } : undefined}
+                    >
+                      {site.nome}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

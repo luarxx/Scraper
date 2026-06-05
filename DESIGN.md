@@ -146,8 +146,8 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - **Animações**: `panelSlideIn` no conteúdo, `kpiStagger` nos KPIs
 
 ### AutoConfigList
-- **Entradas inline**: termo input + seletor de site em button-group (cores por loja) + drag handle visual + botão remover
-- **Animações**: `fadeInUp` com delay progressivo em cada entry
+- **Entradas inline**: termo input + seletor de site em button-group (cores por loja) + drag handle funcional com card flutuante, slot de destino e suporte a teclado + botão remover
+- **Animações**: sem animação de entrada nas entries editáveis; usar apenas transições de borda/fundo para evitar flicker ao adicionar, editar ou reordenar
 - **Empty state**: ilustração SVG (caixa + lupa), título + descrição + CTA
 - **Status "Não salvo"**: badge laranja quando há mudanças pendentes
 - **Botão "Salvar"**: mostra spinner durante save, checkmark quando salvo

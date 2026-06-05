@@ -2,6 +2,24 @@
 
 Resumo do fluxo para atualizar o site em producao depois de alterar o repositorio local.
 
+## Atualizacao automatica
+
+O projeto tambem possui deploy automatico via GitHub Actions:
+
+```txt
+.github/workflows/deploy-vps.yml
+```
+
+Depois de configurar os secrets descritos em `DEPLOY_GITHUB_ACTIONS.md`, basta fazer:
+
+```bash
+git push origin master
+```
+
+O GitHub builda o projeto, envia os arquivos de producao para a VPS e reinicia o PM2 automaticamente.
+
+O fluxo abaixo continua valido caso queira atualizar manualmente pelo FileZilla.
+
 ## 1. Gerar build local
 
 No computador local, dentro do projeto:

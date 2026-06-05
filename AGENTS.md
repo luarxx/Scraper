@@ -194,12 +194,15 @@ Auto:
 - **Tema escuro**: fundo `#020617` (slate-950), superfície `#0f172a` (slate-900), variáveis CSS customizadas via `@theme`
 - **Cor de destaque**: laranja (`--color-accent: #f97316`), aplicada em inputs, badges e botões
 - **Cores por loja**: KaBuM! laranja, Pichau vermelho, Terabyte verde — definidas em `App.tsx`, `ProductCard.tsx`, `SearchHistory.tsx`, `AutoResultsView.tsx`
-- **Fontes**: **Inter** (UI, Google Fonts) + **DM Sans** (Display, Google Fonts) — carregadas via `<link>` em `index.html`
-- **Background animado**: gradientes radiais fixos com `gradientShift` (30s infinite alternate) + textura noise SVG `feTurbulence` overlay (35% opacity, `mix-blend-mode: overlay`)
+- **Fontes**: **Inter** (UI principal, Google Fonts) + **DM Sans** (Display pontual, Google Fonts) — carregadas via `<link>` em `index.html`
+- **Background**: gradientes radiais fixos e discretos + textura noise SVG `feTurbulence` overlay (35% opacity, `mix-blend-mode: overlay`), sem animação contínua por padrão
 - **Scrollbar customizada**: 6px largura, thumb `rgba(249,115,22,0.25)` com hover mais claro
-- **Animações**: `fadeIn`, `fadeInUp`, `badgePop`, `dotPulse`, `spinSlow`, `spinReverse`, `shimmer`, `breathe`, `tabActivate`, `radarRing`, `radarSweep`, `gradientShift`, `numberTick`, `sparkDraw`, `panelSlideIn`, `kpiStagger`, `pulseGlow`, `dotPing` — definidas em `index.css`
+- **Animações**: `fadeIn`, `fadeInUp`, `badgePop`, `dotPulse`, `spinSlow`, `spinReverse`, `shimmer`, `breathe`, `tabActivate`, `radarRing`, `radarSweep`, `numberTick`, `sparkDraw`, `panelSlideIn`, `kpiStagger`, `dotPing` — definidas em `index.css`
+- **Motion**: usar animação para feedback de estado, carregamento e expansão/recolhimento; evitar loops decorativos e respeitar `prefers-reduced-motion`
 - Efeito vidro (`backdrop-blur-md`) no header sticky
-- **KPI cards**: grid de cards com ícone + label + valor + animação `kpiStagger` em cascata. Usado em status bar (`AutoSearchPanel`) e execution summary + per-termo (`AutoResultsView`)
+- **KPI cards**: grid de cards com ícone + label + valor + animação curta `kpiStagger`. Usado em status bar (`AutoSearchPanel`) e execution summary + per-termo (`AutoResultsView`)
+- **Polimento operacional**: priorizar comparação rápida e confiança visual; sombras moderadas, botões estáveis, labels em sentence case e foco visível preservado
+- **Acessibilidade UI**: controles selecionáveis usam `aria-pressed`; botões iconográficos usam `aria-label`; não remover outline/foco sem substituto visível
 - **Termo sections**: gradient wash `linear-gradient(135deg, ${siteColor.light}, transparent 70%)` no background, com barra lateral e border highlight na cor da loja
 
 ### Hooks

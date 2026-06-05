@@ -158,7 +158,7 @@ Impedir que N requisições abram N instâncias do Chromium e esgotem a memória
 
 ## 5. Melhorias na Interface (UX/UI)
 
-### 5.1 Filtros no frontend (preço, parcelamento, ordenação) ⬜
+### 5.1 Filtros no frontend (preço, parcelamento, ordenação, produtos que tiveram alteração) ⬜
 Filtrar/ordenar resultados sem refazer requisição: menor preço, maior relevância, faixa de valor.
 **Valor:** Alto | **Complexidade:** Média
 

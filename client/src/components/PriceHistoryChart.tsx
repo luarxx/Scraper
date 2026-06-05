@@ -72,8 +72,8 @@ function CustomTooltip({ active, payload, summary }: { active?: boolean; payload
   if (point.price_cents === null) return null;
   const valueColor = tooltipValueColor(point, summary);
   return (
-    <div className="rounded-md border border-white/10 bg-slate-950/95 backdrop-blur-sm px-2.5 py-2 shadow-2xl">
-      <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wider tabular-nums">
+    <div className="rounded-md border border-white/10 bg-slate-950/95 backdrop-blur-sm px-2.5 py-2 shadow-md">
+      <div className="text-[10px] font-medium text-slate-500 tabular-nums">
         {formatDateFull(point.captured_at)}
       </div>
       <div className="mt-1 flex items-baseline gap-1.5">
@@ -106,7 +106,7 @@ const KpiCell = memo(function KpiCell({ label, value, accent, index, siteColor }
       className="relative bg-slate-950/40 px-5 py-3 flex flex-col items-center justify-center min-w-0 gap-2"
       style={{ animation: `kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) ${index * 0.06}s both` }}
     >
-      <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-[0.18em] leading-none">
+      <span className="text-[10px] font-medium text-slate-500 leading-none">
         {label}
       </span>
       <div className="flex items-baseline gap-1">
@@ -259,15 +259,7 @@ export function PriceHistoryChart({ history, siteColor, loading, erro, summary }
   if (!loading && !hasData && history.length === 0) return null;
 
   return (
-    <div className="mt-3 relative rounded-xl border border-white/[0.08] bg-gradient-to-b from-white/[0.04] to-white/[0.01] overflow-hidden">
-      <div
-        className="absolute left-0 top-0 bottom-0 w-[3px]"
-        style={{
-          background: `linear-gradient(to bottom, ${siteColor}, ${siteColor}40 60%, transparent)`,
-          boxShadow: `0 0 16px ${siteColor}60`,
-        }}
-        aria-hidden
-      />
+    <div className="mt-3 relative rounded-xl border border-white/[0.08] bg-white/[0.025] overflow-hidden">
       <div
         className="absolute inset-0 opacity-[0.025] pointer-events-none"
         style={{
@@ -292,10 +284,10 @@ export function PriceHistoryChart({ history, siteColor, loading, erro, summary }
             />
           )}
           <span
-            className="text-[10px] font-bold uppercase tracking-[0.22em]"
+            className="text-[11px] font-semibold"
             style={{ color: siteColor }}
           >
-            Histórico de Preços
+            Histórico de preços
           </span>
           {summary?.first_seen && (
             <span className="text-[10px] text-slate-600 tabular-nums truncate">

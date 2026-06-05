@@ -10,7 +10,7 @@
 | Superfície alternativa | `#1b2440` |
 | Borda | `#1e293b` (slate-800) |
 | Fonte UI | `Inter` (Google Fonts, variável 400–700) |
-| Fonte Display | `DM Sans` (Google Fonts, 500–900) |
+| Fonte Display | `DM Sans` (Google Fonts, 500–900), reservada para momentos pontuais |
 | Cor de destaque (accent) | `#f97316` (laranja) |
 | Preço | `#34d399` (esmeralda) |
 | Texto primário | `#f1f5f9` (slate-100) |
@@ -27,16 +27,16 @@
 
 ## Background
 
-### Gradientes Animados
-O fundo da página usa três gradientes radiais fixos que se deslocam lentamente:
+### Gradientes Estáticos
+O fundo da página usa três gradientes radiais fixos e discretos:
 
 ```css
-radial-gradient(ellipse 60% 50% at 15% -10%, rgba(249,115,22,0.07), transparent 60%)
-radial-gradient(ellipse 40% 40% at 85% 90%, rgba(249,115,22,0.04), transparent 50%)
-radial-gradient(ellipse 50% 30% at 50% 50%, rgba(59,130,246,0.03), transparent 40%)
+radial-gradient(ellipse 60% 50% at 15% -10%, rgba(249,115,22,0.045), transparent 60%)
+radial-gradient(ellipse 40% 40% at 85% 90%, rgba(249,115,22,0.025), transparent 50%)
+radial-gradient(ellipse 50% 30% at 50% 50%, rgba(59,130,246,0.02), transparent 40%)
 ```
 
-Animação `gradientShift` alterna `background-position` entre 0% e 100% em 30s infinita.
+O fundo não anima por padrão. Motion deve indicar feedback de estado, não decoração.
 
 ### Textura Noise
 Uma camada sutil de ruído fractal (SVG `feTurbulence`, 35% opacity, `mix-blend-mode: overlay`) sobrepõe o background para adicionar profundidade sem custo de performance.
@@ -61,21 +61,21 @@ Uma camada sutil de ruído fractal (SVG `feTurbulence`, 35% opacity, `mix-blend-
 | `tabActivate` | 0.35s | Aba de site ao ser selecionada (escala 0.92 → 1.05 → 1) |
 | `radarRing` | 2s | Anéis expansivos no loading (3 anéis com delay 0s, 0.6s, 1.2s) |
 | `radarSweep` | 2s | Sweep cônico no loading |
-| `gradientShift` | 30s | Background animado (infinite alternate) |
 | `numberTick` | 0.4s | Entrada de números em KPI (blur → foco) |
 | `sparkDraw` | 0.6s | Desenho de sparkline SVG |
 | `panelSlideIn` | 0.35s | Conteúdo expansível (painéis de resultado) |
 | `kpiStagger` | 0.4s | KPI cards em cascata (entrada com translateY) |
-| `pulseGlow` | 2.5s | Botão "Executar" pulsante quando idle |
+
+Todas as animações respeitam `prefers-reduced-motion: reduce`, que reduz transições/animações a duração mínima e desativa loops decorativos.
 
 ## Componentes
 
 ### SearchForm
-- Input de texto com placeholder "Ex: Ryzen 5 5600gt, RTX 4060..."
-- Borda laranja com glow `rgba(249,115,22,0.5)` ao focar
+- Input de texto com placeholder "Ex: Ryzen 5 5600GT, RTX 4060"
+- Borda laranja com ring discreto ao focar
 - Seletor de site em **abas** (botões lado a lado com fundo slate-900 e borda slate-800)
 - Aba ativa: cor da loja + fundo translúcido + animação `tabActivate`
-- Botão "Buscar" com gradiente `from-orange-600 to-amber-600`, shadow laranja
+- Botão "Buscar" com cor sólida `accent`, hover `accent-hover` e foco visível
 - Modo `compact` (header sticky) vs modo normal (página inicial)
 
 ### SearchHistory
@@ -117,7 +117,7 @@ Quatro estados visuais centralizados:
 - Fallback de imagem: mostra "∅" se `onError` disparar
 - `loading="lazy"` nas imagens
 - Animação `fadeInUp` com delay progressivo (`index * 0.05s`)
-- Hover: card levanta 0.5px, borda clareia
+- Hover: borda clareia de forma sutil, sem salto visual
 
 ### KpiCard (componente interno)
 Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
@@ -135,7 +135,7 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 ### AutoSearchPanel
 - **Status bar**: 3 KPI tiles (Status com dot animado, Próxima busca com countdown, Produtos configurados + botão Executar)
 - **Sub-tabs**: "⚙️ Configurar" e "📊 Resultados" com contagem de resultados
-- Trigger button: pulsa via `pulseGlow` quando idle, mostra spinner durante execução
+- Trigger button: permanece estável quando idle e mostra spinner durante execução
 
 ### AutoResultsView
 - **Execution summary**: grid de 4 KPI cards (⏱ Início, ✅ Fim, 📦 Produtos, 👍 Sucesso/⚠️ Erros)
@@ -172,10 +172,10 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 
 ## Tipografia
 
-- **UI**: Inter (400, 500, 600, 700) — carregado via Google Fonts
-- **Display**: DM Sans (500, 600, 700, 800, 900) — headings, labels, KPIs
-- Uppercase + tracking-wider em labels (ex: "BUSCAR POR: RYZEN 5 5600GT")
-- `font-black` no preço, `font-bold` em badges e botões
+- **UI**: Inter (400, 500, 600, 700) — carregado via Google Fonts e usado na maior parte da interface
+- **Display**: DM Sans (500, 600, 700, 800, 900) — uso pontual, evitando labels operacionais
+- Labels operacionais usam sentence case ou título curto, com pouco tracking
+- `font-semibold`/`font-bold` em preços, badges e botões, evitando peso visual excessivo
 - `text-[10px]` para labels de KPI, `text-[11px]` para badges
 - `tabular-nums` para valores numéricos (preços, contagens, horários)
 
@@ -201,4 +201,6 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - **KPI components**: usar `tabular-nums` + `kpiStagger` animation para entrada em cascata
 - **Site sections**: usar gradient `linear-gradient(135deg, ${siteColor.light}, transparent 70%)` para background de termo
 - **Loading spinners**: spinner duplo (anel externo + interno reverso) para estados de carregamento
-- **Cards**: opacity-0 + `fadeInUp` com `animation-fill-mode: forwards` + delay progressivo
+- **Cards**: `fadeInUp` curto com delay progressivo, sem sombras grandes
+- **Motion**: usar apenas para feedback de estado, expansão/recolhimento e carregamento; evitar loops decorativos
+- **Acessibilidade**: controles selecionáveis usam `aria-pressed`; botões sem texto visual precisam de `aria-label`; foco visível deve ser preservado

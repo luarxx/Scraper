@@ -69,7 +69,7 @@ const KpiCard = memo(function KpiCard({ icon, label, value, accent, index, sub }
     >
       <span className="text-lg shrink-0">{icon}</span>
       <div className="min-w-0">
-        <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
+        <span className="block text-[11px] font-medium text-text-muted leading-tight">
           {label}
         </span>
         <span
@@ -126,7 +126,7 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
       >
         <div className="flex items-center gap-3 min-w-0">
           <div
-            className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-all duration-200"
+            className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-transform duration-200"
             style={{
               background: isOpen ? `${siteColor.text}15` : 'transparent',
               transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
@@ -143,13 +143,13 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
 
           <div className="flex items-center gap-2.5 min-w-0">
             <span
-              className="text-sm sm:text-base font-display font-bold uppercase tracking-wider truncate"
+              className="text-sm sm:text-base font-semibold truncate"
               style={{ color: siteColor.text }}
             >
               {r.termo}
             </span>
             <span
-              className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 border"
+              className="text-[11px] font-semibold px-2 py-0.5 rounded-md shrink-0 border"
               style={{
                 color: siteColor.text,
                 backgroundColor: `${siteColor.text}12`,
@@ -284,14 +284,14 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
     return (
         <div className="text-center py-16 rounded-xl bg-surface/30 border border-dashed border-white/[0.08]">
         <div className="mb-4"><Icon icon={Radio} size={36} className="text-text-muted" /></div>
-        <p className="text-sm text-text-muted mb-2 font-display font-semibold">Nenhuma execução automática ainda</p>
+        <p className="text-sm text-text-secondary mb-2 font-semibold">Nenhuma execução automática ainda</p>
         <p className="text-xs text-text-muted/60 mb-5 max-w-xs mx-auto leading-relaxed">
           Configure produtos na aba "Configurar" e aguarde o próximo ciclo de 6h,
           ou clique em "Executar agora" para iniciar manualmente.
         </p>
         <button
           onClick={onRefresh}
-          className="text-sm px-5 py-2 rounded-xl bg-accent/10 text-accent hover:bg-accent/20 transition-all font-medium"
+          className="text-sm px-5 py-2 rounded-lg bg-accent/10 text-accent hover:bg-accent/20 transition-colors font-medium"
         >
           Atualizar
         </button>
@@ -363,6 +363,7 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
           <button
             onClick={toggleAll}
             className="text-xs text-text-muted hover:text-accent transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-accent/5 border border-transparent hover:border-accent/20"
+            aria-pressed={allExpanded}
           >
             {allExpanded ? (
               <span className="flex items-center gap-1.5"><Icon icon={ChevronsUp} size={14} /> Recolher todos</span>

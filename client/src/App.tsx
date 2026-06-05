@@ -63,23 +63,25 @@ export default function App() {
           <div className="flex items-center justify-center sm:justify-start gap-1 mb-2">
             <button
               onClick={() => setModo('manual')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              aria-pressed={modo === 'manual'}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
                 modo === 'manual'
-                  ? 'bg-accent text-white shadow-lg shadow-accent/20'
+                  ? 'bg-accent text-white'
                   : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
               }`}
             >
-              <Icon icon={Search} size={14} /> <span className="font-display">Manual</span>
+              <Icon icon={Search} size={14} /> <span>Manual</span>
             </button>
             <button
               onClick={() => setModo('auto')}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              aria-pressed={modo === 'auto'}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
                 modo === 'auto'
-                  ? 'bg-accent text-white shadow-lg shadow-accent/20'
+                  ? 'bg-accent text-white'
                   : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
               }`}
             >
-              <Icon icon={Clock} size={14} /> <span className="font-display">Automática</span>
+              <Icon icon={Clock} size={14} /> <span>Automática</span>
             </button>
           </div>
           {modo === 'manual' && (
@@ -87,7 +89,7 @@ export default function App() {
               <SearchForm onSearch={search} loading={loading} compact />
               {termo && timestamp && (
                 <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-2 animate-[fadeIn_0.3s_ease-out]">
-                  <span className="text-[10px] text-text-muted/60 uppercase tracking-[0.1em] font-semibold">
+                  <span className="text-[11px] text-text-muted font-medium">
                     Última busca
                   </span>
                   <span className="w-1 h-1 rounded-full bg-accent/40" />
@@ -113,8 +115,11 @@ export default function App() {
             <main className="flex-1">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 pb-20 sm:pb-24">
                 <div className="mb-6">
-                  <span className="font-sans text-lg sm:text-xl font-bold text-text-primary uppercase tracking-wider" style={{ color: (SITE_COLORS[siteKey] ?? SITE_COLORS.kabum).text }}>
-                    BUSCAR POR: {termo.toUpperCase()}
+                  <span className="font-sans text-base sm:text-lg font-semibold text-text-primary">
+                    Resultados para{' '}
+                    <span style={{ color: (SITE_COLORS[siteKey] ?? SITE_COLORS.kabum).text }}>
+                      &ldquo;{termo}&rdquo;
+                    </span>
                   </span>
                 </div>
                 <ProductGrid produtos={produtos} siteKey={siteKey} />

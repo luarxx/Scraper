@@ -23,7 +23,7 @@ export function SearchHistory({ history, onSelect }: SearchHistoryProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-2 pb-1">
       <div className="flex flex-wrap items-center gap-1.5">
-        <span className="text-[11px] font-medium text-text-muted tracking-wide uppercase mr-0.5">
+        <span className="text-[11px] font-medium text-text-muted mr-0.5">
           Últimas buscas
         </span>
         {history.map((entry, i) => {
@@ -33,7 +33,7 @@ export function SearchHistory({ history, onSelect }: SearchHistoryProps) {
               key={`${entry.termo}-${entry.site}-${i}`}
               type="button"
               onClick={() => onSelect(entry.termo, entry.site)}
-              className="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-orange-500/40 rounded-xl text-slate-300 hover:text-white transition-all font-medium text-xs shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 cursor-pointer flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-orange-500/40 rounded-lg text-slate-300 hover:text-white transition-colors font-medium text-xs active:translate-y-0 cursor-pointer flex items-center gap-1.5"
             >
               <span className="truncate max-w-[120px]">&ldquo;{entry.termo}&rdquo;</span>
               <span

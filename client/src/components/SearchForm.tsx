@@ -45,19 +45,19 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
           onChange={e => setQ(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="Ex: Ryzen 5 5600gt, RTX 4060..."
-          className={`w-full bg-slate-900 border-2 rounded-2xl text-slate-100 placeholder-slate-500 focus:outline-none shadow-2xl transition-all ${inputClasses}`}
+          placeholder="Ex: Ryzen 5 5600GT, RTX 4060"
+          className={`w-full bg-slate-900 border rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none transition-colors ${inputClasses}`}
           style={{
-            borderColor: focused ? 'rgba(249, 115, 22, 0.5)' : '#1e293b',
+            borderColor: focused ? 'rgba(249, 115, 22, 0.65)' : '#1e293b',
             boxShadow: focused
-              ? '0 0 0 4px rgba(249, 115, 22, 0.2), 0 25px 50px -12px rgba(0,0,0,0.25)'
-              : '0 25px 50px -12px rgba(0,0,0,0.25)',
+              ? '0 0 0 3px rgba(249, 115, 22, 0.14)'
+              : '0 1px 2px rgba(0,0,0,0.18)',
           }}
         />
         <button
           type="submit"
           disabled={loading}
-          className={`absolute right-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/20 whitespace-nowrap ${btnClasses}`}
+          className={`absolute right-2 bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300 ${btnClasses}`}
         >
           {loading ? 'Buscando…' : 'Buscar'}
         </button>
@@ -70,14 +70,12 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
               key={s.key}
               type="button"
               onClick={() => setSite(s.key)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ease-out active:scale-95 ${
+              aria-pressed={site === s.key}
+              className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors active:scale-95 ${
                 site === s.key
-                  ? `${s.activeBg} ${s.color} border ${s.activeBorder} shadow-sm`
+                  ? `${s.activeBg} ${s.color} border ${s.activeBorder}`
                   : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] border border-transparent'
               }`}
-              style={{
-                animation: site === s.key ? 'tabActivate 0.35s cubic-bezier(0.16, 1, 0.3, 1)' : undefined,
-              }}
             >
               {s.nome}
             </button>

@@ -61,10 +61,10 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
 
   return (
     <div
-      className="group bg-slate-900 border border-slate-800/90 rounded-2xl shadow-2xl flex flex-col overflow-hidden opacity-0 animate-[fadeInUp_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-all duration-400 hover:border-slate-700/80 hover:-translate-y-0.5 min-h-[460px] sm:min-h-[480px]"
+      className="group bg-slate-900 border border-slate-800/90 rounded-xl shadow-sm flex flex-col overflow-hidden opacity-0 animate-[fadeInUp_0.35s_cubic-bezier(0.16,1,0.3,1)_forwards] transition-colors duration-200 hover:border-slate-700/90 min-h-[450px] sm:min-h-[470px]"
       style={{ animationDelay: `${Math.min(index, 8) * 0.04}s` }}
     >
-      <div className="bg-white p-5 flex items-center justify-center border-b border-slate-200 shadow-inner overflow-hidden relative min-h-[160px]">
+      <div className="bg-white p-5 flex items-center justify-center border-b border-slate-200 overflow-hidden relative min-h-[160px]">
         {produto.image && !imgError ? (
           <>
             {/* Shimmer placeholder */}
@@ -76,9 +76,9 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
             )}
             <img
               src={produto.image}
-              alt=""
+              alt={produto.title}
               loading="lazy"
-              className="max-w-full max-h-36 object-contain group-hover:scale-110 transition-transform duration-700 ease-out"
+              className="max-w-full max-h-36 object-contain group-hover:scale-[1.03] transition-transform duration-300 ease-out"
               onError={() => setImgError(true)}
               onLoad={() => setImgLoaded(true)}
               style={{ opacity: imgLoaded ? 1 : 0 }}
@@ -92,7 +92,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
 
         {isBestOption && (
           <span
-            className="absolute top-2 left-2 text-[11px] font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider z-10 shadow-lg animate-[badgePop_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+            className="absolute top-2 left-2 text-[11px] font-semibold px-2.5 py-1 rounded-full z-10 animate-[badgePop_0.3s_cubic-bezier(0.16,1,0.3,1)_forwards]"
             style={{ color: '#fff', background: siteStyle.text }}
           >
             Melhor Opção
@@ -102,7 +102,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
 
       <div className="p-4 sm:p-5 flex flex-col flex-1">
         <span
-          className="mb-2.5 px-2.5 py-1 text-[11px] font-bold rounded-lg uppercase tracking-widest self-start"
+          className="mb-2.5 px-2.5 py-1 text-[11px] font-semibold rounded-md self-start"
           style={{
             color: siteStyle.text,
             background: siteStyle.bg,
@@ -112,7 +112,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
           {siteName}
         </span>
 
-        <h3 className="text-sm sm:text-base font-bold text-white leading-snug line-clamp-3">
+        <h3 className="text-sm sm:text-base font-semibold text-white leading-snug line-clamp-3">
           {produto.title}
         </h3>
 
@@ -125,7 +125,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
             </span>
           )}
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="text-xl sm:text-2xl font-black tracking-tight text-emerald-400">
+            <span className="text-xl sm:text-2xl font-bold tracking-tight text-emerald-400">
               {produto.price || 'Preço não informado'}
             </span>
             {trendBadge}
@@ -149,7 +149,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
           href={produto.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 w-full text-slate-950 font-bold text-sm px-4 py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xl no-underline"
+          className="mt-3 w-full text-slate-950 font-semibold text-sm px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.99] no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
           style={{ background: siteStyle.btnBg }}
         >
           Ir para a Loja

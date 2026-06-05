@@ -93,7 +93,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
             <span className="relative inline-flex rounded-full h-3 w-3" style={{ backgroundColor: statusColor }} />
           </span>
           <div className="min-w-0">
-            <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
+            <span className="block text-[11px] font-medium text-text-muted leading-tight">
               Status
             </span>
             <span className="text-sm font-semibold text-text-primary mt-0.5 inline-flex items-center gap-1.5">
@@ -109,7 +109,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
         >
           <span className="shrink-0"><Icon icon={CalendarClock} size={18} /></span>
           <div className="min-w-0">
-            <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
+            <span className="block text-[11px] font-medium text-text-muted leading-tight">
               Próxima busca
             </span>
             <span className="block text-sm font-semibold text-text-primary mt-0.5 tabular-nums">
@@ -127,7 +127,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
         >
           <span className="shrink-0"><Icon icon={Clock} size={18} /></span>
           <div className="min-w-0">
-            <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
+            <span className="block text-[11px] font-medium text-text-muted leading-tight">
               Última execução
             </span>
             <span className="block text-sm font-semibold text-text-primary mt-0.5 tabular-nums">
@@ -148,7 +148,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
         >
           <span className="shrink-0"><Icon icon={ClipboardList} size={18} /></span>
           <div className="min-w-0 flex-1">
-            <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
+            <span className="block text-[11px] font-medium text-text-muted leading-tight">
               Produtos
             </span>
             <span className="block text-sm font-semibold text-text-primary mt-0.5 tabular-nums">
@@ -159,10 +159,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           <button
             onClick={handleTriggerRun}
             disabled={running || isExecutando}
-            className="shrink-0 text-xs font-bold px-3.5 py-2 rounded-xl bg-accent text-white hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-accent/15"
-            style={{
-              animation: !running && !isExecutando ? 'pulseGlow 2.5s ease-in-out infinite' : 'none',
-            }}
+            className="shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg bg-accent text-white hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             {running ? (
               <span className="flex items-center gap-1.5">
@@ -184,9 +181,10 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
       <div className="flex gap-1 mb-6 p-1 rounded-xl bg-surface/60 border border-white/[0.06] w-fit">
         <button
           onClick={() => setTab('config')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          aria-pressed={tab === 'config'}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === 'config'
-              ? 'bg-accent text-white shadow-lg shadow-accent/20'
+              ? 'bg-accent text-white'
               : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
           }`}
         >
@@ -194,9 +192,10 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
         </button>
         <button
           onClick={() => setTab('results')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          aria-pressed={tab === 'results'}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
             tab === 'results'
-              ? 'bg-accent text-white shadow-lg shadow-accent/20'
+              ? 'bg-accent text-white'
               : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
           }`}
         >

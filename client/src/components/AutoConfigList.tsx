@@ -96,13 +96,13 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
     <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-sm font-display font-bold text-text-primary uppercase tracking-wider">
+        <h3 className="text-sm font-semibold text-text-primary">
           Produtos monitorados
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-xs text-text-muted tabular-nums">{entries.length}/10</span>
           {dirty && (
-            <span className="text-[10px] font-medium text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-medium text-accent bg-accent/10 px-2 py-0.5 rounded-full">
               Não salvo
             </span>
           )}
@@ -121,15 +121,18 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
               <path d="M48 40v4l2.5 2.5" stroke="#f97316" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </div>
-          <p className="text-sm text-text-muted mb-2 font-display font-semibold">Nenhum produto configurado</p>
+          <p className="text-sm text-text-secondary mb-2 font-semibold">Nenhum produto configurado</p>
           <p className="text-xs text-text-muted/60 mb-5 max-w-xs mx-auto leading-relaxed">
             Adicione até 10 produtos para busca automática a cada 6 horas
           </p>
           <button
             onClick={addEntry}
-            className="text-sm px-5 py-2.5 rounded-xl bg-accent text-white hover:bg-accent-hover transition-all font-semibold shadow-lg shadow-accent/15"
+            className="text-sm px-5 py-2.5 rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors font-semibold"
           >
-            + Adicionar primeiro produto
+            <span className="inline-flex items-center gap-1.5">
+              <Icon icon={Plus} size={16} />
+              Adicionar primeiro produto
+            </span>
           </button>
         </div>
       ) : (
@@ -138,7 +141,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
             return (
               <div
                 key={entry.tempId}
-                className="flex items-center gap-2.5 p-3 rounded-xl bg-surface/40 border border-white/[0.06] hover:border-white/[0.12] transition-all duration-200 group animate-[fadeInUp_0.3s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+                className="flex items-center gap-2.5 p-3 rounded-xl bg-surface/40 border border-white/[0.06] hover:border-white/[0.12] transition-colors duration-200 group animate-[fadeInUp_0.25s_cubic-bezier(0.16,1,0.3,1)_forwards]"
                 style={{ animationDelay: `${idx * 0.04}s` }}
               >
                 {/* Drag handle visual */}
@@ -159,7 +162,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
                   value={entry.termo}
                   onChange={(e) => updateEntry(entry.tempId, 'termo', e.target.value)}
                   placeholder="Ex: RTX 4070"
-                  className="flex-1 min-w-0 bg-transparent border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/40 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-all font-ui"
+                  className="flex-1 min-w-0 bg-transparent border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-text-primary placeholder:text-text-muted/40 outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/20 transition-colors font-ui"
                 />
 
                 {/* Site selector — button group */}
@@ -172,7 +175,8 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
                         key={site.key}
                         type="button"
                         onClick={() => updateEntry(entry.tempId, 'site', site.key)}
-                        className={`px-2.5 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all duration-200 ${
+                        aria-pressed={isActive}
+                        className={`px-2.5 py-1.5 rounded-md text-[11px] font-semibold transition-colors duration-200 ${
                           isActive
                             ? 'shadow-sm'
                             : 'text-text-muted/60 hover:text-text-secondary'
@@ -192,7 +196,8 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
                 {/* Remove */}
                 <button
                   onClick={() => removeEntry(entry.tempId)}
-                  className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-text-muted/40 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
+                  aria-label={`Remover ${entry.termo || `produto ${idx + 1}`}`}
+                  className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-text-muted/40 hover:text-red-400 hover:bg-red-500/10 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
                   title="Remover"
                 >
                   <Icon icon={X} size={14} />
@@ -210,7 +215,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
             {entries.length < 10 && (
               <button
                 onClick={addEntry}
-                className="text-sm px-4 py-2 rounded-xl border border-dashed border-white/[0.12] text-text-secondary hover:text-text-primary hover:border-accent/40 hover:bg-accent/5 transition-all font-medium flex items-center gap-1.5"
+                className="text-sm px-4 py-2 rounded-lg border border-dashed border-white/[0.12] text-text-secondary hover:text-text-primary hover:border-accent/40 hover:bg-accent/5 transition-colors font-medium flex items-center gap-1.5"
               >
                 <Icon icon={Plus} size={16} />
                 Adicionar
@@ -228,7 +233,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
             <button
               onClick={handleSave}
               disabled={saving || !dirty}
-              className="text-sm px-5 py-2 rounded-xl bg-accent text-white hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-all font-semibold shadow-lg shadow-accent/15"
+              className="text-sm px-5 py-2 rounded-lg bg-accent text-white hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-semibold"
             >
               {saving ? (
                 <span className="flex items-center gap-2">

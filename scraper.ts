@@ -65,74 +65,165 @@ const CACHE_DIR = path.join(__dirname, 'data', 'cache');
 interface Fingerprint {
   userAgent: string;
   viewport: { width: number; height: number };
-  pluginsLength: number;
+  plugins: PluginFingerprint[];
   hardwareConcurrency: number;
   deviceMemory: number;
+  languages: string[];
+  platform: string;
   webglVendor: string;
   webglRenderer: string;
 }
 
+interface PluginFingerprint {
+  name: string;
+  filename: string;
+  description: string;
+  mimeTypes: Array<{ type: string; suffixes: string; description: string }>;
+}
+
 const USER_AGENTS = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.53 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.217 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.179 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.215 Safari/537.36',
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.178 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
 ];
 
-const WEBGL_VENDORS = ['Intel Inc.', 'Google Inc.', 'Apple Inc.', 'NVIDIA Corporation', 'AMD'];
-const WEBGL_RENDERERS = [
-  'Intel Iris OpenGL Engine',
-  'ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0)',
-  'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0)',
-  'Apple M1',
-  'ANGLE (AMD, AMD Radeon(TM) Graphics Direct3D11 vs_5_0 ps_5_0)',
-  'Google SwiftShader',
+const WEBGL_PROFILES = [
+  { vendor: 'Google Inc. (Intel)', renderer: 'ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)' },
+  { vendor: 'Google Inc. (Intel)', renderer: 'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics Direct3D11 vs_5_0 ps_5_0, D3D11)' },
+  { vendor: 'Google Inc. (NVIDIA)', renderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)' },
+  { vendor: 'Google Inc. (NVIDIA)', renderer: 'ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 SUPER Direct3D11 vs_5_0 ps_5_0, D3D11)' },
+  { vendor: 'Google Inc. (AMD)', renderer: 'ANGLE (AMD, AMD Radeon RX 6600 Direct3D11 vs_5_0 ps_5_0, D3D11)' },
+  { vendor: 'Intel Inc.', renderer: 'Intel Iris OpenGL Engine' },
+  { vendor: 'Apple Inc.', renderer: 'Apple M1' },
+  { vendor: 'Google Inc.', renderer: 'ANGLE (Mesa, llvmpipe (LLVM 17.0.6, 256 bits), OpenGL 4.5)' },
 ];
 
-function gerarFingerprint(): Fingerprint {
-  return {
-    userAgent: USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)],
-    viewport: {
-      width: 1920 + Math.floor(Math.random() * 401) - 200,
-      height: 1080 + Math.floor(Math.random() * 201) - 100,
-    },
-    pluginsLength: 3 + Math.floor(Math.random() * 3),
-    hardwareConcurrency: 4 + Math.floor(Math.random() * 13),
-    deviceMemory: [4, 8][Math.floor(Math.random() * 2)],
-    webglVendor: WEBGL_VENDORS[Math.floor(Math.random() * WEBGL_VENDORS.length)],
-    webglRenderer: WEBGL_RENDERERS[Math.floor(Math.random() * WEBGL_RENDERERS.length)],
-  };
+const PLUGIN_POOL: PluginFingerprint[] = [
+  {
+    name: 'PDF Viewer',
+    filename: 'internal-pdf-viewer',
+    description: 'Portable Document Format',
+    mimeTypes: [{ type: 'application/pdf', suffixes: 'pdf', description: 'Portable Document Format' }],
+  },
+  {
+    name: 'Chrome PDF Viewer',
+    filename: 'internal-pdf-viewer',
+    description: 'Portable Document Format',
+    mimeTypes: [{ type: 'application/pdf', suffixes: 'pdf', description: 'Portable Document Format' }],
+  },
+  {
+    name: 'Chromium PDF Viewer',
+    filename: 'internal-pdf-viewer',
+    description: 'Portable Document Format',
+    mimeTypes: [{ type: 'application/pdf', suffixes: 'pdf', description: 'Portable Document Format' }],
+  },
+  {
+    name: 'Microsoft Edge PDF Viewer',
+    filename: 'internal-pdf-viewer',
+    description: 'Portable Document Format',
+    mimeTypes: [{ type: 'application/pdf', suffixes: 'pdf', description: 'Portable Document Format' }],
+  },
+  {
+    name: 'WebKit built-in PDF',
+    filename: 'internal-pdf-viewer',
+    description: 'Portable Document Format',
+    mimeTypes: [{ type: 'application/pdf', suffixes: 'pdf', description: 'Portable Document Format' }],
+  },
+];
+
+const lastFingerprintBySite = new Map<string, string>();
+
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function sample<T>(items: T[]): T {
+  return items[randomInt(0, items.length - 1)];
+}
+
+function shuffle<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = randomInt(0, i);
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function gerarFingerprint(siteKey: string): Fingerprint {
+  let fingerprint: Fingerprint;
+  let assinatura: string;
+
+  do {
+    const userAgent = sample(USER_AGENTS);
+    const webgl = sample(WEBGL_PROFILES);
+    const platform = userAgent.includes('Macintosh') ? 'MacIntel' : userAgent.includes('Linux') ? 'Linux x86_64' : 'Win32';
+    fingerprint = {
+      userAgent,
+      viewport: {
+        width: 1920 + randomInt(-200, 200),
+        height: 1080 + randomInt(-100, 100),
+      },
+      plugins: shuffle(PLUGIN_POOL).slice(0, randomInt(3, 5)),
+      hardwareConcurrency: sample([4, 6, 8, 10, 12, 16]),
+      deviceMemory: sample([4, 8]),
+      languages: ['pt-BR', 'pt', 'en-US', 'en'],
+      platform,
+      webglVendor: webgl.vendor,
+      webglRenderer: webgl.renderer,
+    };
+    assinatura = `${fingerprint.userAgent}|${fingerprint.viewport.width}x${fingerprint.viewport.height}|${fingerprint.webglVendor}|${fingerprint.webglRenderer}`;
+  } while (lastFingerprintBySite.get(siteKey) === assinatura);
+
+  lastFingerprintBySite.set(siteKey, assinatura);
+  return fingerprint;
 }
 
 async function randomWait(min = 200, max = 800): Promise<void> {
-  const ms = Math.floor(Math.random() * (max - min + 1)) + min;
-  await new Promise(r => setTimeout(r, ms));
+  await new Promise(r => setTimeout(r, randomInt(min, max)));
 }
 
-async function scrollGradual(page: Page, targetY: number, steps = 4): Promise<void> {
-  const stepSize = Math.floor(targetY / steps);
+async function scrollGradual(page: Page): Promise<void> {
+  const steps = randomInt(3, 5);
   for (let i = 0; i < steps; i++) {
-    const delta = stepSize + Math.floor(Math.random() * 101) - 50;
-    await page.mouse.wheel(0, Math.max(1, delta));
-    await randomWait(200, 600);
+    await page.mouse.wheel(0, randomInt(200, 400));
+    await randomWait(220, 750);
   }
 }
 
-async function mouseMove(page: Page, x: number, y: number): Promise<void> {
-  const steps = 3 + Math.floor(Math.random() * 5);
-  const startX = Math.floor(Math.random() * 200);
-  const startY = Math.floor(Math.random() * 200);
-  await page.mouse.move(startX + Math.floor(Math.random() * 100), startY + Math.floor(Math.random() * 100));
+async function mouseMove(page: Page, viewport: { width: number; height: number }, x?: number, y?: number): Promise<void> {
+  const steps = randomInt(4, 8);
+  const startX = randomInt(40, Math.max(80, Math.floor(viewport.width * 0.35)));
+  const startY = randomInt(40, Math.max(80, Math.floor(viewport.height * 0.35)));
+  const targetX = x ?? randomInt(Math.floor(viewport.width * 0.35), Math.floor(viewport.width * 0.75));
+  const targetY = y ?? randomInt(Math.floor(viewport.height * 0.3), Math.floor(viewport.height * 0.7));
+
+  await page.mouse.move(startX, startY);
+  await randomWait(80, 220);
+
   for (let i = 1; i <= steps; i++) {
     const t = i / steps;
-    const cx = Math.floor(startX + (x - startX) * t + (Math.random() - 0.5) * 20);
-    const cy = Math.floor(startY + (y - startY) * t + (Math.random() - 0.5) * 20);
+    const ease = t * t * (3 - 2 * t);
+    const cx = Math.floor(startX + (targetX - startX) * ease + randomInt(-18, 18));
+    const cy = Math.floor(startY + (targetY - startY) * ease + randomInt(-14, 14));
     await page.mouse.move(cx, cy);
-    await randomWait(30, 100);
+    await randomWait(35, 140);
+  }
+}
+
+async function comportamentoHumano(page: Page, viewport: { width: number; height: number }): Promise<void> {
+  await randomWait(350, 900);
+  await mouseMove(page, viewport);
+  await scrollGradual(page);
+  if (Math.random() > 0.35) {
+    await randomWait(250, 700);
+    await page.mouse.wheel(0, -randomInt(80, 180));
   }
 }
 
@@ -396,7 +487,7 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
 
   chromium.use(StealthPlugin());
 
-  const fingerprint = gerarFingerprint();
+  const fingerprint = gerarFingerprint(siteKey);
 
   const browser = await chromium.launch({
     headless: HEADLESS,
@@ -406,6 +497,7 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
     userAgent: fingerprint.userAgent,
     viewport: fingerprint.viewport,
     locale: 'pt-BR',
+    timezoneId: 'America/Sao_Paulo',
   });
   const page = await context.newPage();
 
@@ -413,27 +505,51 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
     Object.defineProperty(navigator, 'webdriver', { get: () => false });
     Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => fp.hardwareConcurrency });
     Object.defineProperty(navigator, 'deviceMemory', { get: () => fp.deviceMemory });
-    Object.defineProperty(navigator, 'languages', { get: () => ['pt-BR', 'pt', 'en-US', 'en'] });
+    Object.defineProperty(navigator, 'languages', { get: () => fp.languages });
+    Object.defineProperty(navigator, 'language', { get: () => fp.languages[0] });
+    Object.defineProperty(navigator, 'platform', { get: () => fp.platform });
 
-    const pluginNames = ['PDF Viewer', 'Chrome PDF Viewer', 'Chrome PDF Plugin'];
-    const pluginList: any[] = [];
-    for (let i = 0; i < fp.pluginsLength && i < pluginNames.length; i++) {
-      pluginList.push({
-        name: pluginNames[i],
-        filename: pluginNames[i].toLowerCase().replace(/\s+/g, '') + '.dll',
-        description: 'Portable Document Format',
-        length: 1,
-        item: () => ({ type: 'application/pdf', suffixes: 'pdf', description: 'Portable Document Format' }),
-        namedItem: () => null,
+    const mimeTypes: any[] = [];
+    const pluginList = fp.plugins.map((plugin) => {
+      const pluginMimeTypes = plugin.mimeTypes.map((mimeType, mimeIndex) => {
+        const item = {
+          ...mimeType,
+          enabledPlugin: null as any,
+        };
+        mimeTypes.push(item);
+        return { item, mimeIndex };
       });
-    }
+      const pluginObject: any = {
+        name: plugin.name,
+        filename: plugin.filename,
+        description: plugin.description,
+        length: pluginMimeTypes.length,
+        item: (i: number) => pluginMimeTypes[i]?.item || null,
+        namedItem: (name: string) => pluginMimeTypes.find(({ item }) => item.type === name)?.item || null,
+      };
+      pluginMimeTypes.forEach(({ item, mimeIndex }) => {
+        item.enabledPlugin = pluginObject;
+        Object.defineProperty(pluginObject, mimeIndex, { value: item, enumerable: true });
+      });
+      return pluginObject;
+    });
+
     Object.defineProperty(navigator, 'plugins', {
       get: () => ({
         ...pluginList,
         length: pluginList.length,
         item: (i: number) => pluginList[i] || null,
-        namedItem: () => null,
+        namedItem: (name: string) => pluginList.find((plugin: any) => plugin.name === name) || null,
         [Symbol.iterator]: function* () { for (const p of pluginList) yield p; },
+      }),
+    });
+    Object.defineProperty(navigator, 'mimeTypes', {
+      get: () => ({
+        ...mimeTypes,
+        length: mimeTypes.length,
+        item: (i: number) => mimeTypes[i] || null,
+        namedItem: (name: string) => mimeTypes.find((mimeType: any) => mimeType.type === name) || null,
+        [Symbol.iterator]: function* () { for (const mimeType of mimeTypes) yield mimeType; },
       }),
     });
 
@@ -457,6 +573,7 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
     if (site.precisaHomePrimeiro) {
       await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
       await randomWait(1500, 3000);
+      await comportamentoHumano(page, fingerprint.viewport);
     }
 
     let produtos: Produto[];
@@ -488,8 +605,7 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
       const urlBusca = site.searchUrl!(termoBusca);
       await page.goto(urlBusca, { waitUntil: site.waitStrategy!, timeout: TIMEOUT });
       await randomWait(2000, 4000);
-      await mouseMove(page, 600, 400);
-      await scrollGradual(page, 600);
+      await comportamentoHumano(page, fingerprint.viewport);
 
       const isChallenge = await detectarChallenge(page);
       if (isChallenge) {

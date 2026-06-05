@@ -1,488 +1,296 @@
 window.__RESULT = {
-  "termo": "placa de video rtx 5050",
-  "site": "kabum",
-  "siteNome": "KaBuM!",
-  "timestamp": "2026-06-04T23:47:13.091Z",
-  "total": 60,
+  "termo": "rtx 5050",
+  "site": "pichau",
+  "siteNome": "Pichau",
+  "timestamp": "2026-06-05T01:22:30.704Z",
+  "total": 36,
   "produtos": [
     {
-      "title": "Placa De Video Gpu Inno3d Geforce RTX 5050 Twin X2 8GB 128bits Gddr6 N50502-08d6-174071n",
-      "price": "R$2.199,90",
-      "parcelamento": "No PIX ou 10x de R$ 244,43",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/925184/medium/Placa-De-Video-Gpu-Inno3d-Geforce-RTX-5050-Twin-X2-8GB-128bits-Gddr6-N50502-08d6-174071n_1779205419.jpg",
-      "url": "https://www.kabum.com.br/produto/925184/placa-de-video-gpu-inno3d-geforce-rtx-5050-twin-x2-8gb-128bits-gddr6-n50502-08d6-174071n",
-      "relevancia": 5
-    },
-    {
-      "title": "Placa De Video RTX5050 8GB Gddr6 128bits Msi Ventus 2x Oc 912-v538-0",
-      "price": "R$2.224,99",
-      "parcelamento": "No PIX ou 10x de R$ 252,83",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/905341/medium/Placa-De-Video-RTX5050-8GB-Gddr6-128bits-Msi-Ventus-2x-Oc-912-v538-0_1776564520.png",
-      "url": "https://www.kabum.com.br/produto/905341/placa-de-video-rtx5050-8gb-gddr6-128bits-msi-ventus-2x-oc-912-v538-0",
-      "relevancia": 5
-    },
-    {
-      "title": "Placa De Video Zotac RTX 5050 Twin Edge Oc 8GB Gddr6 128bits - Zt-b50500h-10m",
-      "price": "R$2.386,99",
-      "parcelamento": "No PIX ou 10x de R$ 265,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/909826/medium/Placa-De-Video-Zotac-RTX-5050-Twin-Edge-Oc-8GB-Gddr6-128bits-Zt-b50500h-10m_1776182915.jpg",
-      "url": "https://www.kabum.com.br/produto/909826/placa-de-video-zotac-rtx-5050-twin-edge-oc-8gb-gddr6-128bits-zt-b50500h-10m",
-      "relevancia": 5
-    },
-    {
-      "title": "Placa De Video Galax Geforce RTX 5050 1 Click Oc 2x 8GB - 128 Bits - 2 HDMI/2x Displayport - 55nsl8mhdxre",
-      "price": "R$2.386,99",
-      "parcelamento": "No PIX ou 10x de R$ 265,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/996427/medium/Placa-De-Video-Galax-Geforce-RTX-5050-1-Click-Oc-2x-8GB-128-Bits-2-HDMI-2x-Displayport-55nsl8mhdxre_1777553953.jpg",
-      "url": "https://www.kabum.com.br/produto/996427/placa-de-video-galax-geforce-rtx-5050-1-click-oc-2x-8gb-128-bits-2-hdmi-2x-displayport-55nsl8mhdxre",
-      "relevancia": 5
-    },
-    {
-      "title": "Placa De Video Asus Dual RTX 5050-o 8GB Gddr6 128 Bits RTX5050-o8g",
-      "price": "R$2.408,90",
-      "parcelamento": "No PIX ou 10x de R$ 240,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/928105/medium/Placa-De-Video-Asus-Dual-RTX-5050-o-8GB-Gddr6-128-Bits-RTX5050-o8g_1780424620.jpg",
-      "url": "https://www.kabum.com.br/produto/928105/placa-de-video-asus-dual-rtx-5050-o-8gb-gddr6-128-bits-rtx5050-o8g",
-      "relevancia": 5
-    },
-    {
-      "title": "Placa Video 8GB RTX5050 Msi Shadow Gddr6 Dual Fan",
-      "price": "R$2.789,90",
-      "parcelamento": "No PIX ou 10x de R$ 278,98",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1042821/medium/Placa-Video-8GB-RTX5050-Msi-Shadow-Gddr6-Dual-Fan_1779882522.jpg",
-      "url": "https://www.kabum.com.br/produto/1042821/placa-video-8gb-rtx5050-msi-shadow-gddr6-dual-fan",
-      "relevancia": 5
-    },
-    {
-      "title": "Placa De Video Pny Geforce RTX 5050 8GB Gddr6 128 Bits - Vcg50508sfxpb1",
-      "price": "R$2.799,00",
-      "parcelamento": "No PIX ou 10x de R$ 279,89",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1033743/medium/Placa-De-Video-Pny-Geforce-RTX-5050-8GB-Gddr6-128-Bits-Vcg50508sfxpb1_1780349323.jpg",
-      "url": "https://www.kabum.com.br/produto/1033743/placa-de-video-pny-geforce-rtx-5050-8gb-gddr6-128-bits-vcg50508sfxpb1",
-      "relevancia": 5
-    },
-    {
-      "title": "Placa de Video MSI GeForce RTX 3050 Ventus OC 2X, 6GB, GDDR6, 96-bit, 912-V812-060",
-      "price": "R$1.308,90",
-      "parcelamento": "No PIX ou 10x de R$ 153,98",
-      "image": "https://images.kabum.com.br/produtos/fotos/997881/placa-de-video-msi-geforce-rtx-3050-ventus-oc-2x-6gb-gddr6-96-bit-912-v812-060_1770130439_m.jpg",
-      "url": "https://www.kabum.com.br/produto/997881/placa-de-video-msi-geforce-rtx-3050-ventus-oc-2x-6gb-gddr6-96-bit-912-v812-060",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo MSI GeForce RTX 5050 Gaming OC, Nvidia, 8GB, GDDR6, 128-Bit - G5050-8GC",
-      "price": "R$2.089,99",
-      "parcelamento": "No PIX ou 10x de R$ 232,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/1012611/placa-de-video-msi-geforce-rtx-5050-gaming-oc-nvidia-8gb-gddr7-128-bit-g5050-8gc_1775759170_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1012611/placa-de-video-msi-geforce-rtx-5050-gaming-oc-nvidia-8gb-gddr6-128-bit-g5050-8gc",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa de Vídeo MSI GeForce RTX 5050 8G VENTUS 2X OC NVIDIA GeForce, 8GB GDDR6, 128 bits, 2617 MHz, DLSS 4, Ray Tracing - G5050-8V2C",
-      "price": "R$2.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 238,63",
-      "image": "https://images.kabum.com.br/produtos/fotos/888165/placa-de-video-msi-geforce-rtx-5050-8g-ventus-2x-oc-nvidia-geforce-8gb-gddr6-128-bits-2617-mhz-dlss-4-ray-tracing-g5050-8v2c_1751287282_m.jpg",
-      "url": "https://www.kabum.com.br/produto/888165/placa-de-video-msi-geforce-rtx-5050-8g-ventus-2x-oc-nvidia-geforce-8gb-gddr6-128-bits-2617-mhz-dlss-4-ray-tracing-g5050-8v2c",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa de Vídeo MSI GeForce RTX5050 8GB GDDR6 128BITS VENTUS 2X OC 912-V538-010",
-      "price": "R$2.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 247,05",
-      "image": "https://images.kabum.com.br/produtos/fotos/997882/placa-de-video-msi-geforce-rtx5050-8gb-gddr6-128bits-ventus-2x-oc-912-v538-010_1770140052_m.jpg",
-      "url": "https://www.kabum.com.br/produto/997882/placa-de-video-msi-geforce-rtx5050-8gb-gddr6-128bits-ventus-2x-oc-912-v538-010",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo Msi Nvidia Geforce RTX 5050 Shadow 8GB Gdrr6 128 Bits - 912-v538-008",
-      "price": "R$2.199,00",
-      "parcelamento": "No PIX ou 10x de R$ 219,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/951242/medium/Placa-De-V-deo-Msi-Nvidia-Geforce-RTX-5050-Shadow-8GB-Gdrr6-128-Bits-912-v538-008_1779372236.jpg",
-      "url": "https://www.kabum.com.br/produto/951242/placa-de-video-msi-geforce-rtx-5050-shadow-2x-oc-8gb-gddr6-128bits-912-v538-008",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa de Vídeo GALAX NVIDIA GeForce RTX 5050 1-Click OC, 8GB, GDDR6, 128-Bits, Ray Tracing, DLSS 4 - 55NSL8MHDXRE",
-      "price": "R$2.249,99",
-      "parcelamento": "No PIX ou 10x de R$ 264,70",
-      "image": "https://images.kabum.com.br/produtos/fotos/953957/placa-de-video-galax-nvidia-geforce-rtx-5050-1-click-oc-8gb-gddr6-128-bits-ray-tracing-dlss-4-55nsl8mhdxre_1768484145_m.jpg",
-      "url": "https://www.kabum.com.br/produto/953957/placa-de-video-galax-nvidia-geforce-rtx-5050-1-click-oc-8gb-gddr6-128-bits-ray-tracing-dlss-4-55nsl8mhdxre",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa de Video Palit GeForce RTX 5060 8GB INFINITY 2 OC GDDR7 128bits - NE75060V19P1-GB2063L",
-      "price": "R$2.399,99",
-      "parcelamento": "No PIX ou 10x de R$ 282,35",
-      "image": "https://images.kabum.com.br/produtos/fotos/988706/placa-de-video-palit-geforce-rtx-5060-8gb-infinity-2-oc-gddr7-128bits-ne75060v19p1-gb2063l_1771874345_m.jpg",
-      "url": "https://www.kabum.com.br/produto/988706/placa-de-video-palit-geforce-rtx-5060-8gb-infinity-2-oc-gddr7-128bits-ne75060v19p1-gb2063l",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Video Msi Geforce RTX 5060 Shadow 2x Oc 8GB Gddr7 128 Bits 912-v537-037",
-      "price": "R$2.499,00",
-      "parcelamento": "No PIX ou 10x de R$ 271,63",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/882316/medium/Placa-De-Video-Msi-Geforce-RTX-5060-Shadow-2x-Oc-8GB-Gddr7-128-Bits-912-v537-037_1779114525.jpg",
-      "url": "https://www.kabum.com.br/produto/882316/vga-msi-nv-gf-rtx5060-8gb-gddr7-128bits-shadow-2x-oc-912-v537-037",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo Msi Geforce RTX 5050 Gaming Oc, 8GB, Gddr6, PCie 4.0, 912-v538-009",
-      "price": "R$2.599,40",
-      "parcelamento": "No PIX ou 10x de R$ 259,93",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1008840/medium/Placa-De-V-deo-Msi-Geforce-RTX-5050-Gaming-Oc-8GB-Gddr6-PCie-4-0-912-v538-009_1773155011.webp",
-      "url": "https://www.kabum.com.br/produto/1008840/placa-de-video-msi-geforce-rtx-5050-gaming-oc-8gb-gddr6-pcie-4-0-912-v538-009",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo Geforce RTX 5050 Pegasus 8GB 128bits Gddr6 Gainward",
-      "price": "R$2.761,44",
-      "parcelamento": "No PIX ou 10x de R$ 324,87",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/988015/medium/Placa-De-V-deo-Geforce-RTX-5050-Pegasus-8GB-128bits-Gddr6-Gainward_1771985322.png",
-      "url": "https://www.kabum.com.br/produto/988015/placa-de-video-geforce-rtx-5050-pegasus-8gb-128bits-gddr6-gainward",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa de Vídeo Asus DUAL RTX 5050 OC 8G NVIDIA GeForce, 8GB, GDDR6, 128-bit, OpenGL 4.6, DLSS 4, Ray Tracing - 90YV0N72-M0NA00",
-      "price": "R$2.999,99",
-      "parcelamento": "No PIX ou 10x de R$ 340,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/888146/placa-de-video-asus-dual-rtx-5050-oc-8g-nvidia-geforce-8gb-gddr6-128-bit-opengl-4-6-dlss-4-ray-tracing-90yv0n72-m0na00_1751285839_m.jpg",
-      "url": "https://www.kabum.com.br/produto/888146/placa-de-video-asus-dual-rtx-5050-oc-8g-nvidia-geforce-8gb-gddr6-128-bit-opengl-4-6-dlss-4-ray-tracing-90yv0n72-m0na00",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa de Video MSI GeForce RTX 5060 TI 16Gb Ventus OC Black Plus 2X 128 Bits HDMI/3X DP - 912-V535-088",
-      "price": "R$4.359,99",
-      "parcelamento": "No PIX ou 10x de R$ 512,93",
-      "image": "https://images.kabum.com.br/produtos/fotos/997883/placa-de-video-msi-geforce-rtx-5060-ti-16gb-ventus-oc-black-plus-2x-128-bits-hdmi-3x-dp-912-v535-088_1770140608_m.jpg",
-      "url": "https://www.kabum.com.br/produto/997883/placa-de-video-msi-geforce-rtx-5060-ti-16gb-ventus-oc-black-plus-2x-128-bits-hdmi-3x-dp-912-v535-088",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo Msi Shadow 2x Oc 8GB Geforce RTX5050 Gddr6 - 912-v538-018",
-      "price": "R$5.934,23",
-      "parcelamento": "No PIX ou 10x de R$ 593,42",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032423/medium/Placa-De-V-deo-Msi-Shadow-2x-Oc-8GB-Geforce-RTX5050-Gddr6-912-v538-018_1777285120.jpg",
-      "url": "https://www.kabum.com.br/produto/1032423/placa-de-video-msi-shadow-2x-oc-8gb-geforce-rtx5050-gddr6-912-v538-018",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo Zotac Solo Gaming 8GB Geforce RTX5050 Gddr6 - Zt-b50500g-10l",
-      "price": "R$6.331,44",
-      "parcelamento": "No PIX ou 10x de R$ 633,14",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032495/medium/Placa-De-V-deo-Zotac-Solo-Gaming-8GB-Geforce-RTX5050-Gddr6-Zt-b50500g-10l_1777285427.jpg",
-      "url": "https://www.kabum.com.br/produto/1032495/placa-de-video-zotac-solo-gaming-8gb-geforce-rtx5050-gddr6-zt-b50500g-10l",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo Zotac Gaming Twin Edge Oc 8GB Geforce RTX5050 Gddr6 - Zt-b50500h-10m",
-      "price": "R$6.490,33",
-      "parcelamento": "No PIX ou 10x de R$ 649,03",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032503/medium/Placa-De-V-deo-Zotac-Gaming-Twin-Edge-Oc-8GB-Geforce-RTX5050-Gddr6-Zt-b50500h-10m_1777285429.jpg",
-      "url": "https://www.kabum.com.br/produto/1032503/placa-de-video-zotac-gaming-twin-edge-oc-8gb-geforce-rtx5050-gddr6-zt-b50500h-10m",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Vídeo Palit Dual Oc 8GB Geforce RTX5050 Gddr6 - Ne65050s19p1-gb2070d",
-      "price": "R$6.947,11",
-      "parcelamento": "No PIX ou 10x de R$ 694,71",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1032485/medium/Placa-De-V-deo-Palit-Dual-Oc-8GB-Geforce-RTX5050-Gddr6-Ne65050s19p1-gb2070d_1777285435.jpg",
-      "url": "https://www.kabum.com.br/produto/1032485/placa-de-video-palit-dual-oc-8gb-geforce-rtx5050-gddr6-ne65050s19p1-gb2070d",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa De Video Pny Nvidia Quadro RTX Pro6000 Blackwell Wkstation 96gb Gddr7 512bit VcnRTXpro6000b-pb",
-      "price": "R$89.093,72",
-      "parcelamento": "No PIX ou 10x de R$ 8909,37",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/927538/medium/Placa-De-Video-Pny-Nvidia-Quadro-RTX-Pro6000-Blackwell-Wkstation-96gb-Gddr7-512bit-VcnRTXpro6000b-pb_1757686179.jpg",
-      "url": "https://www.kabum.com.br/produto/927538/placa-de-video-pny-nvidia-quadro-rtx-pro6000-blackwell-wkstation-96gb-gddr7-512bit-vcnrtxpro6000b-pb",
-      "relevancia": 4
-    },
-    {
-      "title": "Placa de video Gpu Rx 550, 4GB, GDDR5, 128 Bits Projeto Edge - Pvex5504gbdf",
-      "price": "R$598,90",
-      "parcelamento": "No PIX ou 10x de R$ 65,09",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/538966/medium/Placa-de-video-Gpu-Rx-550-4GB-GDDR5-128-Bits-Projeto-Edge-Pvex5504gbdf_1780093123.jpg",
-      "url": "https://www.kabum.com.br/produto/538966/placa-de-video-gpu-rx-550-4gb-gddr5-128-bits-projeto-edge-pvex5504gbdf",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo PcYes Nvidia Geforce Rtx 3050 6Gb Gddr6 96Bits - Pvpcr30506Gb2F",
-      "price": "R$1.199,99",
-      "parcelamento": "No PIX ou 10x de R$ 141,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/998334/placa-de-video-pcyes-nvidia-geforce-rtx-3050-6gb-gddr6-96bits-pvpcr30506gb2f_1771421169_m.jpg",
-      "url": "https://www.kabum.com.br/produto/998334/placa-de-video-pcyes-nvidia-geforce-rtx-3050-6gb-gddr6-96bits-pvpcr30506gb2f",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo MSI RTX 3050 LP OC NVIDIA Geforce, 6GB, GDDR6, 96-Bit, Low Profile - G3050LP6C",
-      "price": "R$1.299,99",
-      "parcelamento": "No PIX ou 10x de R$ 144,44",
-      "image": "https://images.kabum.com.br/produtos/fotos/1012613/placa-de-video-msi-geforce-rtx-3050-lp-oc-nvidia-6gb-gddr6-96-bit-low-profile-g3050lp6c_1775759946_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1012613/placa-de-video-msi-rtx-3050-lp-oc-nvidia-geforce-6gb-gddr6-96-bit-low-profile-g3050lp6c",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo RTX 3050 ASUS 6G Dual OC NVIDIA GeForce, 6GB GDDR6, DLSS, Ray Tracing, G-Sync  - 90YV0K60-M0NA00",
-      "price": "R$1.399,99",
-      "parcelamento": "No PIX ou 10x de R$ 164,70",
-      "image": "https://images.kabum.com.br/produtos/fotos/520492/placa-de-video-rtx-3050-asus-o6g-dual-nvidia-geforce-dlss-ray-tracing-g-sync-90yv0k60-m0na00_1711648234_m.jpg",
-      "url": "https://www.kabum.com.br/produto/520492/placa-de-video-rtx-3050-asus-6g-dual-oc-nvidia-geforce-6gb-gddr6-dlss-ray-tracing-g-sync-90yv0k60-m0na00",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo Galax GeForce RTX 3050 EX V2, 6GB, GDDR6, 96 Bits - 35NRLDHP9OID",
-      "price": "R$1.459,99",
-      "parcelamento": "No PIX ou 10x de R$ 171,76",
-      "image": "https://images.kabum.com.br/produtos/fotos/703109/placa-de-video-galax-geforce-rtx-3050-ex-v2-6gb-gddr6-96-bits-35nrldhp9oid_1738068519_m.jpg",
-      "url": "https://www.kabum.com.br/produto/703109/placa-de-video-galax-geforce-rtx-3050-ex-v2-6gb-gddr6-96-bits-35nrldhp9oid",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo Pcyes Projeto Edge GPU RTX 3050 NVIDIA Geforce, 8GB, GDDR6, 128Bit, Branco - PVRTX30508WTPE",
-      "price": "R$1.499,99",
-      "parcelamento": "No PIX ou 10x de R$ 176,46",
-      "image": "https://images.kabum.com.br/produtos/fotos/716959/placa-de-video-pcyes-gpu-nvidia-geforce-rtx-3050-8gb-gddr6-128bit-projeto-edge-branco-pvrtx30508wtpe_1744386589_m.jpg",
-      "url": "https://www.kabum.com.br/produto/716959/placa-de-video-pcyes-projeto-edge-gpu-rtx-3050-nvidia-geforce-8gb-gddr6-128bit-branco-pvrtx30508wtpe",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo Gigabyte Geforce RTX 3050 Windforce Oc V2 6gb Gddr6 96 Bit",
-      "price": "R$1.699,27",
-      "parcelamento": "No PIX ou 10x de R$ 197,59",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/729052/medium/Placa-De-V-deo-Gigabyte-Geforce-RTX-3050-Windforce-Oc-V2-6gb-Gddr6-96-Bit_1747783178.jpg",
-      "url": "https://www.kabum.com.br/produto/729052/placa-de-video-gigabyte-geforce-rtx-3050-windforce-oc-v2-6gb-gddr6-96-bit",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo Pcyes Projeto Edge GPU RTX 3050 NVIDIA Geforce, 8GB, GDDR6, 128Bit - PVRTX30508BLPE",
-      "price": "R$1.999,99",
-      "parcelamento": "No PIX ou 10x de R$ 235,29",
-      "image": "https://images.kabum.com.br/produtos/fotos/716958/placa-de-video-pcyes-gpu-nvidia-geforce-rtx-3050-8gb-gddr6-128bit-projeto-edge-pvrtx30508blpe_1744384396_m.jpg",
-      "url": "https://www.kabum.com.br/produto/716958/placa-de-video-pcyes-projeto-edge-gpu-rtx-3050-nvidia-geforce-8gb-gddr6-128bit-pvrtx30508blpe",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo MSI RTX 5060 Shadow 2X OC NVIDIA GeForce, 8GB, GDDR7, 128-bit - 912-V537-038",
-      "price": "R$2.559,99",
-      "parcelamento": "No PIX ou 10x de R$ 301,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/1000741/placa-de-video-msi-rtx-5060-shadow-2x-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v537-038_1771333499_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1000741/placa-de-video-msi-rtx-5060-shadow-2x-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v537-038",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo ASUS RTX 5060 Dual NVIDIA GeForce, 8GB, GDDR7, 128-bit - DUAL-RTX5060-8G",
-      "price": "R$2.599,99",
-      "parcelamento": "No PIX ou 10x de R$ 305,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/1000487/placa-de-video-asus-rtx-5060-dual-nvidia-geforce-8gb-gddr7-128-bit-dual-rtx5060-8g_1770982522_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1000487/placa-de-video-asus-rtx-5060-dual-nvidia-geforce-8gb-gddr7-128-bit-dual-rtx5060-8g",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo Galax RTX 5060 8GB Gddr7 1-click Oc- 56nsn8mddxbo",
-      "price": "R$2.611,84",
-      "parcelamento": "No PIX ou 10x de R$ 296,80",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/996062/medium/Placa-De-V-deo-Galax-RTX-5060-8GB-Gddr7-1-click-Oc-56nsn8mddxbo_1777727015.jpg",
-      "url": "https://www.kabum.com.br/produto/996062/placa-de-video-galax-rtx-5060-8gb-gddr7-1-click-oc-56nsn8mddxbo",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo MSI RTX 5060 Cyclone OC NVIDIA GeForce, 8GB, GDDR7, 128-bit - 912-V812-205",
-      "price": "R$2.849,99",
-      "parcelamento": "No PIX ou 10x de R$ 335,29",
-      "image": "https://images.kabum.com.br/produtos/fotos/1000742/placa-de-video-msi-rtx-5060-cyclone-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v812-205_1771004650_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1000742/placa-de-video-msi-rtx-5060-cyclone-oc-nvidia-geforce-8gb-gddr7-128-bit-912-v812-205",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo MSI GeForce RTX 5060 Ti Shadow 2X OC Plus, Nvidia, 8GB, GDDR7, 128-Bit - G506T-8S2CP",
-      "price": "R$2.899,99",
-      "parcelamento": "No PIX ou 10x de R$ 322,22",
-      "image": "https://images.kabum.com.br/produtos/fotos/1012610/placa-de-video-msi-geforce-rtx-5060-ti-shadow-2x-oc-plus-nvidia-8gb-gddr7-128-bit-g506t-8s2cp_1775757469_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1012610/placa-de-video-msi-geforce-rtx-5060-ti-shadow-2x-oc-plus-nvidia-8gb-gddr7-128-bit-g506t-8s2cp",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo MSI RTX 5060 Ti Gaming OC NVIDIA GeForce, 8GB, GDDR7, 128-Bit - G506T-8GC",
-      "price": "R$3.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 344,44",
-      "image": "https://images.kabum.com.br/produtos/fotos/1013926/placa-de-video-msi-geforce-rtx-5060-ti-gaming-oc-nvidia-8gb-gddr7-128-bit-g506t-8gc_1776087485_m.jpg",
-      "url": "https://www.kabum.com.br/produto/1013926/placa-de-video-msi-rtx-5060-ti-gaming-oc-nvidia-geforce-8gb-gddr7-128-bit-g506t-8gc",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo Gigabyte Geforce RTX 5060 Ti Windforce 8GB Gddr7 128 Bits - Gv-n506twf2-8gd",
-      "price": "R$3.494,95",
-      "parcelamento": "No PIX ou 10x de R$ 406,38",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/880470/medium/Placa-De-V-deo-Gigabyte-Geforce-RTX-5060-Ti-Windforce-8GB-Gddr7-128-Bits-Gv-n506twf2-8gd_1777379932.jpg",
-      "url": "https://www.kabum.com.br/produto/880470/gpu-gigabyte-rtx-5060-ti-8gb-windforce-gddr7-128-bits-3x-dp-1x-hdmi-gv-n506twf2-8gd",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo Msi Geforce RTX 5060 Ti Ventus 3x Oc, 16gb Gddr7, 128-bit, Dlss, Ray Tracing - G506t-16v3c",
-      "price": "R$4.299,00",
-      "parcelamento": "No PIX ou 10x de R$ 467,28",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/954052/medium/Placa-De-V-deo-Msi-Geforce-RTX-5060-Ti-Ventus-3x-Oc-16gb-Gddr7-128-bit-Dlss-Ray-Tracing-G506t-16v3c_1770928363.png",
-      "url": "https://www.kabum.com.br/produto/954052/placa-de-video-msi-geforce-rtx-5060-ti-ventus-3x-oc-16gb-gddr7-128-bit-dlss-ray-tracing-g506t-16v3c",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo MSI GeForce RTX 5070 12G VENTUS 2X OC,12 GB GDDR7, 28Gbps, NVIDIA GeForce RTX 5070- G5070-12V2C",
-      "price": "R$4.599,99",
-      "parcelamento": "No PIX ou 10x de R$ 541,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/725587/placa-de-video-msi-geforce-rtx-5070-12g-ventus-2x-oc-g5070-12v2c_1741201246_m.jpg",
-      "url": "https://www.kabum.com.br/produto/725587/placa-de-video-msi-geforce-rtx-5070-12g-ventus-2x-oc-12-gb-gddr7-28gbps-nvidia-geforce-rtx-5070-g5070-12v2c",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo ASUS PRIME RTX 5070 OC 12G WHITE NVIDIA Geforce, 12GB, GDDR7, OpenGL 4.6, 2587 MHz, Triple Fan, DLSS 4 - 90YV0M19-M0NA00",
-      "price": "R$5.099,99",
-      "parcelamento": "No PIX ou 10x de R$ 599,99",
-      "image": "https://images.kabum.com.br/produtos/fotos/870970/placa-de-video-asus-prime-rtx-5070-oc-12g-white-nvidia-geforce-12gb-gddr7-opengl-4-6-2587-mhz-triple-fan-dlss-4-90yv0m19-m0na00_1750943794_m.jpg",
-      "url": "https://www.kabum.com.br/produto/870970/placa-de-video-asus-prime-rtx-5070-oc-12g-white-nvidia-geforce-12gb-gddr7-opengl-4-6-2587-mhz-triple-fan-dlss-4-90yv0m19-m0na00",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa De Vídeo RTX 5070 12gb Gddr7 192its Shadow 3x Oc Msi - 912-v532-008",
-      "price": "R$5.199,00",
-      "parcelamento": "No PIX ou 10x de R$ 577,66",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/741509/medium/Placa-De-V-deo-RTX-5070-12gb-Gddr7-192its-Shadow-3x-Oc-Msi-912-v532-008_1779382743.jpg",
-      "url": "https://www.kabum.com.br/produto/741509/placa-de-video-rtx-5070-12gb-gddr7-192its-shadow-3x-oc-msi-912-v532-008",
-      "relevancia": 3
-    },
-    {
-      "title": "Placa de Vídeo RX 7600 GAMING OC 8G AMD Radeon Gigabyte, 8GB, GDDR6, 128bits, RGB - GV-R76GAMING OC-8GD",
-      "price": "R$1.659,99",
-      "parcelamento": "No PIX ou 10x de R$ 195,29",
-      "image": "https://images.kabum.com.br/produtos/fotos/475647/placa-de-video-rx-7600-gaming-oc-8g-radeon-gigabyte-8gb-gddr6-128bits-rgb-gv-r76gaming-oc-8gd_1698435450_m.jpg",
-      "url": "https://www.kabum.com.br/produto/475647/placa-de-video-rx-7600-gaming-oc-8g-amd-radeon-gigabyte-8gb-gddr6-128bits-rgb-gv-r76gaming-oc-8gd",
+      "title": "Placa de Video Palit GeForce RTX 5050 StormX, 8GB, GDDR6, 128-bit, NE65050019P1-GB2070F",
+      "price": "R$ 1.879,99",
+      "parcelamento": "12x de R$ 184,31",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne65050019p1-gb2070f4.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-palit-geforce-rtx-5050-stormx-8gb-gddr6-128-bit-ne65050019p1-gb2070f",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Ryzen 5 5500| 16gb 3200mhz| (RTX 5050 8GB)| SSD 480GB| 600w 80 Plus| 3 Fans RGB, Neologic - Nli90475",
-      "price": "R$5.699,99",
-      "parcelamento": "No PIX ou 10x de R$ 633,33",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/910863/medium/PC-Gamer-Ryzen-5-5500-16gb-3200mhz-RTX-5050-8GB-SSD-480GB-600w-80-Plus-3-Fans-RGB-Neologic-Nli90475_1779134650.jpg",
-      "url": "https://www.kabum.com.br/produto/910863/pc-gamer-ryzen-5-5500-16gb-3200mhz-rtx-5050-8gb-a520m-ssd-480gb-m-2-600w-80-plus-3-fans-rgb-neologic-nli90475-u-unica-unica",
+      "title": "Placa de Video INNO3D GeForce RTX 5050 Twin X2, 8GB, GDDR6, 128-bit, N50502-08D6-174071N-NAC",
+      "price": "R$ 1.899,99",
+      "parcelamento": "12x de R$ 186,27",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/5/n50502-08d6-174071n-nac.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-inno3d-geforce-rtx-5050-twin-x2-8gb-gddr6-128-bit-n50502-08d6-174071n-nac",
       "relevancia": 2
     },
     {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i7 14650hx 8GB Ram 512gb SSD Linux Keepos Tela 16\" 165hz Nível Ips Cinza - Rv019",
-      "price": "R$7.649,00",
-      "parcelamento": "No PIX ou 10x de R$ 899,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/951740/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i7-14650hx-8GB-Ram-512gb-SSD-Linux-Keepos-Tela-16-165hz-N-vel-Ips-Cinza-Rv019_1765585720.jpg",
-      "url": "https://www.kabum.com.br/produto/951740/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i7-14650hx-8gb-ram-512gb-ssd-linux-keepos-tela-16-165hz-nivel-ips-cinza-rv019",
+      "title": "Placa de Video Palit GeForce RTX 5050 StormX OC, 8GB, GDDR6, 128-bit, NE65050T19P1-GB2070F",
+      "price": "R$ 1.899,99",
+      "parcelamento": "12x de R$ 186,27",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne65050t19p1-gb2070f.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-palit-geforce-rtx-5050-stormx-oc-8gb-gddr6-128-bit-ne65050t19p1-gb2070f",
       "relevancia": 2
     },
     {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i5 14a 16gb Ram 512gb SSD Linux 16\" Ips LED Fhd 165hz Rv257",
-      "price": "R$7.649,00",
-      "parcelamento": "No PIX ou 10x de R$ 899,88",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1036743/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i5-14a-16gb-Ram-512gb-SSD-Linux-16-Ips-LED-Fhd-165hz-Rv257_1778612620.jpg",
-      "url": "https://www.kabum.com.br/produto/1036743/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i5-14a-16gb-ram-512gb-ssd-linux-16-ips-led-fhd-165hz-rv257",
+      "title": "Placa de Video MSI GeForce RTX 5050 Ventus 2X OC, 8GB, GDDR6, 128-bit, G5050-8V2C-NAC",
+      "price": "R$ 1.929,99",
+      "parcelamento": "12x de R$ 189,22",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/g/5/g5050-8v2c-nac3.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-msi-geforce-rtx-5050-ventus-2x-oc-8gb-gddr6-128-bit-g5050-8v2c-nac",
       "relevancia": 2
     },
     {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i5 14a 16gb Ram 512gb SSD WINDOWS 11 Home Tela 16\" LED Fhd 165hz Gray - Rv122w",
-      "price": "R$8.499,15",
-      "parcelamento": "No PIX ou 10x de R$ 999,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1008856/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i5-14a-16gb-Ram-512gb-SSD-WINDOWS-11-Home-Tela-16-LED-Fhd-165hz-Gray-Rv122w_1775825918.jpg",
-      "url": "https://www.kabum.com.br/produto/1008856/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i5-14a-16gb-ram-512gb-ssd-windows-11-home-tela-16-led-fhd-165hz-gray-rv122w",
+      "title": "Placa de Video Palit GeForce RTX 5050 Dual OC, 8GB, GDDR6, 128-bit, NE65050S19P1-GB2070D",
+      "price": "R$ 1.939,99",
+      "parcelamento": "12x de R$ 190,20",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne65050s19p1-gb2070d7.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-palit-geforce-rtx-5050-dual-oc-8gb-gddr6-128-bit-ne65050s19p1-gb2070d",
       "relevancia": 2
     },
     {
-      "title": "Notebook Asus Tuf Gaming F16 Fx608jhr Nvidia RTX 5050 Intel Core i7 14650hx 16gb Ram 512gb SSD WINDOWS 11 Home Tela 16\" 165hz Nível Ips Cinza - Rv016w",
-      "price": "R$9.349,15",
-      "parcelamento": "No PIX ou 10x de R$ 1099,90",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/895398/medium/Notebook-Asus-Tuf-Gaming-F16-Fx608jhr-Nvidia-RTX-5050-Intel-Core-i7-14650hx-16gb-Ram-512gb-SSD-WINDOWS-11-Home-Tela-16-165hz-N-vel-Ips-Cinza-Rv016w_1770929885.jpg",
-      "url": "https://www.kabum.com.br/produto/895398/notebook-asus-tuf-gaming-f16-fx608jhr-nvidia-rtx-5050-intel-core-i7-14650hx-16gb-ram-512gb-ssd-windows-11-home-tela-16-165hz-nivel-ips-cinza-rv016w",
+      "title": "Placa de Video PNY GeForce RTX 5050 Dual Fan, 8GB, GDDR6, 128-bit, VCG50508DFXPB1",
+      "price": "R$ 1.959,99",
+      "parcelamento": "12x de R$ 192,16",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/v/c/vcg50508dfxpb13.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-pny-geforce-rtx-5050-dual-fan-8gb-gddr6-128-bit-vcg50508dfxpb1",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqm002-e",
-      "price": "R$9.470,75",
-      "parcelamento": "No PIX ou 10x de R$ 947,07",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046474/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqm002-e_1780514624.jpg",
-      "url": "https://www.kabum.com.br/produto/1046474/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqm002-e",
+      "title": "Placa de Video MSI GeForce RTX 5050 Shadow 2X OC, 8GB, GDDR6, 128-bit, G5050-8S2C-NAC",
+      "price": "R$ 1.999,99",
+      "parcelamento": "12x de R$ 196,08",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/9/1/912-v538-018-nac.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-msi-geforce-rtx-5050-shadow-2x-oc-8gb-gddr6-128-bit-g5050-8s2c-nac",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqm072-e",
-      "price": "R$9.484,14",
-      "parcelamento": "No PIX ou 10x de R$ 948,41",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046471/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqm072-e_1780514625.jpg",
-      "url": "https://www.kabum.com.br/produto/1046471/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqm072-e",
+      "title": "Placa de Video Zotac GeForce RTX 5050 Gaming Twin Edge OC, 8GB, GDDR6, 128-bit, ZT-B50500H-10M-NAC",
+      "price": "R$ 2.059,99",
+      "parcelamento": "12x de R$ 201,96",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/z/t/zt-b50500h-10m-nac4.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-zotac-geforce-rtx-5050-gaming-twin-edge-oc-8gb-gddr6-128-bit-zt-b50500h-10m-nac",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqp071-e",
-      "price": "R$9.541,71",
-      "parcelamento": "No PIX ou 10x de R$ 954,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046423/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqp071-e_1780514623.jpg",
-      "url": "https://www.kabum.com.br/produto/1046423/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqp071-e",
+      "title": "Placa de Video Asus GeForce RTX 5050 Dual OC, 8GB, GDDR6, 128-bit, DUAL-RTX5050-O8G",
+      "price": "R$ 2.299,99",
+      "parcelamento": "12x de R$ 225,49",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/d/u/dual-rtx5050-o8g.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-asus-geforce-rtx-5050-dual-oc-8gb-gddr6-128-bit-dual-rtx5050-o8g",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqp001-e",
-      "price": "R$9.541,71",
-      "parcelamento": "No PIX ou 10x de R$ 954,17",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046465/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqp001-e_1780514624.jpg",
-      "url": "https://www.kabum.com.br/produto/1046465/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqp001-e",
+      "title": "PC Gamer Pichau Afrodite, AMD Ryzen 5 5500, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 480GB",
+      "price": "R$ 3.799,85",
+      "parcelamento": "12x de R$ 372,53",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-narok-v2-gpu-p-001_79_3_1.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-afrodite-amd-ryzen-5-5500-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-480gb-63371",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Gc1003-e",
-      "price": "R$9.770,68",
-      "parcelamento": "No PIX ou 10x de R$ 977,06",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046472/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Gc1003-e_1780514624.jpg",
-      "url": "https://www.kabum.com.br/produto/1046472/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-gc1003-e",
+      "title": "PC Gamer Pichau Eridu II, Intel i3-12100F, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 480GB",
+      "price": "R$ 4.499,98",
+      "parcelamento": "12x de R$ 441,17",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/-/a-pc-pichau-hexer-gpu-m-bk-001_5_14.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-eridu-ii-intel-i3-12100f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-480gb-58677",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Gc1073-e",
-      "price": "R$9.780,06",
-      "parcelamento": "No PIX ou 10x de R$ 978,00",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046462/medium/PC-Gamer-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Gc1073-e_1780514624.jpg",
-      "url": "https://www.kabum.com.br/produto/1046462/pc-gamer-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-gc1073-e",
+      "title": "PC Gamer Pichau Musa V, Intel i3-14100F, GeForce RTX 5050 8GB, 16GB DDR4, SSD 480GB",
+      "price": "R$ 4.633,68",
+      "parcelamento": "12x de R$ 454,28",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-narok-v2-gpu-m-001_2_7.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-musa-v-intel-i3-14100f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-480gb-61480",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Completo Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Aqp036-e",
-      "price": "R$10.175,06",
-      "parcelamento": "No PIX ou 10x de R$ 1017,50",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046117/medium/PC-Gamer-Completo-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Aqp036-e_1780492727.jpg",
-      "url": "https://www.kabum.com.br/produto/1046117/pc-gamer-completo-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-aqp036-e",
+      "title": "PC Gamer Pichau Íncubo, AMD Ryzen 5 5500, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 480GB",
+      "price": "R$ 4.671,66",
+      "parcelamento": "12x de R$ 458,01",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-narok-v2-gpu-m-001_1_31.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-incubo-amd-ryzen-5-5500-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-480gb-58673",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Completo Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Gc1038-e",
-      "price": "R$10.404,03",
-      "parcelamento": "No PIX ou 10x de R$ 1040,40",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046170/medium/PC-Gamer-Completo-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Gc1038-e_1780492726.jpg",
-      "url": "https://www.kabum.com.br/produto/1046170/pc-gamer-completo-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-gc1038-e",
+      "title": "PC Gamer Pichau Helheim, Intel i5-12400F, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 480GB",
+      "price": "R$ 4.928,57",
+      "parcelamento": "12x de R$ 483,19",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/o/computador-gamer-mancer-ward-v3-rgb-001_1.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-helheim-intel-i5-12400f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-480gb-63528",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Completo Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Gc1096-e",
-      "price": "R$10.413,40",
-      "parcelamento": "No PIX ou 10x de R$ 1041,34",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046174/medium/PC-Gamer-Completo-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Gc1096-e_1780492727.jpg",
-      "url": "https://www.kabum.com.br/produto/1046174/pc-gamer-completo-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-gc1096-e",
+      "title": "PC Gamer Pichau Shamash, Intel i5-14400F, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 480GB",
+      "price": "R$ 5.199,99",
+      "parcelamento": "12x de R$ 509,80",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-narok-v2-gpu-m-1_26.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-shamash-intel-i5-14400f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-480gb-64545",
       "relevancia": 2
     },
     {
-      "title": "PC Gamer Completo Ryzen 5 8400f, RTX 5050, 16gb Ddr5, SSD Nvme 500gb, 600w 80 Plus, Gc4039-e",
-      "price": "R$10.456,25",
-      "parcelamento": "No PIX ou 10x de R$ 1045,62",
-      "image": "https://images.kabum.com.br/produtos/fotos/sync_mirakl/1046127/medium/PC-Gamer-Completo-Ryzen-5-8400f-RTX-5050-16gb-Ddr5-SSD-Nvme-500gb-600w-80-Plus-Gc4039-e_1780492728.jpg",
-      "url": "https://www.kabum.com.br/produto/1046127/pc-gamer-completo-ryzen-5-8400f-rtx-5050-16gb-ddr5-ssd-nvme-500gb-600w-80-plus-gc4039-e",
+      "title": "PC Gamer Pichau Helheim II, Intel i5-12400F, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 1TB",
+      "price": "R$ 5.303,78",
+      "parcelamento": "12x de R$ 519,98",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-narok-v2-gpu-m-1_7.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-juno-xi-intel-i5-12400f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-1tb-59734",
       "relevancia": 2
     },
     {
-      "title": "Placa-Mãe Husky Nexus B450, M.2 NVMe, DDR4 3200MHz, Ryzen 5000/3000/2000, Micro-ATX, 64GB Dual Channel - HPM450",
-      "price": "R$369,99",
-      "parcelamento": "No PIX ou 10x de R$ 43,52",
-      "image": "https://images.kabum.com.br/produtos/fotos/692459/placa-mae-husky-nexus-b450-m-2-nvme-ddr4-3200mhz-ryzen-5000-3000-2000-micro-atx-64gb-dual-channel-hpm450_1761574090_m.jpg",
-      "url": "https://www.kabum.com.br/produto/692459/placa-mae-husky-nexus-b450-m-2-nvme-ddr4-3200mhz-ryzen-5000-3000-2000-micro-atx-64gb-dual-channel-hpm450",
+      "title": "PC Gamer Pichau Éter V, Intel i5-13400F, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 1TB",
+      "price": "R$ 5.357,91",
+      "parcelamento": "12x de R$ 525,29",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/-/a-pc-hx110-preto-gpu-m-001_1.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-eter-v-intel-i5-13400f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-1tb-59736",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Completo Pichau Helheim III, Intel i5-12400F, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 480GB + Monitor + Kit Periféricos",
+      "price": "R$ 5.384,97",
+      "parcelamento": "12x de R$ 527,94",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/a/ward-v3-gpu-m-ariete_1.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-completo-pichau-helheim-iii-intel-i5-12400f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-480gb-monitor-kit-perifericos-63532",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Shax, Intel i5-14400F, GeForce RTX 5050 8GB, 16GB DDR4, SSD M.2 1TB",
+      "price": "R$ 5.599,98",
+      "parcelamento": "12x de R$ 549,02",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/-/a-pc-pichau-apus-black-gpu-m-001_2_5.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-shax-intel-i5-14400f-geforce-rtx-5050-8gb-16gb-ddr4-ssd-m-2-1tb-59737",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Gaia VIII, AMD Ryzen 5 8400F, GeForce RTX 5050 8GB, 16GB DDR5, SSD M.2 1TB",
+      "price": "R$ 5.986,12",
+      "parcelamento": "12x de R$ 586,87",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/-/a-pc-pichau-apus-black-gpu-m-001_40.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-gaia-viii-amd-ryzen-5-8400f-geforce-rtx-5050-8gb-16gb-ddr5-ssd-m-2-1tb-58830",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Apaosha, Intel Core Ultra 5 245K, GeForce RTX 5050 8GB, 16GB DDR5, SSD M.2 1TB",
+      "price": "R$ 7.043,84",
+      "parcelamento": "12x de R$ 690,57",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-pichau-cv700l-preto-cf_wt240mm-001.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-apaosha-intel-core-ultra-5-245k-geforce-rtx-5050-8gb-16gb-ddr5-ssd-m-2-1tb-63157",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Khepri, Intel Core Ultra 5 245KF, GeForce RTX 5050 8GB, 16GB DDR5, SSD M.2 1TB",
+      "price": "R$ 7.070,57",
+      "parcelamento": "12x de R$ 693,19",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/p/apus-rgb-water-240mm-gpu-g-pc-001_3.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-khepri-intel-core-ultra-5-245kf-geforce-rtx-5050-8gb-16gb-ddr5-ssd-m-2-1tb-62669",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Marbas, Intel Core Ultra 7 265F, GeForce RTX 5050 8GB, 16GB DDR5, SSD M.2 1TB",
+      "price": "R$ 7.499,98",
+      "parcelamento": "12x de R$ 735,29",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/-/a-pc-apus-rgb-cgpu-m_dia-001_4_3.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-marbas-intel-core-ultra-7-265f-geforce-rtx-5050-8gb-16gb-ddr5-ssd-m-2-1tb-64049",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Morax, Intel Core Ultra 7 265K, GeForce RTX 5050 8GB, 16GB DDR5, SSD M.2 1TB",
+      "price": "R$ 7.623,53",
+      "parcelamento": "12x de R$ 747,41",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/a/p/apus-rgb-water-240mm-gpu-g-pc-001_5_1.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-morax-intel-core-ultra-7-265k-geforce-rtx-5050-8gb-16gb-ddr5-ssd-m-2-1tb-64479",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Leviatã, Intel Core Ultra 5 225F, GeForce RTX 5050 8GB, 16GB DDR5, SSD M.2 480GB",
+      "price": "R$ 8.079,22",
+      "parcelamento": "12x de R$ 792,08",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-pichau-cv100-gpu-m-001_1_27.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-leviat-intel-core-ultra-5-225f-geforce-rtx-5050-8gb-16gb-ddr5-ssd-m-2-480gb-64737",
+      "relevancia": 2
+    },
+    {
+      "title": "PC Gamer Pichau Leviatã, Intel Core Ultra 5 225F, GeForce RTX 5050 8GB, 16GB DDR5, SSD M.2 1TB",
+      "price": "R$ 8.946,64",
+      "parcelamento": "12x de R$ 877,12",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/c/pc-narok-v2-gpu-m-001_1_16.jpg",
+      "url": "https://www.pichau.com.br/pc-gamer-pichau-leviat-intel-core-ultra-5-225f-geforce-rtx-5050-8gb-16gb-ddr5-ssd-m-2-1tb-62645",
+      "relevancia": 2
+    },
+    {
+      "title": "Placa de Video Mancer GeForce RTX 2060 Heimdall, 6GB, GDDR6, 192-bit, MCR-RTX20606G-HDLL",
+      "price": "R$ 1.199,99",
+      "parcelamento": "12x de R$ 117,65",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/c/mcr-rtx20606g-hdll1.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-mancer-geforce-rtx-2060-heimdall-6gb-gddr6-192-bit-mcr-rtx20606g-hdll",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video PCYes GeForce RTX 3050 Projeto Edge, 6GB, GDDR6, 96-bit, PVRTX30506BLPE",
+      "price": "R$ 1.269,99",
+      "parcelamento": "12x de R$ 124,51",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/p/v/pvrtx30506blpe.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-pcyes-geforce-rtx-3050-projeto-edge-6gb-gddr6-96-bit-pvrtx30506blpe",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video PNY Quadro RTX A400, 4GB, GDDR6, 64-bit, VCNRTXA400ATX-PB",
+      "price": "R$ 1.379,99",
+      "parcelamento": "12x de R$ 135,29",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/v/c/vcnrtxa400atx-pb5.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-pny-quadro-rtx-a400-4gb-gddr6-64-bit-vcnrtxa400atx-pb",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video Palit GeForce RTX 5060 Ti Dual, 8GB, GDDR7, 128-bit, NE7506T019P1-GB2062D",
+      "price": "R$ 2.599,99",
+      "parcelamento": "12x de R$ 254,90",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne7506t019p1-gb2062d7.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-palit-geforce-rtx-5060-ti-dual-8gb-gddr7-128-bit-ne7506t019p1-gb2062d",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video Palit GeForce RTX 5070 White OC, 12GB, GDDR7, 192-bit, NE75070U19K9-GB2050W",
+      "price": "R$ 4.499,99",
+      "parcelamento": "12x de R$ 441,18",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne75070u19k9-gb2050w6.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-palit-geforce-rtx-5070-white-oc-12gb-gddr7-192-bit-ne75070u19k9-gb2050w",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video Gainward GeForce RTX 5070 Phoenix, 12GB, GDDR7, 192-bit, NE75070019K9-GB2050X-NAC",
+      "price": "R$ 4.689,99",
+      "parcelamento": "12x de R$ 459,80",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne75070019k9-gb2050x-nac7.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-gainward-geforce-rtx-5070-phoenix-12gb-gddr7-192-bit-ne75070019k9-gb2050x-nac",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video Palit GeForce RTX 5070 Infinity 3, 12GB, GDDR7, 192-bit, NE75070019K9-GB2050S",
+      "price": "R$ 4.759,99",
+      "parcelamento": "12x de R$ 466,67",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne75070019k9-gb2050s6.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-palit-geforce-rtx-5070-infinity-3-12gb-gddr7-192-bit-ne75070019k9-gb2050s",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video PNY Quadro RTX A4500, 20GB, GDDR6, 320-bit, VCNRTXA4500-PB",
+      "price": "R$ 8.799,99",
+      "parcelamento": "12x de R$ 862,74",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/v/c/vcnrtxa4500-pb3.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-pny-quadro-rtx-a4500-20gb-gddr6-320-bit-vcnrtxa4500-pb",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video Palit GeForce RTX 5080 Gaming Pro, 16GB, GDDR7, 256-bit, NE75080019T2-GB2031Y",
+      "price": "R$ 9.799,99",
+      "parcelamento": "12x de R$ 960,78",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/e/ne75080019t2-gb2031y6.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-palit-geforce-rtx-5080-gaming-pro-16gb-gddr7-256-bit-ne75080019t2-gb2031y",
+      "relevancia": 1
+    },
+    {
+      "title": "Placa de Video INNO3D GeForce RTX 5090 X3, 32GB, GDDR7, 512-bit, N50903-32D7-17593928",
+      "price": "R$ 20.999,99",
+      "parcelamento": "12x de R$ 2.058,82",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/n/5/n50903-32d7-17593928.jpg",
+      "url": "https://www.pichau.com.br/placa-de-video-inno3d-geforce-rtx-5090-x3-32gb-gddr7-512-bit-n50903-32d7-17593928",
       "relevancia": 1
     }
   ]

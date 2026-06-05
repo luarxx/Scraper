@@ -124,10 +124,10 @@ interface SiteConfig {
 
 ### Anti-detecção
 
-- `navigator.webdriver = false` via `addInitScript`
-- User-Agent de Chrome real
-- Viewport 1920×1080, locale `pt-BR`
-- Scroll simulado após carregar página (DOM mode)
+- Fingerprint único por `browser.newContext()` com rotação por site para evitar repetir a mesma assinatura em buscas consecutivas
+- User-Agent de Chrome desktop real/recente (Windows, Linux e macOS), viewport 1920±200 × 1080±100, locale `pt-BR` e timezone `America/Sao_Paulo`
+- Spoof via `addInitScript` de `navigator.webdriver`, `language`, `languages`, `platform`, `plugins`, `mimeTypes`, `hardwareConcurrency`, `deviceMemory` e WebGL vendor/renderer
+- Comportamento humano simulado após navegação: movimento gradual de mouse, scroll via `page.mouse.wheel()` em 3-5 passos de 200-400px e pausas aleatórias entre ações
 
 ### Cloudflare / Challenge Detection
 

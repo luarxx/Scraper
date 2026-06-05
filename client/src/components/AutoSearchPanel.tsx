@@ -6,6 +6,7 @@ import { useAutoResults } from '../hooks/useAutoResults';
 import { AutoConfigList } from './AutoConfigList';
 import { AutoResultsView } from './AutoResultsView';
 import { Icon } from './Icon';
+import { formatBrazilDateMonthTime } from '../utils/date';
 
 interface AutoSearchPanelProps {
   sites: Site[];
@@ -148,10 +149,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
             </span>
             <span className="block text-sm font-semibold text-text-primary mt-0.5 tabular-nums">
               {status?.ultima_execucao
-                ? new Date(status.ultima_execucao).toLocaleDateString('pt-BR', {
-                    day: 'numeric', month: 'short',
-                    hour: '2-digit', minute: '2-digit',
-                  })
+                ? formatBrazilDateMonthTime(status.ultima_execucao)
                 : '—'}
             </span>
           </div>

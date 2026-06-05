@@ -8,14 +8,7 @@ import { ProductGrid } from './components/ProductGrid';
 import { StateMessage } from './components/StateMessage';
 import { AutoSearchPanel } from './components/AutoSearchPanel';
 import { Icon } from './components/Icon';
-
-function formatDate(iso: string): string {
-  const dt = new Date(iso);
-  return dt.toLocaleDateString('pt-BR', {
-    day: 'numeric', month: 'long', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  });
-}
+import { formatBrazilDateTime } from './utils/date';
 
 const SITE_COLORS: Record<string, { text: string }> = {
   kabum: { text: '#f97316' },
@@ -94,7 +87,7 @@ export default function App() {
                   </span>
                   <span className="w-1 h-1 rounded-full bg-accent/40" />
                   <time className="text-[11px] text-text-secondary font-medium tabular-nums">
-                    {formatDate(timestamp)}
+                    {formatBrazilDateTime(timestamp)}
                   </time>
                 </div>
               )}
@@ -127,7 +120,7 @@ export default function App() {
                   <div className="w-6 h-px bg-white/[0.06] mx-auto mb-4" />
                   <p className="text-xs text-text-muted">
                     Dados obtidos via scraper ·{' '}
-                    <time className="text-text-secondary">{formatDate(timestamp)}</time>
+                    <time className="text-text-secondary">{formatBrazilDateTime(timestamp)}</time>
                   </p>
                 </footer>
               </div>

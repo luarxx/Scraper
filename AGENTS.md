@@ -54,6 +54,7 @@ Server (server.ts — Node.js http)
 ├── AGENTS.md           # ← este arquivo
 ├── DESIGN.md           # Documentação do design system e UI/UX
 ├── DEPLOY_ORACLE_VPS.md # Guia de deploy na Oracle VPS com FileZilla, Nginx e PM2
+├── DEPLOY_GITHUB_ACTIONS.md # Guia do deploy automático via GitHub Actions
 ├── COMANDOS_VPS.md     # Comandos operacionais para administrar a VPS em produção
 ├── ATUALIZAR_SITE_VPS.md # Fluxo curto para atualizar a VPS após mudanças locais
 ├── .env                # Configuração local/produção (AUTO_INTERVAL_HOURS)

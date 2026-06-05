@@ -13,6 +13,7 @@ interface AutoSearchPanelProps {
 
 export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
   const [tab, setTab] = useState<'config' | 'results'>('config');
+  const [nowMs, setNowMs] = useState(() => Date.now());
   const { configs, status, loading: configLoading, saving, error: configError, fetchConfig, fetchStatus, saveConfig, removeConfig } = useAutoConfig();
   const { execucao, resultados, loading: resultsLoading, running, error: resultsError, fetchResults, triggerRun } = useAutoResults();
 
@@ -31,6 +32,13 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
     refreshAll();
   }, [refreshAll]);
 
+  useEffect(() => {
+    const id = setInterval(() => {
+      setNowMs(Date.now());
+    }, 1000);
+    return () => clearInterval(id);
+  }, []);
+
   // Poll leve: só status (sem refetch de results) enquanto executa.
   // Refetch de results acontece apenas na transição de "executando" -> outro estado.
   useEffect(() => {
@@ -40,6 +48,15 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
     }, 5000);
     return () => clearInterval(id);
   }, [status?.status, fetchStatus]);
+
+  useEffect(() => {
+    if (!status?.proxima_execucao || status.status === 'executando') return;
+    const delay = Math.max(new Date(status.proxima_execucao).getTime() - Date.now() + 1500, 0);
+    const id = setTimeout(() => {
+      fetchStatus();
+    }, delay);
+    return () => clearTimeout(id);
+  }, [status?.proxima_execucao, status?.status, fetchStatus]);
 
   const prevStatusRef = useRef<string | undefined>(undefined);
   useEffect(() => {
@@ -64,11 +81,10 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
 
   const statusIcon = isExecutando ? Zap : isAgendado ? Clock : Pause;
 
-  function formatProximaExecucao(iso: string | null): string {
+  function formatProximaExecucao(iso: string | null, now: number): string {
     if (!iso) return '—';
     const dt = new Date(iso);
-    const now = new Date();
-    const diffMs = dt.getTime() - now.getTime();
+    const diffMs = dt.getTime() - now;
     if (diffMs <= 0) return 'A qualquer momento';
     const horas = Math.floor(diffMs / 3600000);
     const mins = Math.floor((diffMs % 3600000) / 60000);
@@ -114,7 +130,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
             </span>
             <span className="block text-sm font-semibold text-text-primary mt-0.5 tabular-nums">
               {status?.proxima_execucao && !isExecutando
-                ? formatProximaExecucao(status.proxima_execucao)
+                ? formatProximaExecucao(status.proxima_execucao, nowMs)
                 : isExecutando ? 'Em execução' : '—'}
             </span>
           </div>

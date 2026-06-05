@@ -261,6 +261,16 @@ async function executarAutoBuscas(): Promise<void> {
     `UPDATE auto_execucoes SET finalizada_em = datetime('now', 'localtime'), status = 'concluido' WHERE id = ?`
   ).run(execucaoId);
 
+  const resultados = db.prepare(
+    `SELECT termo, site, status, total FROM auto_resultados WHERE execucao_id = ?`
+  ).all(execucaoId) as { termo: string; site: string; status: string; total: number }[];
+
+  const ok = resultados.filter(r => r.status === 'ok').length;
+  const erros = resultados.filter(r => r.status === 'erro').length;
+  const totalProdutos = resultados.reduce((acc, r) => acc + (r.total || 0), 0);
+
+  console.log(`[Busca Automática] Concluída — ${resultados.length} termo(s), ${ok} ok, ${erros} erro(s), ${totalProdutos} produto(s) no total`);
+
   schedulerStatus = 'agendado';
   proximaExecucao = calcularProximoHorario().toISOString();
 }
@@ -350,11 +360,15 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
       .then((data) => {
         if (!('erro' in data) || !data.erro) {
           salvarPrecos(data.produtos, site);
+          console.log(`[Busca Manual] "${q.trim()}" em ${SITES[site].nome} — ${data.total} produto(s) encontrado(s)`);
+        } else {
+          console.log(`[Busca Manual] "${q.trim()}" em ${SITES[site].nome} — erro: ${data.mensagem}`);
         }
         res.end(JSON.stringify(data));
       })
       .catch((err: unknown) => {
         const error = err as Error;
+        console.log(`[Busca Manual] "${q.trim()}" em ${SITES[site].nome} — erro: ${error.message}`);
         res.end(JSON.stringify({ erro: true, mensagem: error.message }));
       });
 

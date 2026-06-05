@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Search, Clock } from 'lucide-react';
 import { useSearch } from './hooks/useSearch';
 import { useSearchHistory } from './hooks/useSearchHistory';
 import { SearchForm } from './components/SearchForm';
@@ -6,6 +7,7 @@ import { SearchHistory } from './components/SearchHistory';
 import { ProductGrid } from './components/ProductGrid';
 import { StateMessage } from './components/StateMessage';
 import { AutoSearchPanel } from './components/AutoSearchPanel';
+import { Icon } from './components/Icon';
 
 function formatDate(iso: string): string {
   const dt = new Date(iso);
@@ -61,23 +63,23 @@ export default function App() {
           <div className="flex items-center justify-center sm:justify-start gap-1 mb-2">
             <button
               onClick={() => setModo('manual')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                 modo === 'manual'
                   ? 'bg-accent text-white shadow-lg shadow-accent/20'
                   : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
               }`}
             >
-              🔍 <span className="font-display">Manual</span>
+              <Icon icon={Search} size={14} /> <span className="font-display">Manual</span>
             </button>
             <button
               onClick={() => setModo('auto')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
                 modo === 'auto'
                   ? 'bg-accent text-white shadow-lg shadow-accent/20'
                   : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
               }`}
             >
-              ⏰ <span className="font-display">Automática</span>
+              <Icon icon={Clock} size={14} /> <span className="font-display">Automática</span>
             </button>
           </div>
           {modo === 'manual' && (

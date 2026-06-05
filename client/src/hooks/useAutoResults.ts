@@ -47,15 +47,12 @@ export function useAutoResults(): UseAutoResultsReturn {
         }
         return;
       }
-      // Aguarda um momento e recarrega os resultados
-      await new Promise((r) => setTimeout(r, 2000));
-      await fetchResults();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
     } finally {
       setRunning(false);
     }
-  }, [fetchResults]);
+  }, []);
 
   return { execucao, resultados, loading, running, error, fetchResults, triggerRun };
 }

@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { X, Plus, AlertCircle, Check } from 'lucide-react';
 import type { Site, AutoConfigEntry } from '../types';
+import { Icon } from './Icon';
 
 const SITE_CONFIG: Record<string, { text: string; bg: string; label: string }> = {
   kabum: { text: '#f97316', bg: 'rgba(249,115,22,0.12)', label: 'KaBuM!' },
@@ -193,9 +195,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
                   className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-text-muted/40 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
                   title="Remover"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <Icon icon={X} size={14} />
                 </button>
               </div>
             );
@@ -212,17 +212,13 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
                 onClick={addEntry}
                 className="text-sm px-4 py-2 rounded-xl border border-dashed border-white/[0.12] text-text-secondary hover:text-text-primary hover:border-accent/40 hover:bg-accent/5 transition-all font-medium flex items-center gap-1.5"
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
+                <Icon icon={Plus} size={16} />
                 Adicionar
               </button>
             )}
             {entries.length >= 10 && (
               <span className="text-xs text-text-muted/60 flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <Icon icon={AlertCircle} size={14} />
                 Limite máximo de 10 produtos
               </span>
             )}
@@ -243,9 +239,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
                 'Salvar configuração'
               ) : (
                 <span className="flex items-center gap-1.5">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Icon icon={Check} size={16} strokeWidth={2.5} />
                   Salvo
                 </span>
               )}

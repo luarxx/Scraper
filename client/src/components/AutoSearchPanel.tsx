@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { Zap, Clock, Pause, CalendarClock, ClipboardList, Play, Settings, BarChart3 } from 'lucide-react';
 import type { Site } from '../types';
 import { useAutoConfig } from '../hooks/useAutoConfig';
 import { useAutoResults } from '../hooks/useAutoResults';
 import { AutoConfigList } from './AutoConfigList';
 import { AutoResultsView } from './AutoResultsView';
+import { Icon } from './Icon';
 
 interface AutoSearchPanelProps {
   sites: Site[];
@@ -13,6 +15,11 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
   const [tab, setTab] = useState<'config' | 'results'>('config');
   const { configs, status, loading: configLoading, saving, error: configError, fetchConfig, fetchStatus, saveConfig, removeConfig } = useAutoConfig();
   const { execucao, resultados, loading: resultsLoading, running, error: resultsError, fetchResults, triggerRun } = useAutoResults();
+
+  const handleTriggerRun = useCallback(async () => {
+    await triggerRun();
+    fetchStatus();
+  }, [triggerRun, fetchStatus]);
 
   const refreshAll = useCallback(() => {
     fetchConfig();
@@ -55,7 +62,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
     : isAgendado ? 'Agendado'
     : 'Parado';
 
-  const statusIcon = isExecutando ? '⚡' : isAgendado ? '⏰' : '💤';
+  const statusIcon = isExecutando ? Zap : isAgendado ? Clock : Pause;
 
   function formatProximaExecucao(iso: string | null): string {
     if (!iso) return '—';
@@ -89,8 +96,8 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
             <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
               Status
             </span>
-            <span className="block text-sm font-semibold text-text-primary mt-0.5">
-              {statusIcon} {statusLabel}
+            <span className="text-sm font-semibold text-text-primary mt-0.5 inline-flex items-center gap-1.5">
+              <Icon icon={statusIcon} size={16} /> {statusLabel}
             </span>
           </div>
         </div>
@@ -100,7 +107,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]"
           style={{ animation: 'kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) 0.06s both' }}
         >
-          <span className="text-lg shrink-0">📅</span>
+          <span className="shrink-0"><Icon icon={CalendarClock} size={18} /></span>
           <div className="min-w-0">
             <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
               Próxima busca
@@ -118,7 +125,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]"
           style={{ animation: 'kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) 0.12s both' }}
         >
-          <span className="text-lg shrink-0">🕐</span>
+          <span className="shrink-0"><Icon icon={Clock} size={18} /></span>
           <div className="min-w-0">
             <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
               Última execução
@@ -139,7 +146,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]"
           style={{ animation: 'kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) 0.18s both' }}
         >
-          <span className="text-lg shrink-0">📋</span>
+          <span className="shrink-0"><Icon icon={ClipboardList} size={18} /></span>
           <div className="min-w-0 flex-1">
             <span className="block text-[10px] font-semibold text-text-muted uppercase tracking-[0.12em] leading-tight">
               Produtos
@@ -150,7 +157,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           </div>
           {/* Trigger button */}
           <button
-            onClick={triggerRun}
+            onClick={handleTriggerRun}
             disabled={running || isExecutando}
             className="shrink-0 text-xs font-bold px-3.5 py-2 rounded-xl bg-accent text-white hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-lg shadow-accent/15"
             style={{
@@ -165,7 +172,9 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
             ) : isExecutando ? (
               'Executando…'
             ) : (
-              '▶ Executar'
+              <span className="flex items-center gap-1.5">
+                <Icon icon={Play} size={14} /> Executar
+              </span>
             )}
           </button>
         </div>
@@ -175,23 +184,23 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
       <div className="flex gap-1 mb-6 p-1 rounded-xl bg-surface/60 border border-white/[0.06] w-fit">
         <button
           onClick={() => setTab('config')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             tab === 'config'
               ? 'bg-accent text-white shadow-lg shadow-accent/20'
               : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
           }`}
         >
-          ⚙️ Configurar
+          <Icon icon={Settings} size={15} /> Configurar
         </button>
         <button
           onClick={() => setTab('results')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
             tab === 'results'
               ? 'bg-accent text-white shadow-lg shadow-accent/20'
               : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
           }`}
         >
-          📊 Resultados
+          <Icon icon={BarChart3} size={15} /> Resultados
           {execucao && (
             <span className="ml-1.5 text-xs opacity-70">
               ({resultados.filter(r => r.status === 'ok').length}/{resultados.length})

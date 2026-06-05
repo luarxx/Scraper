@@ -254,6 +254,12 @@ npm run start         # Node production (dist/server.js)
 npm run typecheck     # TypeScript check (root + client via npm -w)
 ```
 
+### OpenCode Slash Commands
+
+| Comando | Descrição |
+|---|---|
+| `/commit` | Analisa `git status` + diffs, verifica conflitos/segredos, stageia alterações coesas com `git add -A` e cria commit automático em pt-BR seguindo Conventional Commits. Não executa `git push`. |
+
 **Workflow padrão:**
 1. `cd client && npm run build` — após qualquer mudança em `client/`
 2. `npm run dev:server` — testar servidor servindo o build

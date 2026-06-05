@@ -6,6 +6,10 @@
     "scraper": {
       "description": "Agente especializado no Scraper de e-commerce (KaBuM!, TerabyteShop).",
       "mode": "primary"
+    },
+    "commit": {
+      "description": "Agente para commits automáticos com Conventional Commits em pt-BR.",
+      "mode": "subagent"
     }
   },
   "permission": {

@@ -1,195 +1,105 @@
-<purpose>
-Analisa todas as alterações do repositório, gera uma mensagem de commit detalhada em português (pt-BR) seguindo as regras de commit do projeto, e executa o commit após confirmação do usuário.
+---
+description: "Analisa diff, stageia alterações e cria commit automático em pt-BR"
+argument-hint: "contexto opcional do commit"
+agent: "commit"
+---
 
-**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `question` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-the agent runtimes (OpenAI Codex, Gemini CLI, etc.) where `question` is not available.
-</purpose>
+Crie um commit automaticamente para as alterações atuais do repositório.
 
-<required_reading>
-- Read AGENTS.md to understand commit message rules (prefix format, body structure, file grouping)
-- Read all changed files to understand the context and purpose of changes
-</required_reading>
-
-<process>
-
-<step name="check_status">
-Verificar o estado atual do repositório:
-
-```bash
-git status --short
-```
-
-```bash
-git diff --stat
-```
-
-```bash
-git diff --cached --stat
-```
-
-Listar arquivos modificados, adicionados e deletados. Separar em:
-- Arquivos com mudanças staged (já no index)
-- Arquivos com mudanças unstaged (modificados mas não adicionados)
-- Arquivos untracked (novos)
-
-Se não houver nenhuma alteração (staged ou unstaged):
-```
-Nenhuma alteração encontrada para commit.
-```
-E encerrar o workflow.
-</step>
-
-<step name="analyze_changes">
-Para cada arquivo alterado, ler o diff para entender o contexto da mudança:
-
-```bash
-git diff --no-color -- arquivo1 arquivo2 ...
-```
-
-```bash
-git diff --cached --no-color -- arquivo1 arquivo2 ...
-```
-
-Para arquivos novos (untracked), ler o conteúdo completo com a ferramenta Read.
-
-Analisar e categorizar as mudanças por funcionalidade:
-- Identificar o tipo de alteração (feat, fix, docs, refactor, style, test, chore)
-- Agrupar arquivos por funcionalidade ou módulo
-- Determinar a finalidade e contexto de cada mudança
-- Identificar motivos e impacto das alterações
-</step>
-
-<step name="generate_message">
-Gerar a mensagem de commit seguindo rigorosamente o padrão definido em AGENTS.md:
-
-**1. Linha de resumo (máx 72 caracteres, imperativa, prefixo):**
-- `feat:` - nova funcionalidade
-- `fix:` - correção de bug
-- `docs:` - documentação
-- `refactor:` - refatoração
-- `style:` - formatação, sem lógica
-- `test:` - testes
-- `chore:` - tarefas auxiliares
-
-**2. Corpo da mensagem (separado por linha em branco):**
-- Explicação clara da finalidade e contexto
-- Lista de arquivos afetados, agrupados por funcionalidade
-- Informações adicionais (motivo da mudança, impacto)
-
-Exemplo de estrutura:
-```
-tipo: resumo imperativo com máximo 72 caracteres
-
-Explicação clara da finalidade e contexto da alteração.
-
-Arquivos afetados:
-- Funcionalidade A: caminho/arquivo1.ts, caminho/arquivo2.ts
-- Funcionalidade B: caminho/arquivo3.tsx
-- Configuração: package.json, tsconfig.json
-
-Informações adicionais: motivo da mudança, impacto no projeto.
-```
-</step>
-
-<step name="confirm">
-Mostrar a mensagem gerada e pedir confirmação:
+Use o argumento do usuário apenas como contexto adicional:
 
 ```
-Mensagem de commit gerada:
-
-----------------------------------------
-{tipo: resumo}
-
-{explicação da finalidade e contexto}
-
-Arquivos afetados:
-- {grupo1}: {arquivos}
-- {grupo2}: {arquivos}
-
-{informações adicionais}
-----------------------------------------
-
-Arquivos que serão commitados:
-{lista de todos os arquivos staged e unstaged}
+$ARGUMENTS
 ```
 
-question:
-  question: "Deseja prosseguir com este commit?"
-  header: "Confirmar"
-  options:
-    - label: "Confirmar"
-      description: "Executar o commit com a mensagem gerada"
-    - label: "Editar mensagem"
-      description: "Permitir edição da mensagem antes do commit"
-    - label: "Cancelar"
-      description: "Abortar o commit"
-</step>
+## Objetivo
 
-<step name="execute_commit">
-Se confirmado, executar o commit:
+Verificar o estado do Git, analisar os diffs, stagear as mudanças apropriadas e executar `git commit` com uma mensagem em português do Brasil no padrão Conventional Commits.
 
-1. Se houver arquivos unstaged, adicioná-los ao stage:
-```bash
-git add arquivo1 arquivo2 ...
+## Regras obrigatórias
+
+- Não faça `git push`.
+- Não peça confirmação quando as alterações forem coesas e seguras.
+- Pare e pergunte ao usuário se houver mudanças não relacionadas que deveriam virar commits separados.
+- Pare sem commitar se houver conflitos de merge.
+- Pare sem commitar se detectar arquivos ou trechos suspeitos de segredo, como `.env`, `*.pem`, `credentials.json`, tokens, chaves privadas, senhas ou variáveis com `SECRET`, `TOKEN`, `PASSWORD`, `API_KEY`.
+- Não reverta alterações.
+- Preserve mudanças existentes do usuário.
+- Use português do Brasil em toda a mensagem de commit.
+- Siga Conventional Commits: `tipo(escopo): descrição`.
+- Use apenas estes tipos: `feat`, `fix`, `refactor`, `docs`, `test`, `perf`, `build`, `chore`, `ci`.
+- Use escopo quando fizer sentido: `scraper`, `server`, `client`, `auto`, `docs`, `deps`, `config`.
+- Mantenha a primeira linha com no máximo 72 caracteres.
+- Escreva a descrição no presente, curta, direta e sem ponto final.
+- Inclua corpo detalhado quando o diff tiver mais de uma mudança relevante.
+- No corpo, explique o que mudou e por que mudou, agrupando por área afetada.
+- Se houver breaking change, use `!` no tipo/escopo e explique no rodapé.
+
+## Fluxo
+
+1. Leia `AGENTS.md` para confirmar as regras do projeto.
+2. Execute `git status --short`.
+3. Execute `git diff --stat`.
+4. Execute `git diff --cached --stat`.
+5. Verifique se há conflitos com `git diff --name-only --diff-filter=U`.
+6. Se não houver alterações staged, unstaged ou untracked, responda: `Nenhuma alteração encontrada para commit.`
+7. Analise os diffs:
+   - `git diff --no-color`
+   - `git diff --cached --no-color`
+   - Para arquivos untracked relevantes, leia o conteúdo antes de stagear.
+8. Identifique se as mudanças formam um único commit coeso.
+9. Se forem coesas e seguras, execute `git add -A`.
+10. Execute `git diff --cached --stat` novamente.
+11. Execute `git diff --cached --no-color` para revisar exatamente o que será commitado.
+12. Gere a mensagem de commit.
+13. Execute `git commit` com a mensagem gerada.
+14. Execute `git log -1 --stat --oneline` para confirmar o resultado.
+15. Responda com hash, mensagem usada e resumo dos arquivos commitados.
+
+## Formato da mensagem
+
+Use este formato para mudanças simples:
+
+```text
+tipo(escopo): descrição curta em pt-BR
 ```
 
-2. Executar o commit com a mensagem gerada:
-```bash
-git commit -m "MENSAGEM_COMPLETA"
+Use este formato para mudanças detalhadas:
+
+```text
+tipo(escopo): descrição curta em pt-BR
+
+Detalha a finalidade geral da alteração em uma ou duas frases.
+
+Alterações:
+- Área 1: descreve mudança relevante
+- Área 2: descreve mudança relevante
+
+Impacto:
+- Explica efeitos práticos, compatibilidade ou observações de teste
 ```
 
-Importante: A mensagem deve ser passada exatamente como gerada, respeitando quebras de linha. Usar aspas e formato adequado para o shell no Windows (PowerShell).
+## Exemplos
 
-Exemplo para PowerShell:
-```bash
-git commit -m "tipo: resumo
+```text
+feat(auto): adiciona painel de buscas automáticas
 
-Explicação da finalidade e contexto.
+Implementa a configuração e visualização de buscas automáticas na interface.
 
-Arquivos afetados:
-- Grupo: arquivo1, arquivo2"
+Alterações:
+- client: adiciona painel, lista de configuração e resultados por termo
+- server: expõe endpoints para salvar configuração e consultar execuções
+- banco: registra execuções e resultados no SQLite
+
+Impacto:
+- Permite acompanhar preços recorrentes sem acionar buscas manuais
 ```
 
-3. Verificar o resultado:
-```bash
-git log -1 --stat
+```text
+fix(scraper): corrige extração de preços da Pichau
+
+Ajusta seletores para acompanhar a marcação atual da página de resultados.
+
+Impacto:
+- Reduz resultados vazios em buscas DOM da Pichau
 ```
-
-Se "Editar mensagem" foi escolhido, perguntar a nova mensagem ou abrir editor.
-Se "Cancelar" foi escolhido, encerrar sem fazer commit.
-</step>
-
-<step name="report">
-Apresentar o resultado:
-
-```
-Commit realizado com sucesso!
-
-Hash: {hash do commit}
-Resumo: {linha de resumo}
-
-Arquivos alterados:
-{estatísticas do git log --stat}
-```
-</step>
-
-</process>
-
-<edge_cases>
-1. **Nenhuma alteração**: Encerrar com mensagem informativa
-2. **Apenas arquivos staged**: Fazer commit direto, sem `git add`
-3. **Apenas arquivos untracked**: Adicionar com `git add` antes do commit
-4. **Diff muito grande**: Resumir alterações por funcionalidade em vez de ler arquivo por arquivo
-5. **Mensagem muito longa**: Garantir que a linha de resumo tenha no máximo 72 caracteres
-6. **Conflitos de merge**: Não lidar com conflitos - avisar que o commit não pode ser feito com conflitos pendentes
-7. **Arquivos de credencial**: Avisar se detectar arquivos como .env, credentials.json e sugerir adicioná-los ao .gitignore
-</edge_cases>
-
-<success_criteria>
-- [ ] Git status e diff analisados completamente
-- [ ] Mensagem gerada em pt-BR seguindo rigorosamente o padrão de AGENTS.md
-- [ ] Linha de resumo com máximo 72 caracteres e prefixo correto
-- [ ] Arquivos agrupados por funcionalidade no corpo da mensagem
-- [ ] Confirmação do usuário obtida antes do commit
-- [ ] Commit executado com sucesso
-- [ ] Resultado reportado com hash e estatísticas
-</success_criteria>

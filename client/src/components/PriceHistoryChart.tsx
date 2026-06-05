@@ -1,4 +1,5 @@
 import { useId, useState, useMemo, memo } from 'react';
+import { AlertTriangle, ChevronDown } from 'lucide-react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -9,6 +10,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import type { PricePoint, HistorySummary } from '../types';
+import { Icon } from './Icon';
 
 interface PriceHistoryChartProps {
   history: PricePoint[];
@@ -49,10 +51,26 @@ function trendOf(summary: HistorySummary | null | undefined): { dir: 'up' | 'dow
 
 interface TooltipPayloadItem { payload: PricePoint }
 
-function CustomTooltip({ active, payload, siteColor }: { active?: boolean; payload?: readonly TooltipPayloadItem[]; siteColor: string }) {
+const ACCENT_COLOR = {
+  emerald: '#34d399',
+  rose: '#fb7185',
+  slate: '#f1f5f9',
+  site: '#f97316',
+} as const;
+
+function tooltipValueColor(point: PricePoint, summary: HistorySummary | null | undefined): string {
+  if (!summary || point.price_cents === null) return ACCENT_COLOR.slate;
+  if (summary.min_price !== null && point.price_cents === summary.min_price) return ACCENT_COLOR.emerald;
+  if (summary.max_price !== null && point.price_cents === summary.max_price) return ACCENT_COLOR.rose;
+  if (summary.avg_price !== null && Math.abs(point.price_cents - summary.avg_price) < 1) return ACCENT_COLOR.slate;
+  return ACCENT_COLOR.slate;
+}
+
+function CustomTooltip({ active, payload, summary }: { active?: boolean; payload?: readonly TooltipPayloadItem[]; summary?: HistorySummary | null }) {
   if (!active || !payload || payload.length === 0) return null;
   const point = payload[0].payload;
   if (point.price_cents === null) return null;
+  const valueColor = tooltipValueColor(point, summary);
   return (
     <div className="rounded-md border border-white/10 bg-slate-950/95 backdrop-blur-sm px-2.5 py-2 shadow-2xl">
       <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wider tabular-nums">
@@ -60,7 +78,7 @@ function CustomTooltip({ active, payload, siteColor }: { active?: boolean; paylo
       </div>
       <div className="mt-1 flex items-baseline gap-1.5">
         <span className="text-[10px] text-slate-500">R$</span>
-        <span className="text-base font-bold tabular-nums" style={{ color: siteColor }}>
+        <span className="text-base font-bold tabular-nums" style={{ color: valueColor }}>
           {formatBRL(point.price_cents)}
         </span>
       </div>
@@ -76,17 +94,10 @@ function CustomTooltip({ active, payload, siteColor }: { active?: boolean; paylo
 interface KpiCellProps {
   label: string;
   value: string;
-  accent: 'emerald' | 'rose' | 'slate' | 'site';
+  accent: keyof typeof ACCENT_COLOR;
   index: number;
   siteColor?: string;
 }
-
-const ACCENT_COLOR: Record<KpiCellProps['accent'], string> = {
-  emerald: '#34d399',
-  rose: '#fb7185',
-  slate: '#f1f5f9',
-  site: '#f97316',
-};
 
 const KpiCell = memo(function KpiCell({ label, value, accent, index, siteColor }: KpiCellProps) {
   const color = accent === 'site' && siteColor ? siteColor : ACCENT_COLOR[accent];
@@ -116,9 +127,10 @@ interface ChartBodyProps {
   history: PricePoint[];
   siteColor: string;
   gradientId: string;
+  summary?: HistorySummary | null;
 }
 
-const ChartBody = memo(function ChartBody({ history, siteColor, gradientId }: ChartBodyProps) {
+const ChartBody = memo(function ChartBody({ history, siteColor, gradientId, summary }: ChartBodyProps) {
   const chartData = useMemo(() => {
     const filtered = history.filter((p) => p.price_cents !== null);
     return filtered.map((p, i) => {
@@ -182,7 +194,7 @@ const ChartBody = memo(function ChartBody({ history, siteColor, gradientId }: Ch
             width={48}
           />
           <Tooltip
-            content={<CustomTooltip siteColor={siteColor} />}
+            content={<CustomTooltip summary={summary} />}
             cursor={{ stroke: siteColor, strokeWidth: 1, strokeDasharray: '3 3', strokeOpacity: 0.5 }}
           />
           <Area
@@ -298,18 +310,15 @@ export function PriceHistoryChart({ history, siteColor, loading, erro, summary }
             </span>
           )}
           {erro && !loading && (
-            <span className="text-[10px] text-amber-500/70" title={erro}>⚠</span>
+            <span className="text-amber-500/70" title={erro}><Icon icon={AlertTriangle} size={14} /></span>
           )}
-          <svg
-            className="w-3 h-3 text-slate-500 transition-transform duration-200"
-            style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+          <Icon
+            icon={ChevronDown}
+            size={12}
             strokeWidth={2.5}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
+            className="text-slate-500 transition-transform duration-200"
+            style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          />
         </div>
       </button>
 
@@ -337,7 +346,7 @@ export function PriceHistoryChart({ history, siteColor, loading, erro, summary }
         <div className="overflow-hidden">
           {expanded && (
             <div className="relative px-2 pb-3 animate-[fadeIn_0.2s_ease-out]">
-              <ChartBody history={history} siteColor={siteColor} gradientId={gradientId} />
+              <ChartBody history={history} siteColor={siteColor} gradientId={gradientId} summary={summary} />
             </div>
           )}
         </div>

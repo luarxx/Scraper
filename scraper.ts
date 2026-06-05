@@ -1,10 +1,12 @@
-import { chromium, type Page } from 'playwright';
+import { chromium } from 'playwright-extra';
+import type { Page } from 'playwright';
 import { createHash } from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
 import * as os from 'os';
 import * as cheerio from 'cheerio';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 // ─── TYPES ──────────────────────────────────────────────────────────────
 
@@ -55,9 +57,84 @@ type Resultado = ResultadoSucesso | ResultadoErro;
 // ─── CONFIGURAÇÃO GLOBAL ────────────────────────────────────────────────
 const HEADLESS = true;
 const TIMEOUT = 30000;
-const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 const CACHE_TTL = 10 * 60 * 1000;
 const CACHE_DIR = path.join(__dirname, 'data', 'cache');
+
+// ─── FINGERPRINT ──────────────────────────────────────────────────────────
+
+interface Fingerprint {
+  userAgent: string;
+  viewport: { width: number; height: number };
+  pluginsLength: number;
+  hardwareConcurrency: number;
+  deviceMemory: number;
+  webglVendor: string;
+  webglRenderer: string;
+}
+
+const USER_AGENTS = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+];
+
+const WEBGL_VENDORS = ['Intel Inc.', 'Google Inc.', 'Apple Inc.', 'NVIDIA Corporation', 'AMD'];
+const WEBGL_RENDERERS = [
+  'Intel Iris OpenGL Engine',
+  'ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0)',
+  'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0)',
+  'Apple M1',
+  'ANGLE (AMD, AMD Radeon(TM) Graphics Direct3D11 vs_5_0 ps_5_0)',
+  'Google SwiftShader',
+];
+
+function gerarFingerprint(): Fingerprint {
+  return {
+    userAgent: USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)],
+    viewport: {
+      width: 1920 + Math.floor(Math.random() * 401) - 200,
+      height: 1080 + Math.floor(Math.random() * 201) - 100,
+    },
+    pluginsLength: 3 + Math.floor(Math.random() * 3),
+    hardwareConcurrency: 4 + Math.floor(Math.random() * 13),
+    deviceMemory: [4, 8][Math.floor(Math.random() * 2)],
+    webglVendor: WEBGL_VENDORS[Math.floor(Math.random() * WEBGL_VENDORS.length)],
+    webglRenderer: WEBGL_RENDERERS[Math.floor(Math.random() * WEBGL_RENDERERS.length)],
+  };
+}
+
+async function randomWait(min = 200, max = 800): Promise<void> {
+  const ms = Math.floor(Math.random() * (max - min + 1)) + min;
+  await new Promise(r => setTimeout(r, ms));
+}
+
+async function scrollGradual(page: Page, targetY: number, steps = 4): Promise<void> {
+  const stepSize = Math.floor(targetY / steps);
+  for (let i = 0; i < steps; i++) {
+    const delta = stepSize + Math.floor(Math.random() * 101) - 50;
+    await page.mouse.wheel(0, Math.max(1, delta));
+    await randomWait(200, 600);
+  }
+}
+
+async function mouseMove(page: Page, x: number, y: number): Promise<void> {
+  const steps = 3 + Math.floor(Math.random() * 5);
+  const startX = Math.floor(Math.random() * 200);
+  const startY = Math.floor(Math.random() * 200);
+  await page.mouse.move(startX + Math.floor(Math.random() * 100), startY + Math.floor(Math.random() * 100));
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const cx = Math.floor(startX + (x - startX) * t + (Math.random() - 0.5) * 20);
+    const cy = Math.floor(startY + (y - startY) * t + (Math.random() - 0.5) * 20);
+    await page.mouse.move(cx, cy);
+    await randomWait(30, 100);
+  }
+}
 
 // ─── CONFIGURAÇÃO DOS SITES ─────────────────────────────────────────────
 const SITES: Record<string, SiteConfig> = {
@@ -129,60 +206,60 @@ const SITES: Record<string, SiteConfig> = {
   pichau: {
     nome: 'Pichau',
     urlBase: 'https://www.pichau.com.br',
-    searchUrl: null,
-    waitStrategy: null,
-    precisaHomePrimeiro: false,
-    selectors: null,
-    usaApi: true,
-    apiUrl: (termo) => `https://www.pichau.com.br/search?q=${encodeURIComponent(termo)}`,
-    async extrairProdutosViaApi(_page, termo) {
-      const url = `https://www.pichau.com.br/search?q=${encodeURIComponent(termo)}`;
-      const tmpFile = path.join(os.tmpdir(), `pichau_${Date.now()}.html`);
-      execSync(
-        `curl -sL -o ${JSON.stringify(tmpFile)} -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" ${JSON.stringify(url)}`,
-        { timeout: 30000, stdio: 'pipe' },
-      );
-      const html = fs.readFileSync(tmpFile, 'utf-8');
-      try { fs.unlinkSync(tmpFile); } catch { /* ignore */ }
-
-      const $ = cheerio.load(html);
-      const produtos: Produto[] = [];
+    searchUrl: (termo) => `https://www.pichau.com.br/search?q=${encodeURIComponent(termo)}`,
+    waitStrategy: 'domcontentloaded',
+    precisaHomePrimeiro: true,
+    selectors: {
+      productCard: 'a[data-cy="list-product"]',
+      title: 'h2',
+      priceContainer: '[class*="price_vista"], [class*="price_total"]',
+    },
+    extrairProdutos(termo) {
+      const links = Array.from(document.querySelectorAll('a[data-cy="list-product"]'));
+      const results: Produto[] = [];
       const seen = new Set<string>();
 
-      $('a[data-cy="list-product"]').each((_, el) => {
-        const href = $(el).attr('href') || '';
+      links.forEach((a) => {
+        const href = a.getAttribute('href') || '';
         const fullUrl = href.startsWith('http') ? href : `https://www.pichau.com.br${href}`;
         if (seen.has(fullUrl)) return;
         seen.add(fullUrl);
 
-        const title = $(el).find('h2').text().trim();
+        const titleEl = a.querySelector('h2');
+        if (!titleEl) return;
+        const title = titleEl.textContent!.trim();
         if (!title || title.length < 5) return;
 
-        const img = $(el).find('img').attr('src') || '';
+        const imgEl = a.querySelector('img');
+        const img = imgEl ? (imgEl.getAttribute('src') || '') : '';
 
         let price: string | null = null;
-        const priceVista = $(el).find('[class*="price_vista"]').first().text().trim();
+        const priceVista = a.querySelector('[class*="price_vista"]');
         if (priceVista) {
-          price = priceVista;
+          price = priceVista.textContent!.trim();
         }
         if (!price) {
-          const priceTotal = $(el).find('[class*="price_total"]').first().text().trim();
-          if (priceTotal) price = priceTotal;
+          const priceTotal = a.querySelector('[class*="price_total"]');
+          if (priceTotal) price = priceTotal.textContent!.trim();
         }
 
         let parcelamento: string | null = null;
-        const parcelEl = $(el).find('[class*="price_parcelado_inline"]').first().text().trim();
+        const parcelEl = a.querySelector('[class*="price_parcelado_inline"]');
         if (parcelEl) {
-          const parcelMatch = $(el).find('[class*="price_parcelado_text"]').first().text().trim();
-          const match = parcelMatch.match(/(\d+x\s*de\s*R\$\s*[\d.,]+)/i);
-          if (match) {
-            parcelamento = match[1].trim();
+          const parcelText = a.querySelector('[class*="price_parcelado_text"]');
+          if (parcelText) {
+            const match = parcelText.textContent!.trim().match(/(\d+x\s*de\s*R\$\s*[\d.,]+)/i);
+            if (match) {
+              parcelamento = match[1].trim();
+            } else {
+              parcelamento = parcelEl.textContent!.trim();
+            }
           } else {
-            parcelamento = parcelEl.trim();
+            parcelamento = parcelEl.textContent!.trim();
           }
         }
 
-        produtos.push({
+        results.push({
           title,
           price,
           parcelamento,
@@ -194,7 +271,7 @@ const SITES: Record<string, SiteConfig> = {
         });
       });
 
-      return produtos;
+      return results;
     },
   },
 
@@ -317,25 +394,69 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
   const cacheHit = lerCache(siteKey, termoBusca);
   if (cacheHit) return cacheHit;
 
+  chromium.use(StealthPlugin());
+
+  const fingerprint = gerarFingerprint();
+
   const browser = await chromium.launch({
     headless: HEADLESS,
     args: ['--disable-blink-features=AutomationControlled'],
   });
   const context = await browser.newContext({
-    userAgent: USER_AGENT,
-    viewport: { width: 1920, height: 1080 },
+    userAgent: fingerprint.userAgent,
+    viewport: fingerprint.viewport,
     locale: 'pt-BR',
   });
   const page = await context.newPage();
 
-  await page.addInitScript(() => {
+  await page.addInitScript((fp: Fingerprint) => {
     Object.defineProperty(navigator, 'webdriver', { get: () => false });
-  });
+    Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => fp.hardwareConcurrency });
+    Object.defineProperty(navigator, 'deviceMemory', { get: () => fp.deviceMemory });
+    Object.defineProperty(navigator, 'languages', { get: () => ['pt-BR', 'pt', 'en-US', 'en'] });
+
+    const pluginNames = ['PDF Viewer', 'Chrome PDF Viewer', 'Chrome PDF Plugin'];
+    const pluginList: any[] = [];
+    for (let i = 0; i < fp.pluginsLength && i < pluginNames.length; i++) {
+      pluginList.push({
+        name: pluginNames[i],
+        filename: pluginNames[i].toLowerCase().replace(/\s+/g, '') + '.dll',
+        description: 'Portable Document Format',
+        length: 1,
+        item: () => ({ type: 'application/pdf', suffixes: 'pdf', description: 'Portable Document Format' }),
+        namedItem: () => null,
+      });
+    }
+    Object.defineProperty(navigator, 'plugins', {
+      get: () => ({
+        ...pluginList,
+        length: pluginList.length,
+        item: (i: number) => pluginList[i] || null,
+        namedItem: () => null,
+        [Symbol.iterator]: function* () { for (const p of pluginList) yield p; },
+      }),
+    });
+
+    const origGetParam = WebGLRenderingContext.prototype.getParameter;
+    WebGLRenderingContext.prototype.getParameter = function (p: number) {
+      if (p === 37445) return fp.webglVendor;
+      if (p === 37446) return fp.webglRenderer;
+      return origGetParam.call(this, p);
+    };
+    if (typeof WebGL2RenderingContext !== 'undefined') {
+      const origGetParam2 = WebGL2RenderingContext.prototype.getParameter;
+      WebGL2RenderingContext.prototype.getParameter = function (p: number) {
+        if (p === 37445) return fp.webglVendor;
+        if (p === 37446) return fp.webglRenderer;
+        return origGetParam2.call(this, p);
+      };
+    }
+  }, fingerprint);
 
   try {
     if (site.precisaHomePrimeiro) {
       await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
-      await page.waitForTimeout(2000);
+      await randomWait(1500, 3000);
     }
 
     let produtos: Produto[];
@@ -366,9 +487,9 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
     } else {
       const urlBusca = site.searchUrl!(termoBusca);
       await page.goto(urlBusca, { waitUntil: site.waitStrategy!, timeout: TIMEOUT });
-      await page.waitForTimeout(3000);
-      await page.evaluate(() => window.scrollTo(0, 600));
-      await page.waitForTimeout(1000);
+      await randomWait(2000, 4000);
+      await mouseMove(page, 600, 400);
+      await scrollGradual(page, 600);
 
       const isChallenge = await detectarChallenge(page);
       if (isChallenge) {
@@ -390,14 +511,14 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
         } catch {
           console.log('⚠️  Desafio não resolvido. Continuando...');
         }
-        await page.waitForTimeout(2000);
+        await randomWait(1000, 3000);
       }
 
       const cardSelector = site.selectors!.productCard;
       try {
         await page.waitForSelector(cardSelector, { timeout: 10000 });
       } catch { /* empty */ }
-      await page.waitForTimeout(500);
+      await randomWait(300, 800);
 
       produtos = await page.evaluate(site.extrairProdutos!, termoBusca);
       produtos = ordenarPorRelevancia(produtos, termoBusca);

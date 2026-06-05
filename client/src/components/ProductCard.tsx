@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, memo } from 'react';
+import { TrendingUp, TrendingDown, ImageOff } from 'lucide-react';
 import type { Produto } from '../types';
 import { usePriceHistory } from '../hooks/usePriceHistory';
 import { PriceHistoryChart } from './PriceHistoryChart';
+import { Icon } from './Icon';
 
 interface ProductCardProps {
   produto: Produto;
@@ -52,7 +54,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
           background: isDown ? 'rgba(52, 211, 153, 0.1)' : 'rgba(239, 68, 68, 0.1)',
         }}
       >
-        {isDown ? '▼' : '▲'} {Math.abs(pct).toFixed(1)}%
+        {isDown ? <Icon icon={TrendingDown} size={12} /> : <Icon icon={TrendingUp} size={12} />} {Math.abs(pct).toFixed(1)}%
       </span>
     );
   })();
@@ -83,8 +85,8 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
             />
           </>
         ) : (
-          <div className="flex items-center justify-center text-slate-300 text-2xl font-medium">
-            ∅
+          <div className="flex items-center justify-center text-slate-300">
+            <Icon icon={ImageOff} size={28} />
           </div>
         )}
 

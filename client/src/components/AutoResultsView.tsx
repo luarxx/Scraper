@@ -1,6 +1,8 @@
 import { useState, useCallback, useMemo, memo, useEffect, useRef } from 'react';
+import { AlertTriangle, BadgeDollarSign, BarChart, Search, XCircle, Radio, Timer, CheckCircle, Loader2, Package, ThumbsUp, ChevronsUp, ChevronsDown, ChevronRight } from 'lucide-react';
 import type { AutoExecucao, AutoResultadoItem, Produto } from '../types';
 import { ProductGrid } from './ProductGrid';
+import { Icon } from './Icon';
 
 const SITE_COLORS: Record<string, { text: string; light: string; glow: string }> = {
   kabum: { text: '#f97316', light: 'rgba(249,115,22,0.08)', glow: 'rgba(249,115,22,0.15)' },
@@ -26,12 +28,12 @@ function parsePrice(price: string | null): number {
   return parseFloat(price.replace(/[^\d,]/g, '').replace(',', '.'));
 }
 
-function formatBRL(centsOrString: number | string | null): string {
-  if (centsOrString === null || centsOrString === undefined) return '—';
-  if (typeof centsOrString === 'number') {
-    return (centsOrString / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function formatBRL(reaisOrString: number | string | null): string {
+  if (reaisOrString === null || reaisOrString === undefined) return '—';
+  if (typeof reaisOrString === 'number') {
+    return reaisOrString.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
-  const num = parsePrice(centsOrString);
+  const num = parsePrice(reaisOrString);
   if (num === Infinity) return '—';
   return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
@@ -49,7 +51,7 @@ function getTermoStats(produtos: Produto[]): { minPrice: number; avgPrice: numbe
 
 /* ─── KPI Card Component ─────────────────────────────────── */
 interface KpiCardProps {
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   value: string;
   accent: string;
@@ -130,16 +132,13 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
               transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)',
             }}
           >
-            <svg
-              className="w-3.5 h-3.5 transition-colors"
-              style={{ color: isOpen ? siteColor.text : '#64748b' }}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+            <Icon
+              icon={ChevronRight}
+              size={14}
               strokeWidth={2.5}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
+              className="transition-colors"
+              style={{ color: isOpen ? siteColor.text : '#64748b' }}
+            />
           </div>
 
           <div className="flex items-center gap-2.5 min-w-0">
@@ -175,16 +174,14 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
             </span>
           )}
           {r.status === 'erro' && (
-            <span className="text-xs text-red-400 truncate max-w-[160px]" title={r.erro || ''}>
-              ⚠ {r.erro?.slice(0, 40) || 'Erro'}
+            <span className="inline-flex items-center gap-1.5 text-xs text-red-400 truncate max-w-[160px]" title={r.erro || ''}>
+              <Icon icon={AlertTriangle} size={14} /> {r.erro?.slice(0, 40) || 'Erro'}
             </span>
           )}
           {r.status === 'ok' && (
             <div className="flex items-center gap-1.5 text-xs">
               <span className="text-text-muted tabular-nums">{r.total}</span>
-              <svg className="w-3 h-3 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
+              <Icon icon={Package} size={12} className="text-text-muted" />
             </div>
           )}
         </div>
@@ -203,11 +200,11 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
                 <>
                   {stats && stats.minPrice > 0 && (
                     <div className="flex items-center gap-4 mb-3 px-2 text-xs text-text-muted/70">
-                      <span>
-                        💰 Menor preço: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.minPrice)}</span>
+                      <span className="flex items-center gap-1.5">
+                        <Icon icon={BadgeDollarSign} size={14} /> Menor preço: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.minPrice)}</span>
                       </span>
-                      <span className="hidden sm:inline">
-                        📊 Média: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.avgPrice)}</span>
+                      <span className="hidden sm:inline-flex items-center gap-1.5">
+                        <Icon icon={BarChart} size={14} /> Média: <span className="font-semibold text-text-secondary">R$ {formatBRL(stats.avgPrice)}</span>
                       </span>
                     </div>
                   )}
@@ -215,14 +212,14 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
                 </>
               ) : r.status === 'ok' && r.produtos.length === 0 ? (
                 <div className="px-4 py-8 text-center text-sm text-text-muted">
-                  <span className="text-2xl block mb-2">🔍</span>
+                  <span className="block mb-2"><Icon icon={Search} size={28} /></span>
                   Nenhum produto encontrado para este termo
                 </div>
               ) : null}
 
               {r.status === 'erro' && (
                 <div className="px-4 py-8 text-center text-sm text-text-muted">
-                  <span className="text-2xl block mb-2">❌</span>
+                  <span className="block mb-2"><Icon icon={XCircle} size={28} /></span>
                   {r.erro || 'Erro desconhecido ao buscar produtos'}
                 </div>
               )}
@@ -239,11 +236,10 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
   const [expanded, setExpanded] = useState<Set<number>>(() => new Set());
   const initializedRef = useRef(false);
 
-  // Auto-expand first term on first data load (preview, sem renderizar todos de uma vez)
   useEffect(() => {
     if (!initializedRef.current && resultados.length > 0) {
       initializedRef.current = true;
-      setExpanded(new Set([resultados[0].id]));
+      setExpanded(new Set(resultados.map((r) => r.id)));
     }
   }, [resultados]);
 
@@ -286,8 +282,8 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
 
   if (!execucao) {
     return (
-      <div className="text-center py-16 rounded-xl bg-surface/30 border border-dashed border-white/[0.08]">
-        <div className="text-4xl mb-4">📡</div>
+        <div className="text-center py-16 rounded-xl bg-surface/30 border border-dashed border-white/[0.08]">
+        <div className="mb-4"><Icon icon={Radio} size={36} className="text-text-muted" /></div>
         <p className="text-sm text-text-muted mb-2 font-display font-semibold">Nenhuma execução automática ainda</p>
         <p className="text-xs text-text-muted/60 mb-5 max-w-xs mx-auto leading-relaxed">
           Configure produtos na aba "Configurar" e aguarde o próximo ciclo de 6h,
@@ -307,7 +303,7 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <KpiCard
-          icon="⏱"
+          icon={<Icon icon={Timer} size={18} />}
           label="Início"
           value={formatTime(execucao.iniciada_em)}
           accent="#94a3b8"
@@ -316,7 +312,7 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
         />
         {execucao.finalizada_em ? (
           <KpiCard
-            icon="✅"
+            icon={<Icon icon={CheckCircle} size={18} />}
             label="Fim"
             value={formatTime(execucao.finalizada_em)}
             accent="#94a3b8"
@@ -325,7 +321,7 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
           />
         ) : (
           <KpiCard
-            icon="⏳"
+            icon={<Icon icon={Loader2} size={18} className="animate-spin" />}
             label="Status"
             value="Em andamento"
             accent="#fbbf24"
@@ -333,7 +329,7 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
           />
         )}
         <KpiCard
-          icon="📦"
+          icon={<Icon icon={Package} size={18} />}
           label="Produtos"
           value={String(stats.totalProdutos)}
           accent="#34d399"
@@ -341,7 +337,7 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
           sub={`${stats.okCount} termo${stats.okCount !== 1 ? 's' : ''} ok`}
         />
         <KpiCard
-          icon={stats.erroCount > 0 ? '⚠️' : '👍'}
+          icon={stats.erroCount > 0 ? <Icon icon={AlertTriangle} size={18} /> : <Icon icon={ThumbsUp} size={18} />}
           label={stats.erroCount > 0 ? 'Erros' : 'Sucesso'}
           value={stats.erroCount > 0 ? String(stats.erroCount) : '100%'}
           accent={stats.erroCount > 0 ? '#ef4444' : '#34d399'}
@@ -369,9 +365,9 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
             className="text-xs text-text-muted hover:text-accent transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-accent/5 border border-transparent hover:border-accent/20"
           >
             {allExpanded ? (
-              <>📕 Recolher todos</>
+              <span className="flex items-center gap-1.5"><Icon icon={ChevronsUp} size={14} /> Recolher todos</span>
             ) : (
-              <>📖 Expandir todos</>
+              <span className="flex items-center gap-1.5"><Icon icon={ChevronsDown} size={14} /> Expandir todos</span>
             )}
           </button>
         </div>

@@ -76,8 +76,15 @@ function parseLocalDatetime(s: string): Date {
 
 function brlToCents(price: string | null): number | null {
   if (!price) return null;
-  const cleaned = price.replace(/R\$\s*/i, '').replace(/\./g, '').replace(',', '.').trim();
-  const num = parseFloat(cleaned);
+  let s = price.replace(/R\$\s*/i, '').trim();
+  const lastDot = s.lastIndexOf('.');
+  const lastComma = s.lastIndexOf(',');
+  if (lastComma > lastDot) {
+    s = s.replace(/\./g, '').replace(',', '.');
+  } else {
+    s = s.replace(/,/g, '');
+  }
+  const num = parseFloat(s);
   return isNaN(num) ? null : Math.round(num * 100);
 }
 

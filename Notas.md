@@ -54,8 +54,38 @@ Cada nova loja aumenta a utilidade do scraper. Amazon e ML são notoriamente dif
 **Valor:** Alto | **Complexidade:** Média-Alta
 
 ### 3.2 Estratégias de anti-bot mais robustas
-Proxies rotativos, fingerprint aleatório, `playwright-stealth`. Aumenta a taxa de sucesso em sites protegidos.
-**Valor:** Alto | **Complexidade:** Média-Alta
+Atualmente o scraper só seta `userAgent`, `--disable-blink-features=AutomationControlled`, `navigator.webdriver = false` e viewport. Para enfrentar Cloudflare avançado, Amazon e Mercado Livre, isso é insuficiente. Abaixo em fases progressivas.
+
+#### 3.2.1 Fase 1 — Plug-and-play stealth (baixo esforço)
+Instalar `playwright-extra` + `playwright-stealth`. O stealth plugin aplica automaticamente ~30 patches anti-detecção (WebGL vendor, canvas, plugins, chrome.runtime, languages, etc.) sem configurar nada manualmente.
+
+- **Integração:** substituir `chromium.launch()` por `playwright-extra` com o stealth plugin
+- **Cobertura:** resolve bloqueios de sites com proteção média (Pichau, KaBuM! mais agressivo, TerabyteShop)
+- **Manutenção:** quase zero — o plugin é mantido pela comunidade
+- **Stack:** `playwright-extra` + `playwright-stealth` (npm)
+- **Esforço:** 1 dia
+- **Valor:** Alto | **Complexidade:** Baixa
+
+#### 3.2.2 Fase 2 — Pool de fingerprints + comportamento humano (médio esforço)
+Estratégia em camadas para tornar cada sessão de scraping única e indistinguível de um usuário real.
+
+**Fingerprint realístico por contexto:**
+- Para cada `browser.newContext()`, gerar combinação única de: viewport (1920±200 × 1080±100), `userAgent` (rotacionar entre 5-10 UAs de Chrome reais), `navigator.plugins` (quantidade e nomes variados), `navigator.hardwareConcurrency` (4-16), `navigator.deviceMemory` (4-8), `navigator.languages` (`['pt-BR', 'pt', 'en-US', 'en']`), `WebGL vendor/renderer` spoofing
+- Impede correlação entre requisições consecutivas para o mesmo site
+
+**Comportamento humano simulado:**
+- Substituir scroll fixo (`window.scrollTo(0,600)`) por scroll gradual via `page.mouse.wheel()` com pausas aleatórias (3-5 passos de 200-400px)
+- Movimento de mouse realístico antes de ações via `page.mouse.move()` com coordenadas intermediárias
+- `page.waitForTimeout()` com valores aleatórios (200-800ms) em vez de constantes fixas
+- Pequenas pausas entre digitação de teclas (opcional, para formulários)
+
+**Stack:** nenhuma dependência extra — tudo via Playwright API pura (`context.addInitScript()`, `page.mouse`, `page.keyboard`)
+**Esforço:** 3-5 dias
+**Valor:** Alto | **Complexidade:** Média
+
+#### 3.2.3 Fase 3 — Proxies rotativos + bypass Cloudflare (futuro)
+*Reservado para implementação futura quando necessário.* Incluirá pool de proxies (BrightData/Webshare), retry com proxy diferente a cada falha, integração com 2Captcha/Capsolver para resolver challenges de Amazon e Mercado Livre.
+**Valor:** Alto | **Complexidade:** Alta
 
 ### 3.3 Suporte a paginação (mais resultados)
 Atualmente pega apenas a primeira página. Adicionar navegação para coletar significativamente mais produtos.

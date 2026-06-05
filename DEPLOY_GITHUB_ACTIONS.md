@@ -71,6 +71,12 @@ VPS_SSH_KEY=conteudo da chave privada SSH
 
 `VPS_PORT` pode ser omitido se o SSH usa a porta 22.
 
+O erro abaixo significa que `VPS_SSH_KEY` nao foi criado, esta vazio ou recebeu a chave publica em vez da privada:
+
+```txt
+Error: can't connect without a private SSH key or password
+```
+
 ## Criar chave SSH para o GitHub Actions
 
 No seu computador local, gere uma chave especifica para deploy:
@@ -90,6 +96,20 @@ No GitHub, o secret `VPS_SSH_KEY` deve receber o conteudo da chave privada:
 
 ```bash
 cat github-actions-scraper
+```
+
+No Windows PowerShell, use:
+
+```powershell
+Get-Content .\github-actions-scraper -Raw
+```
+
+Copie tudo, incluindo as linhas:
+
+```txt
+-----BEGIN OPENSSH PRIVATE KEY-----
+...
+-----END OPENSSH PRIVATE KEY-----
 ```
 
 Na VPS, adicionar a chave publica ao usuario `ubuntu`:

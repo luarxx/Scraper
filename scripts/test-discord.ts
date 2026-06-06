@@ -38,10 +38,14 @@ async function main(): Promise<void> {
     username: 'Scraper de Preços',
     ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
     embeds: [{
-      title: 'Teste de alerta de preço',
+      title: 'Preço alvo atingido',
       description: [
-        'Teste manual do webhook Discord.',
-        'Se esta mensagem chegou, o envio de alertas está funcionando.',
+        '**RTX 4060 branca**',
+        'Loja: KaBuM!',
+        'Preço atual: **R$ 1.899,90**',
+        'Preço alvo: **R$ 1.999,90**',
+        'Parcelamento: 10x de R$ 189,99 sem juros',
+        '[Abrir produto](https://www.kabum.com.br/)',
       ].join('\n'),
       color: 0x22c55e,
       timestamp: new Date().toISOString(),

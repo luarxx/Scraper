@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { JSDOM } from 'jsdom';
-import { gerarCacheKey, normalizarTermo, ordenarPorRelevancia, SITES } from '../scraper';
+import { extrairProdutoPorUrlHtml, gerarCacheKey, normalizarTermo, ordenarPorRelevancia, SITES } from '../scraper';
 import type { Produto } from '../scraper';
 
 function withDocument(html: string, run: () => Produto[]): Produto[] {
@@ -35,6 +35,33 @@ describe('scraper helpers', () => {
 });
 
 describe('site extractors', () => {
+  it('prioriza preço promocional por URL da KaBuM!', () => {
+    const produto = extrairProdutoPorUrlHtml('kabum', `
+      <html>
+        <head>
+          <meta property="og:title" content="Memória ram">
+          <meta property="og:image" content="https://img.test/memoria.jpg">
+        </head>
+        <body>
+          <h1>Memória ram</h1>
+          <section>
+            <span>De R$ 1.388,22</span>
+            <span>10x de R$ 138,82 sem juros</span>
+            <strong class="finalPrice">R$ 1.000,00 no Pix</strong>
+          </section>
+        </body>
+      </html>
+    `, 'https://www.kabum.com.br/produto/101657/memoria-ram', 'Fallback');
+
+    expect(produto).toMatchObject({
+      title: 'Memória ram',
+      price: 'R$ 1.000,00',
+      parcelamento: '10x de R$ 138,82',
+      image: 'https://img.test/memoria.jpg',
+      url: 'https://www.kabum.com.br/produto/101657/memoria-ram',
+    });
+  });
+
   it('extrai produtos KaBuM! de fixture HTML', () => {
     const produtos = withDocument(`
       <a href="/produto/1/placa-video">

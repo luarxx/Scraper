@@ -9,7 +9,7 @@ const ROOT = path.basename(__dirname) === 'dist' ? path.resolve(__dirname, '..')
 loadEnv();
 process.env.TZ = 'America/Sao_Paulo';
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT || 3000);
 const APP_TIME_ZONE = 'America/Sao_Paulo';
 const APP_TIME_OFFSET = '-03:00';
 const CLIENT_DIST = path.join(ROOT, 'client', 'dist');
@@ -570,6 +570,11 @@ async function executarWatchAlerts(): Promise<void> {
      VALUES (?, ?, ?, ?, ?, ?, ?)`
   );
 
+  let ok = 0;
+  let erros = 0;
+  let disparados = 0;
+  let precosVerificados = 0;
+
   for (const alerta of alertas) {
     const checkedAt = formatDbDatetime();
     try {
@@ -580,16 +585,24 @@ async function executarWatchAlerts(): Promise<void> {
       if (precoCents === null) {
         const erro = 'Preço atual não identificado';
         insertCheck.run(alerta.id, checkedAt, 'erro', null, produto.price, erro, 0);
+        erros++;
         db.prepare(
           `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
         ).run(checkedAt, erro, checkedAt, alerta.id);
         continue;
       }
 
+      precosVerificados++;
+
       if (precoCents <= alerta.preco_alvo_cents) {
         const notified = await enviarWatchDiscord(alerta, precoCents, produto.price || centsToBrl(precoCents), produto.parcelamento);
         const erro = notified ? null : 'Falha ao enviar notificação Discord';
         insertCheck.run(alerta.id, checkedAt, notified ? 'disparado' : 'erro', precoCents, produto.price, erro, notified ? 1 : 0);
+        if (notified) {
+          disparados++;
+        } else {
+          erros++;
+        }
         db.prepare(
           `UPDATE watch_alerts
            SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, status = ?, ativo = ?, disparado_em = ?, erro = ?, atualizado_em = ?
@@ -608,6 +621,7 @@ async function executarWatchAlerts(): Promise<void> {
         );
       } else {
         insertCheck.run(alerta.id, checkedAt, 'ok', precoCents, produto.price, null, 0);
+        ok++;
         db.prepare(
           `UPDATE watch_alerts
            SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, erro = NULL, atualizado_em = ?
@@ -617,13 +631,14 @@ async function executarWatchAlerts(): Promise<void> {
     } catch (err: unknown) {
       const error = err as Error;
       insertCheck.run(alerta.id, checkedAt, 'erro', null, null, error.message, 0);
+      erros++;
       db.prepare(
         `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
       ).run(checkedAt, error.message, checkedAt, alerta.id);
     }
   }
 
-  console.log(`[Watch] Verificação concluída — ${alertas.length} alerta(s) processado(s)`);
+  console.log(`[Watch] Verificação concluída — ${alertas.length} alerta(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)`);
   watchStatus = 'agendado';
   proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
 }
@@ -896,6 +911,39 @@ function createServer(): http.Server {
     return;
   }
 
+  if (pathname === '/api/watch/preview' && req.method === 'GET') {
+    const url = (parsedUrl.searchParams.get('url') || '').trim();
+    const site = (parsedUrl.searchParams.get('site') || 'kabum').trim();
+
+    if (!url || !site) {
+      sendJson(res, 400, { erro: true, mensagem: 'Informe URL e site' });
+      return;
+    }
+    if (!SITES[site]) {
+      sendJson(res, 400, { erro: true, mensagem: `Site "${site}" não encontrado` });
+      return;
+    }
+    try {
+      const parsed = new URL(url);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('protocolo inválido');
+    } catch {
+      sendJson(res, 400, { erro: true, mensagem: 'URL inválida' });
+      return;
+    }
+
+    buscarProdutoPorUrl(site, url)
+      .then((produto) => {
+        console.log(`[Watch] Preview de URL em ${SITES[site].nome} — "${produto.title}"`);
+        sendJson(res, 200, produto);
+      })
+      .catch((err: unknown) => {
+        const error = err as Error;
+        console.log(`[Watch] Preview de URL em ${SITES[site].nome} — erro: ${error.message}`);
+        sendJson(res, 422, { erro: true, mensagem: error.message });
+      });
+    return;
+  }
+
   if (pathname === '/api/watch/alerts' && req.method === 'POST') {
     let body = '';
     req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
@@ -1123,6 +1171,16 @@ function createServer(): http.Server {
 
 function startServer(): http.Server {
   const server = createServer();
+  server.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`[Servidor] Porta ${PORT} já está em uso. Encerre o processo existente ou rode com PORT=${PORT + 1}.`);
+      process.exitCode = 1;
+      return;
+    }
+
+    console.error('[Servidor] Falha ao iniciar:', err.message);
+    process.exitCode = 1;
+  });
   server.listen(PORT, () => {
   iniciarScheduler();
   iniciarWatchScheduler();

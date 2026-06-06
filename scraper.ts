@@ -234,6 +234,162 @@ async function comportamentoHumano(page: Page, viewport: { width: number; height
   }
 }
 
+function cleanText(value: string | null | undefined): string {
+  return (value || '').replace(/\s+/g, ' ').trim();
+}
+
+function extrairPrecoAtualTexto(siteKey: string, html: string): string | null {
+  const $ = cheerio.load(html);
+  const candidatos: { price: string; cents: number; score: number; index: number }[] = [];
+  const seen = new Set<string>();
+
+  function centsFromPrice(price: string): number {
+    return Number(price.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')) * 100;
+  }
+
+  function addFromText(text: string, baseScore = 0): void {
+    const source = cleanText(text);
+    const regex = /R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(source))) {
+      const price = match[0].trim();
+      const before = source.slice(Math.max(0, match.index - 80), match.index).toLowerCase();
+      const after = source.slice(match.index + price.length, match.index + price.length + 120).toLowerCase();
+      const context = `${before} ${after}`;
+      if (/\d{1,2}\s*x\s*(?:de)?\s*$/.test(before) || /parcel|sem juros|juros|cart[aã]o|boleto/.test(context)) continue;
+
+      let score = baseScore;
+      if (/pix|à vista|a vista|pre[cç]o final|pre[cç]o atual|cash/.test(context)) score += 8;
+      if (/desconto|promo[cç][aã]o|oferta|por\b/.test(context)) score += 3;
+      if (/\bde\s*$|pre[cç]o antigo|pre[cç]o anterior|economize/.test(before)) score -= 8;
+      if (siteKey === 'kabum' && /pix|à vista|a vista/.test(context)) score += 4;
+
+      const cents = Math.round(centsFromPrice(price));
+      if (!Number.isFinite(cents) || cents <= 0) continue;
+      const key = `${price}:${match.index}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      candidatos.push({ price, cents, score, index: match.index });
+    }
+  }
+
+  const selectors = [
+    '[class*="finalPrice"]',
+    '[class*="priceCard"]',
+    '[class*="price"]',
+    '[data-testid*="price"]',
+    '[id*="price"]',
+    '[class*="pix"]',
+    '[data-testid*="pix"]',
+    '[class*="avista"]',
+    '[class*="aVista"]',
+  ];
+
+  selectors.forEach((selector) => {
+    $(selector).each((_, el) => addFromText($(el).text(), 4));
+  });
+
+  addFromText($('body').text(), 0);
+
+  if (candidatos.length === 0) return null;
+  candidatos.sort((a, b) => b.score - a.score || a.cents - b.cents || a.index - b.index);
+  return candidatos[0].price;
+}
+
+function extrairProdutoPorUrlHtml(siteKey: string, html: string, url: string, nomeFallback = ''): Produto {
+  const $ = cheerio.load(html);
+  const meta = (selector: string) => cleanText($(selector).attr('content'));
+  const title = cleanText($('h1').first().text())
+    || meta('meta[property="og:title"]')
+    || cleanText($('title').first().text())
+    || nomeFallback;
+  const bodyText = cleanText($('body').text());
+  const parcelMatch = bodyText.match(/\d{1,2}x\s+de\s+R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/i);
+  const image = meta('meta[property="og:image"]')
+    || meta('meta[name="twitter:image"]')
+    || cleanText($('img').first().attr('src'));
+
+  return {
+    title,
+    price: extrairPrecoAtualTexto(siteKey, html),
+    parcelamento: parcelMatch ? parcelMatch[0] : null,
+    image: image.startsWith('http') ? image : '',
+    url,
+    relevancia: 0,
+  };
+}
+
+function criarFingerprintInitScript(fingerprint: Fingerprint): string {
+  return `
+    (() => {
+      const fp = ${JSON.stringify(fingerprint)};
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+      Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => fp.hardwareConcurrency });
+      Object.defineProperty(navigator, 'deviceMemory', { get: () => fp.deviceMemory });
+      Object.defineProperty(navigator, 'languages', { get: () => fp.languages });
+      Object.defineProperty(navigator, 'language', { get: () => fp.languages[0] });
+      Object.defineProperty(navigator, 'platform', { get: () => fp.platform });
+
+      const mimeTypes = [];
+      const pluginList = fp.plugins.map((plugin) => {
+        const pluginMimeTypes = plugin.mimeTypes.map((mimeType, mimeIndex) => {
+          const item = { ...mimeType, enabledPlugin: null };
+          mimeTypes.push(item);
+          return { item, mimeIndex };
+        });
+        const pluginObject = {
+          name: plugin.name,
+          filename: plugin.filename,
+          description: plugin.description,
+          length: pluginMimeTypes.length,
+          item: (i) => pluginMimeTypes[i]?.item || null,
+          namedItem: (name) => pluginMimeTypes.find(({ item }) => item.type === name)?.item || null,
+        };
+        pluginMimeTypes.forEach(({ item, mimeIndex }) => {
+          item.enabledPlugin = pluginObject;
+          Object.defineProperty(pluginObject, mimeIndex, { value: item, enumerable: true });
+        });
+        return pluginObject;
+      });
+
+      Object.defineProperty(navigator, 'plugins', {
+        get: () => ({
+          ...pluginList,
+          length: pluginList.length,
+          item: (i) => pluginList[i] || null,
+          namedItem: (name) => pluginList.find((plugin) => plugin.name === name) || null,
+          [Symbol.iterator]: function* () { for (const p of pluginList) yield p; },
+        }),
+      });
+      Object.defineProperty(navigator, 'mimeTypes', {
+        get: () => ({
+          ...mimeTypes,
+          length: mimeTypes.length,
+          item: (i) => mimeTypes[i] || null,
+          namedItem: (name) => mimeTypes.find((mimeType) => mimeType.type === name) || null,
+          [Symbol.iterator]: function* () { for (const mimeType of mimeTypes) yield mimeType; },
+        }),
+      });
+
+      const origGetParam = WebGLRenderingContext.prototype.getParameter;
+      WebGLRenderingContext.prototype.getParameter = function (p) {
+        if (p === 37445) return fp.webglVendor;
+        if (p === 37446) return fp.webglRenderer;
+        return origGetParam.call(this, p);
+      };
+      if (typeof WebGL2RenderingContext !== 'undefined') {
+        const origGetParam2 = WebGL2RenderingContext.prototype.getParameter;
+        WebGL2RenderingContext.prototype.getParameter = function (p) {
+          if (p === 37445) return fp.webglVendor;
+          if (p === 37446) return fp.webglRenderer;
+          return origGetParam2.call(this, p);
+        };
+      }
+    })();
+  `;
+}
+
 // ─── CONFIGURAÇÃO DOS SITES ─────────────────────────────────────────────
 const SITES: Record<string, SiteConfig> = {
   kabum: {
@@ -425,14 +581,14 @@ function ordenarPorRelevancia(produtos: Produto[], termo: string): Produto[] {
 }
 
 function detectarChallenge(page: Page): Promise<boolean> {
-  return page.evaluate(() => {
+  return page.evaluate(`(() => {
     const body = (document.body?.innerHTML || '').trim();
     const title = document.title || '';
     if (title.includes('Um momento') || title.includes('Just a moment')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('verificação de segurança')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('Enable JavaScript')) return true;
     return false;
-  });
+  })()`);
 }
 
 // ─── CACHE ──────────────────────────────────────────────────────────────
@@ -517,73 +673,7 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
   });
   const page = await context.newPage();
 
-  await page.addInitScript((fp: Fingerprint) => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-    Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => fp.hardwareConcurrency });
-    Object.defineProperty(navigator, 'deviceMemory', { get: () => fp.deviceMemory });
-    Object.defineProperty(navigator, 'languages', { get: () => fp.languages });
-    Object.defineProperty(navigator, 'language', { get: () => fp.languages[0] });
-    Object.defineProperty(navigator, 'platform', { get: () => fp.platform });
-
-    const mimeTypes: any[] = [];
-    const pluginList = fp.plugins.map((plugin) => {
-      const pluginMimeTypes = plugin.mimeTypes.map((mimeType, mimeIndex) => {
-        const item = {
-          ...mimeType,
-          enabledPlugin: null as any,
-        };
-        mimeTypes.push(item);
-        return { item, mimeIndex };
-      });
-      const pluginObject: any = {
-        name: plugin.name,
-        filename: plugin.filename,
-        description: plugin.description,
-        length: pluginMimeTypes.length,
-        item: (i: number) => pluginMimeTypes[i]?.item || null,
-        namedItem: (name: string) => pluginMimeTypes.find(({ item }) => item.type === name)?.item || null,
-      };
-      pluginMimeTypes.forEach(({ item, mimeIndex }) => {
-        item.enabledPlugin = pluginObject;
-        Object.defineProperty(pluginObject, mimeIndex, { value: item, enumerable: true });
-      });
-      return pluginObject;
-    });
-
-    Object.defineProperty(navigator, 'plugins', {
-      get: () => ({
-        ...pluginList,
-        length: pluginList.length,
-        item: (i: number) => pluginList[i] || null,
-        namedItem: (name: string) => pluginList.find((plugin: any) => plugin.name === name) || null,
-        [Symbol.iterator]: function* () { for (const p of pluginList) yield p; },
-      }),
-    });
-    Object.defineProperty(navigator, 'mimeTypes', {
-      get: () => ({
-        ...mimeTypes,
-        length: mimeTypes.length,
-        item: (i: number) => mimeTypes[i] || null,
-        namedItem: (name: string) => mimeTypes.find((mimeType: any) => mimeType.type === name) || null,
-        [Symbol.iterator]: function* () { for (const mimeType of mimeTypes) yield mimeType; },
-      }),
-    });
-
-    const origGetParam = WebGLRenderingContext.prototype.getParameter;
-    WebGLRenderingContext.prototype.getParameter = function (p: number) {
-      if (p === 37445) return fp.webglVendor;
-      if (p === 37446) return fp.webglRenderer;
-      return origGetParam.call(this, p);
-    };
-    if (typeof WebGL2RenderingContext !== 'undefined') {
-      const origGetParam2 = WebGL2RenderingContext.prototype.getParameter;
-      WebGL2RenderingContext.prototype.getParameter = function (p: number) {
-        if (p === 37445) return fp.webglVendor;
-        if (p === 37446) return fp.webglRenderer;
-        return origGetParam2.call(this, p);
-      };
-    }
-  }, fingerprint);
+  await page.addInitScript(criarFingerprintInitScript(fingerprint));
 
   try {
     if (site.precisaHomePrimeiro) {
@@ -713,73 +803,7 @@ async function buscarProdutoPorUrl(siteKey: string, produtoUrl: string, nomeFall
   });
   const page = await context.newPage();
 
-  await page.addInitScript((fp: Fingerprint) => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => false });
-    Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => fp.hardwareConcurrency });
-    Object.defineProperty(navigator, 'deviceMemory', { get: () => fp.deviceMemory });
-    Object.defineProperty(navigator, 'languages', { get: () => fp.languages });
-    Object.defineProperty(navigator, 'language', { get: () => fp.languages[0] });
-    Object.defineProperty(navigator, 'platform', { get: () => fp.platform });
-
-    const mimeTypes: any[] = [];
-    const pluginList = fp.plugins.map((plugin) => {
-      const pluginMimeTypes = plugin.mimeTypes.map((mimeType, mimeIndex) => {
-        const item = {
-          ...mimeType,
-          enabledPlugin: null as any,
-        };
-        mimeTypes.push(item);
-        return { item, mimeIndex };
-      });
-      const pluginObject: any = {
-        name: plugin.name,
-        filename: plugin.filename,
-        description: plugin.description,
-        length: pluginMimeTypes.length,
-        item: (i: number) => pluginMimeTypes[i]?.item || null,
-        namedItem: (name: string) => pluginMimeTypes.find(({ item }) => item.type === name)?.item || null,
-      };
-      pluginMimeTypes.forEach(({ item, mimeIndex }) => {
-        item.enabledPlugin = pluginObject;
-        Object.defineProperty(pluginObject, mimeIndex, { value: item, enumerable: true });
-      });
-      return pluginObject;
-    });
-
-    Object.defineProperty(navigator, 'plugins', {
-      get: () => ({
-        ...pluginList,
-        length: pluginList.length,
-        item: (i: number) => pluginList[i] || null,
-        namedItem: (name: string) => pluginList.find((plugin: any) => plugin.name === name) || null,
-        [Symbol.iterator]: function* () { for (const p of pluginList) yield p; },
-      }),
-    });
-    Object.defineProperty(navigator, 'mimeTypes', {
-      get: () => ({
-        ...mimeTypes,
-        length: mimeTypes.length,
-        item: (i: number) => mimeTypes[i] || null,
-        namedItem: (name: string) => mimeTypes.find((mimeType: any) => mimeType.type === name) || null,
-        [Symbol.iterator]: function* () { for (const mimeType of mimeTypes) yield mimeType; },
-      }),
-    });
-
-    const origGetParam = WebGLRenderingContext.prototype.getParameter;
-    WebGLRenderingContext.prototype.getParameter = function (p: number) {
-      if (p === 37445) return fp.webglVendor;
-      if (p === 37446) return fp.webglRenderer;
-      return origGetParam.call(this, p);
-    };
-    if (typeof WebGL2RenderingContext !== 'undefined') {
-      const origGetParam2 = WebGL2RenderingContext.prototype.getParameter;
-      WebGL2RenderingContext.prototype.getParameter = function (p: number) {
-        if (p === 37445) return fp.webglVendor;
-        if (p === 37446) return fp.webglRenderer;
-        return origGetParam2.call(this, p);
-      };
-    }
-  }, fingerprint);
+  await page.addInitScript(criarFingerprintInitScript(fingerprint));
 
   try {
     await page.goto(produtoUrl, { waitUntil: site.waitStrategy || 'domcontentloaded', timeout: TIMEOUT });
@@ -791,29 +815,8 @@ async function buscarProdutoPorUrl(siteKey: string, produtoUrl: string, nomeFall
       throw new Error('O site ativou um desafio de segurança.');
     }
 
-    const produto = await page.evaluate((fallback: string) => {
-      const clean = (value: string | null | undefined) => (value || '').replace(/\s+/g, ' ').trim();
-      const meta = (selector: string) => clean(document.querySelector(selector)?.getAttribute('content'));
-      const title = clean(document.querySelector('h1')?.textContent)
-        || meta('meta[property="og:title"]')
-        || clean(document.title)
-        || fallback;
-      const bodyText = clean(document.body?.textContent);
-      const priceMatch = bodyText.match(/R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/);
-      const parcelMatch = bodyText.match(/\d{1,2}x\s+de\s+R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/i);
-      const image = meta('meta[property="og:image"]')
-        || meta('meta[name="twitter:image"]')
-        || clean(document.querySelector('img')?.getAttribute('src'));
-
-      return {
-        title,
-        price: priceMatch ? priceMatch[0] : null,
-        parcelamento: parcelMatch ? parcelMatch[0] : null,
-        image: image.startsWith('http') ? image : '',
-        url: location.href,
-        relevancia: 0,
-      };
-    }, nomeFallback);
+    const html = await page.content();
+    const produto = extrairProdutoPorUrlHtml(siteKey, html, page.url(), nomeFallback);
 
     if (!produto.title || !produto.price) {
       throw new Error('Não foi possível identificar o preço atual na página do produto.');
@@ -850,7 +853,7 @@ function parseArgs(): { site: string; termo: string | null } {
 
 // ─── EXPORTS ────────────────────────────────────────────────────────────
 
-export { buscarProduto, buscarProdutoPorUrl, gerarCacheKey, normalizarTermo, ordenarPorRelevancia, SITES };
+export { buscarProduto, buscarProdutoPorUrl, extrairProdutoPorUrlHtml, gerarCacheKey, normalizarTermo, ordenarPorRelevancia, SITES };
 export type { Produto, SiteConfig, Resultado, ResultadoProdutoUrl };
 
 // ─── EXECUÇÃO VIA CLI ───────────────────────────────────────────────────

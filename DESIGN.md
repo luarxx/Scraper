@@ -155,7 +155,7 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 
 ### WatchPanel
 - **Status bar**: 4 KPI tiles (Status, Próximo check, Alertas, Discord + botão Verificar)
-- **Formulário**: campos Nome, URL, Preço-alvo e seletor de site em button-group com cores por loja
+- **Formulário**: campos URL, Nome, Preço-alvo e seletor de site em button-group com cores por loja; Nome fica bloqueado enquanto a URL está sendo identificada
 - **Lista de alertas**: cards compactos com nome, site, status, preço-alvo, último preço, último check e canal/disparo
 - **Discord state**: tile mostra "Configurado" ou "Sem webhook" para evitar falha silenciosa
 - **Estados**: loading inline, empty state com ícone `Bell`, erro em banner vermelho e badge "Salvo" após criação

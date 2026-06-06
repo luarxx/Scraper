@@ -129,3 +129,9 @@ export interface WatchDraft {
   site: string;
   preco_alvo: string;
 }
+
+export interface WatchProductPreview extends Produto {
+  site: string;
+  siteNome: string;
+  timestamp: string;
+}

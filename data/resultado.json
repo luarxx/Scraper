@@ -2,7 +2,7 @@
   "termo": "Attack shark",
   "site": "pichau",
   "siteNome": "Pichau",
-  "timestamp": "2026-06-06T00:01:08.106Z",
+  "timestamp": "2026-06-06T03:01:09.362Z",
   "total": 36,
   "produtos": [
     {
@@ -11,6 +11,14 @@
       "parcelamento": "8x de R$ 10,29",
       "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c01pro-black.jpg",
       "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c01pro-com-conector-aviator-usb-a-para-tipo-c-1-65m-preto-c01pro-black",
+      "relevancia": 2
+    },
+    {
+      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C01PRO, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Rosa, C01PRO-PINK",
+      "price": "R$ 69,99",
+      "parcelamento": "8x de R$ 10,29",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c01pro-pink.jpg",
+      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c01pro-com-conector-aviator-usb-a-para-tipo-c-1-65m-rosa-c01pro-pink",
       "relevancia": 2
     },
     {
@@ -35,6 +43,14 @@
       "parcelamento": "10x de R$ 10,59",
       "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c03-red.jpg",
       "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c03-com-conector-aviator-usb-a-para-tipo-c-1-65m-vermelho-c03-red",
+      "relevancia": 2
+    },
+    {
+      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C03, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Preto, C03-BLACK",
+      "price": "R$ 89,99",
+      "parcelamento": "10x de R$ 10,59",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c03-black.jpg",
+      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c03-com-conector-aviator-usb-a-para-tipo-c-1-65m-preto-c03-black",
       "relevancia": 2
     },
     {
@@ -78,19 +94,19 @@
       "relevancia": 2
     },
     {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X11, RGB, 22000DPI, 7 Botoes, Tri-Mode, Branco, X11-WH",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11-wh145002.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-rgb-22000dpi-7-botoes-tri-mode-branco-x11-wh",
-      "relevancia": 2
-    },
-    {
       "title": "PRE VENDA - Cabo Para Teclado Attack Shark C05, Tipo-C Para USB-A, 1.6m, Preto, C05-BLACK",
       "price": "R$ 159,99",
       "parcelamento": "12x de R$ 15,69",
       "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c05-black.jpg",
       "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c05-tipo-c-para-usb-a-1-6m-preto-c05-black",
+      "relevancia": 2
+    },
+    {
+      "title": "PRE VENDA - Mouse Gamer Attack Shark X11, RGB, 22000DPI, 7 Botoes, Tri-Mode, Branco, X11-WH",
+      "price": "R$ 159,99",
+      "parcelamento": "12x de R$ 15,69",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11-wh145002.jpg",
+      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-rgb-22000dpi-7-botoes-tri-mode-branco-x11-wh",
       "relevancia": 2
     },
     {
@@ -206,14 +222,6 @@
       "relevancia": 2
     },
     {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68 HE, RGB, Switch Magnetico Linear, Black Gradient, X68-HE-BLACK-GRADIENT",
-      "price": "R$ 339,99",
-      "parcelamento": "12x de R$ 33,33",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-he-black-gradient.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68-he-rgb-switch-magnetico-linear-black-gradient-x68-he-black-gradient",
-      "relevancia": 2
-    },
-    {
       "title": "PRE VENDA - Teclado Mecanico Attack Shark R82 HE, RGB, Switch Hall Effect Magnetico, Preto, R82-HE-BK",
       "price": "R$ 349,99",
       "parcelamento": "12x de R$ 34,31",
@@ -267,14 +275,6 @@
       "parcelamento": "12x de R$ 51,96",
       "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-max-wh-contours.jpg",
       "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68max-he-rgb-switch-magnetico-linear-white-contours-x68-max-wh-contours",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68MAX HE, RGB, Switch Magnetico Linear, Black Contours, X68-MAX-BK-CONTOURS",
-      "price": "R$ 529,99",
-      "parcelamento": "12x de R$ 51,96",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-max-bk-contours1.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68max-he-rgb-switch-magnetico-linear-black-contours-x68-max-bk-contours",
       "relevancia": 2
     },
     {

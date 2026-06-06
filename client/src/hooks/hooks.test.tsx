@@ -178,6 +178,28 @@ describe('useWatchAlerts', () => {
     expect(result.current.alerts).toEqual([]);
     expect(result.current.status?.total_ativos).toBe(0);
   });
+
+  it('pré-visualiza produto Watch pela URL', async () => {
+    const fetchMock = mockFetch({
+      body: {
+        title: 'SSD NVMe',
+        price: 'R$ 299,90',
+        parcelamento: null,
+        image: '',
+        url: 'https://www.kabum.com.br/produto/1',
+        relevancia: 0,
+        site: 'kabum',
+        siteNome: 'KaBuM!',
+        timestamp: '2026-06-05T10:00:00.000Z',
+      },
+    });
+    const { result } = renderHook(() => useWatchAlerts());
+
+    const preview = await act(async () => result.current.previewProduct('https://www.kabum.com.br/produto/1', 'kabum'));
+
+    expect(preview.title).toBe('SSD NVMe');
+    expect(fetchMock).toHaveBeenCalledWith('/api/watch/preview?url=https%3A%2F%2Fwww.kabum.com.br%2Fproduto%2F1&site=kabum', { signal: undefined });
+  });
 });
 
 describe('critical UI states', () => {

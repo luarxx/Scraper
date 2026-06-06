@@ -70,6 +70,11 @@ Server (server.ts — Node.js http)
 ├── tsconfig.json       # TS config (root, CommonJS)
 ├── scripts/            # Scripts operacionais manuais (ex.: teste de webhook Discord)
 ├── package.json        # Scripts: dev, dev:server, typecheck, build
+├── tests/              # Testes backend/root do scraper, servidor, SQLite e schedulers
+│   ├── scraper.test.ts
+│   ├── server.test.ts
+│   ├── fixtures/       # HTML/API samples mockados para testes
+│   └── helpers/        # Helpers compartilhados de teste, SQLite temp e mocks
 │
 ├── client/             # Frontend React (sub-projeto ESM)
 │   ├── index.html
@@ -169,6 +174,7 @@ interface SiteConfig {
 | `/api/watch/alerts` | POST | Body: `{ nome, url, preco_alvo, site, canal: "discord" }` | Cria alerta de preço |
 | `/api/watch/alerts/:id` | PATCH | Body parcial | Atualiza alerta/status |
 | `/api/watch/alerts/:id` | DELETE | — | Remove alerta (soft delete/pausa) |
+| `/api/watch/preview` | GET | `url`, `site` | Identifica produto por URL para preencher nome automaticamente |
 | `/api/watch/status` | GET | — | Status do scheduler Watch + webhook |
 | `/api/watch/run` | POST | — | Dispara verificação manual dos alertas |
 
@@ -287,7 +293,7 @@ SQLite em `data/scraper.db` com 3 tabelas:
 ## Watch de preços (alertas de queda)
 
 - Alertas monitoram uma **URL específica** de produto, não uma busca por termo
-- Cadastro: nome, URL, preço-alvo, site e canal `discord`
+- Cadastro: nome, URL, preço-alvo, site e canal `discord`; ao colar uma URL válida, o frontend consulta `/api/watch/preview` e preenche o nome com o título identificado, sem sobrescrever edição manual
 - O botão "Criar alerta" em `ProductCard` abre a aba Watch com nome/URL/site/preço preenchidos
 - O scheduler roda a cada `WATCH_INTERVAL_HOURS` (padrão 3h, mínimo 3h)
 - Cada verificação usa `buscarProdutoPorUrl(site, url, nome)` e salva histórico em `price_history`
@@ -360,13 +366,14 @@ DISCORD_ALERT_TOP_N=1
 - **Soft delete** — items de configuração usam `ativo = 0` em vez de DELETE físico
 - **Resultados automáticos** — armazenados como JSON text no SQLite (coluna `produtos`)
 - **Scheduler** — execução sequencial (1 busca por vez), recuperação de crash na inicialização
+- **Logs operacionais** — sempre que possível, fluxos manuais, schedulers e endpoints que disparam processamento devem registrar `console.log` ao concluir, com prefixo do módulo e resumo curto de totais, sucessos, erros e itens processados (ex.: `[Busca Manual]`, `[Busca Automática]`, `[Watch]`)
 - **Horários** — usar `America/Sao_Paulo` no backend e nos formatadores do frontend para evitar diferença de fuso em VPS UTC
 - **Intervalo automático** — usar `AUTO_INTERVAL_HOURS` no `.env`; valores abaixo de 3 são elevados para 3
 - **Alertas Discord** — usar `DISCORD_WEBHOOK_URL` para webhook do canal e `DISCORD_ALERT_TOP_N` para limitar produtos por termo
 - **Watch** — alertas de queda ficam em `/api/watch/*`; usar soft delete/status em vez de remover fisicamente
 - **Após editar `client/`**, rebuildar com `cd client && npm run build` — o servidor serve arquivos estáticos de `client/dist/`
 - **Testes automatizados** — usar Vitest; testes de scraper/servidor não devem acessar lojas reais nem tocar `data/scraper.db`; use `SCRAPER_DB_PATH` para SQLite temporário e mocks de `buscarProduto()`/`buscarProdutoPorUrl()`
-- **Funcionalidades importantes exigem testes** — ao adicionar ou alterar scraping, rotas de API, scheduler, persistência SQLite, alertas Watch/Discord ou hooks/componentes críticos, criar ou atualizar testes automatizados junto com a mudança
+- **Organização de testes** — testes de backend/root ficam em `tests/` (`tests/scraper.test.ts`, `tests/server.test.ts` e novos arquivos por domínio quando crescer); fixtures mockadas ficam em `tests/fixtures/`; helpers compartilhados ficam em `tests/helpers/`; testes de frontend ficam colocalizados ao lado do hook/componente em `client/src/**`, com sufixo `.test.ts` ou `.test.tsx`
 - **Exports nomeados** (evitar `export default` em componentes utilitários)
 - **Sem comentários em linha** no código-fonte (documentação concentrada aqui)
 - **Português** para nomes de domínio (`Produto`, `buscarProduto`, `SiteConfig`, `termo`, `preco`); inglês para código genérico

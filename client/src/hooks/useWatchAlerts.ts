@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { WatchAlert, WatchStatus } from '../types';
+import type { WatchAlert, WatchProductPreview, WatchStatus } from '../types';
 
 interface WatchAlertInput {
   nome: string;
@@ -15,6 +15,7 @@ export function useWatchAlerts() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [running, setRunning] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAlerts = useCallback(async () => {
@@ -63,6 +64,19 @@ export function useWatchAlerts() {
     }
   }, [fetchStatus]);
 
+  const previewProduct = useCallback(async (url: string, site: string, signal?: AbortSignal) => {
+    setPreviewing(true);
+    try {
+      const params = new URLSearchParams({ url, site });
+      const res = await fetch(`/api/watch/preview?${params.toString()}`, { signal });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.mensagem || `Erro ${res.status}`);
+      return data as WatchProductPreview;
+    } finally {
+      setPreviewing(false);
+    }
+  }, []);
+
   const removeAlert = useCallback(async (id: number) => {
     setError(null);
     try {
@@ -96,9 +110,11 @@ export function useWatchAlerts() {
     loading,
     saving,
     running,
+    previewing,
     error,
     fetchAlerts,
     fetchStatus,
+    previewProduct,
     createAlert,
     removeAlert,
     triggerRun,

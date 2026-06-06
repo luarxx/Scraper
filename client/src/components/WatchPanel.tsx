@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Bell, CalendarClock, CheckCircle2, Clock, ExternalLink, Play, Trash2, Webhook, Zap } from 'lucide-react';
 import type { FormEvent } from 'react';
 import type { Site, WatchAlert, WatchDraft } from '../types';
@@ -41,6 +41,15 @@ function formatCountdown(iso: string | null, now: number): string {
   const mins = Math.floor((diffMs % 3600000) / 60000);
   if (hours > 0) return `${hours}h${mins > 0 ? ` ${mins}min` : ''}`;
   return mins > 0 ? `${mins}min` : '< 1min';
+}
+
+function isValidHttpUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return ['http:', 'https:'].includes(parsed.protocol);
+  } catch {
+    return false;
+  }
 }
 
 function WatchAlertRow({ alert, onRemove }: { alert: WatchAlert; onRemove: (id: number) => void }) {
@@ -121,8 +130,11 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
   const [url, setUrl] = useState('');
   const [site, setSite] = useState('kabum');
   const [precoAlvo, setPrecoAlvo] = useState('');
+  const [autoNome, setAutoNome] = useState('');
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [savedPulse, setSavedPulse] = useState(false);
-  const { alerts, status, loading, saving, running, error, fetchAlerts, fetchStatus, createAlert, removeAlert, triggerRun } = useWatchAlerts();
+  const previewKeyRef = useRef('');
+  const { alerts, status, loading, saving, running, previewing, error, fetchAlerts, fetchStatus, previewProduct, createAlert, removeAlert, triggerRun } = useWatchAlerts();
 
   const activeSites = useMemo(() => sites.length > 0 ? sites : [
     { key: 'kabum', nome: 'KaBuM!' },
@@ -150,8 +162,43 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
     setUrl(draft.url);
     setSite(draft.site);
     setPrecoAlvo(draft.preco_alvo);
+    setAutoNome(draft.nome);
+    setPreviewError(null);
     onDraftConsumed();
   }, [draft, onDraftConsumed]);
+
+  useEffect(() => {
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl || !isValidHttpUrl(trimmedUrl)) {
+      setPreviewError(null);
+      previewKeyRef.current = '';
+      return;
+    }
+    if (nome.trim() && nome !== autoNome) return;
+    const previewKey = `${site}|${trimmedUrl}`;
+    if (previewKeyRef.current === previewKey) return;
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => {
+      setPreviewError(null);
+      previewKeyRef.current = previewKey;
+      previewProduct(trimmedUrl, site, controller.signal)
+        .then((produto) => {
+          if (!produto.title) return;
+          setNome(produto.title);
+          setAutoNome(produto.title);
+        })
+        .catch((err) => {
+          if ((err as Error).name === 'AbortError') return;
+          setPreviewError((err as Error).message);
+        });
+    }, 550);
+
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [autoNome, nome, previewProduct, site, url]);
 
   const isRunning = status?.status === 'executando';
 
@@ -168,6 +215,8 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
     setNome('');
     setUrl('');
     setPrecoAlvo('');
+    setAutoNome('');
+    setPreviewError(null);
     setSavedPulse(true);
     setTimeout(() => setSavedPulse(false), 1400);
   }
@@ -247,22 +296,32 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
             )}
           </div>
 
-          <label className="block text-xs font-medium text-text-secondary mb-1.5" htmlFor="watch-nome">Nome</label>
-          <input
-            id="watch-nome"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            className="w-full rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-400"
-            placeholder="Ex: RTX 4060 branca"
-          />
-
-          <label className="block text-xs font-medium text-text-secondary mb-1.5 mt-4" htmlFor="watch-url">URL do produto</label>
+          <label className="block text-xs font-medium text-text-secondary mb-1.5" htmlFor="watch-url">URL do produto</label>
           <input
             id="watch-url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             className="w-full rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-400"
             placeholder="https://..."
+          />
+          {(previewing || previewError) && (
+            <p className={`mt-2 text-xs ${previewError ? 'text-amber-300' : 'text-text-muted'}`}>
+              {previewError ? 'Não consegui identificar o nome automaticamente.' : 'Identificando produto...'}
+            </p>
+          )}
+
+          <label className="block text-xs font-medium text-text-secondary mb-1.5 mt-4" htmlFor="watch-nome">Nome</label>
+          <input
+            id="watch-nome"
+            value={nome}
+            onChange={(e) => {
+              setNome(e.target.value);
+              if (e.target.value !== autoNome) setAutoNome('');
+            }}
+            disabled={previewing}
+            aria-busy={previewing}
+            className="w-full rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-400 disabled:cursor-wait disabled:border-slate-800/70 disabled:bg-slate-950/45 disabled:text-slate-400"
+            placeholder={previewing ? 'Identificando produto...' : 'Ex: RTX 4060 branca'}
           />
 
           <label className="block text-xs font-medium text-text-secondary mb-1.5 mt-4" htmlFor="watch-price">Preço-alvo</label>

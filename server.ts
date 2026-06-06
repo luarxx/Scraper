@@ -2,7 +2,8 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import Database from 'better-sqlite3';
-import { buscarProduto, SITES } from './scraper';
+import { buscarProduto, buscarProdutoPorUrl, SITES } from './scraper';
+import type { Produto } from './scraper';
 
 const ROOT = path.basename(__dirname) === 'dist' ? path.resolve(__dirname, '..') : __dirname;
 loadEnv();
@@ -139,6 +140,17 @@ function brlToCents(price: string | null): number | null {
   return isNaN(num) ? null : Math.round(num * 100);
 }
 
+function centsToBrl(cents: number | null): string {
+  if (cents === null) return 'Preço indisponível';
+  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function parseTargetPrice(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return Math.round(value);
+  if (typeof value !== 'string') return null;
+  return brlToCents(value);
+}
+
 function salvarPrecos(produtos: { title: string; price: string | null; parcelamento: string | null; image: string; url: string; relevancia: number }[], site: string): void {
   if (produtos.length === 0) return;
   const insert = db.prepare(
@@ -155,7 +167,7 @@ function salvarPrecos(produtos: { title: string; price: string | null; parcelame
 
 // ─── Database ──────────────────────────────────────────────────
 
-const DB_PATH = path.join(ROOT, 'data', 'scraper.db');
+const DB_PATH = process.env.SCRAPER_DB_PATH || path.join(ROOT, 'data', 'scraper.db');
 fs.mkdirSync(path.join(ROOT, 'data'), { recursive: true });
 const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
@@ -202,6 +214,40 @@ function initDatabase(): void {
     );
 
     CREATE INDEX IF NOT EXISTS idx_price_history_url ON price_history(url, site);
+
+    CREATE TABLE IF NOT EXISTS watch_alerts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      url TEXT NOT NULL,
+      site TEXT NOT NULL,
+      canal TEXT NOT NULL DEFAULT 'discord',
+      preco_alvo_cents INTEGER NOT NULL,
+      ultimo_preco_cents INTEGER,
+      ultimo_preco_text TEXT,
+      ultimo_parcelamento TEXT,
+      status TEXT NOT NULL DEFAULT 'ativo',
+      ativo INTEGER NOT NULL DEFAULT 1,
+      ultimo_check_em TEXT,
+      disparado_em TEXT,
+      erro TEXT,
+      criado_em TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours')),
+      atualizado_em TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours'))
+    );
+
+    CREATE TABLE IF NOT EXISTS watch_checks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      alert_id INTEGER NOT NULL,
+      checked_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours')),
+      status TEXT NOT NULL,
+      preco_cents INTEGER,
+      preco_text TEXT,
+      erro TEXT,
+      notified INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (alert_id) REFERENCES watch_alerts(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_watch_alerts_active ON watch_alerts(ativo, status);
+    CREATE INDEX IF NOT EXISTS idx_watch_checks_alert ON watch_checks(alert_id, checked_at);
   `);
 }
 
@@ -216,14 +262,203 @@ const AUTO_INTERVAL_HOURS = Number.isFinite(configuredIntervalHours)
   ? Math.max(MIN_AUTO_INTERVAL_HOURS, Math.floor(configuredIntervalHours))
   : DEFAULT_AUTO_INTERVAL_HOURS;
 const INTERVALO_MS = AUTO_INTERVAL_HOURS * 60 * 60 * 1000;
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
+const DISCORD_WEBHOOK_AVATAR_URL = process.env.DISCORD_WEBHOOK_AVATAR_URL || '';
+const configuredDiscordTopN = Number(process.env.DISCORD_ALERT_TOP_N);
+const DISCORD_ALERT_TOP_N = Number.isFinite(configuredDiscordTopN)
+  ? Math.max(1, Math.min(5, Math.floor(configuredDiscordTopN)))
+  : 1;
 let schedulerStatus: 'idle' | 'executando' | 'agendado' = 'idle';
 let proximaExecucao: string | null = null;
 let schedulerTimer: ReturnType<typeof setInterval> | null = null;
+const MIN_WATCH_INTERVAL_HOURS = 3;
+const DEFAULT_WATCH_INTERVAL_HOURS = 3;
+const configuredWatchIntervalHours = Number(process.env.WATCH_INTERVAL_HOURS);
+const WATCH_INTERVAL_HOURS = Number.isFinite(configuredWatchIntervalHours)
+  ? Math.max(MIN_WATCH_INTERVAL_HOURS, Math.floor(configuredWatchIntervalHours))
+  : DEFAULT_WATCH_INTERVAL_HOURS;
+const WATCH_INTERVALO_MS = WATCH_INTERVAL_HOURS * 60 * 60 * 1000;
+let watchStatus: 'idle' | 'executando' | 'agendado' = 'idle';
+let proximaWatchExecucao: string | null = null;
+let watchTimer: ReturnType<typeof setInterval> | null = null;
 
-function calcularProximoHorario(): Date {
+type WatchAlertRow = {
+  id: number;
+  nome: string;
+  url: string;
+  site: string;
+  canal: string;
+  preco_alvo_cents: number;
+  ultimo_preco_cents: number | null;
+  ultimo_preco_text: string | null;
+  ultimo_parcelamento: string | null;
+  status: string;
+  ativo: number;
+  ultimo_check_em: string | null;
+  disparado_em: string | null;
+  erro: string | null;
+  criado_em: string;
+  atualizado_em: string;
+};
+
+type DiscordResultado = {
+  termo: string;
+  site: string;
+  status: string;
+  total: number;
+  produtos: Produto[] | null;
+  erro: string | null;
+};
+
+function truncateDiscord(value: string, max: number): string {
+  return value.length > max ? `${value.slice(0, max - 1)}…` : value;
+}
+
+function siteNome(site: string): string {
+  return SITES[site]?.nome || site;
+}
+
+function produtoParaLinha(produto: Produto, index: number): string {
+  const preco = produto.price || 'Preço indisponível';
+  const parcelas = produto.parcelamento ? ` | ${produto.parcelamento}` : '';
+  return `${index + 1}. [${truncateDiscord(produto.title, 90)}](${produto.url}) — ${preco}${parcelas}`;
+}
+
+function parseProdutosJson(value: string | null): Produto[] | null {
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as Produto[];
+  } catch {
+    return null;
+  }
+}
+
+async function enviarAlertaDiscord(execucaoId: number): Promise<void> {
+  if (!DISCORD_WEBHOOK_URL) return;
+
+  const resultados = db.prepare(
+    `SELECT termo, site, status, total, produtos, erro FROM auto_resultados WHERE execucao_id = ? ORDER BY id`
+  ).all(execucaoId) as {
+    termo: string;
+    site: string;
+    status: string;
+    total: number;
+    produtos: string | null;
+    erro: string | null;
+  }[];
+
+  const parsed: DiscordResultado[] = resultados.map((r) => ({
+    ...r,
+    produtos: parseProdutosJson(r.produtos),
+  }));
+
+  const ok = parsed.filter((r) => r.status === 'ok').length;
+  const erros = parsed.filter((r) => r.status === 'erro').length;
+  const totalProdutos = parsed.reduce((acc, r) => acc + (r.total || 0), 0);
+
+  const description = parsed.map((resultado) => {
+    if (resultado.status === 'erro') {
+      return `**${resultado.termo}** (${siteNome(resultado.site)}): erro ao buscar - ${truncateDiscord(resultado.erro || 'sem detalhes', 120)}`;
+    }
+
+    const produtos = (resultado.produtos || []).slice(0, DISCORD_ALERT_TOP_N);
+    if (produtos.length === 0) {
+      return `**${resultado.termo}** (${siteNome(resultado.site)}): nenhum produto encontrado`;
+    }
+
+    return [
+      `**${resultado.termo}** (${siteNome(resultado.site)})`,
+      ...produtos.map(produtoParaLinha),
+    ].join('\n');
+  }).join('\n\n');
+
+  const body = {
+    username: 'Scraper de Preços',
+    ...(DISCORD_WEBHOOK_AVATAR_URL ? { avatar_url: DISCORD_WEBHOOK_AVATAR_URL } : {}),
+    embeds: [{
+      title: 'Alertas de preço',
+      description: truncateDiscord(description || 'Nenhum resultado para enviar.', 3900),
+      color: erros > 0 ? 0xf97316 : 0x22c55e,
+      footer: {
+        text: `${parsed.length} termo(s) | ${ok} ok | ${erros} erro(s) | ${totalProdutos} produto(s)`,
+      },
+      timestamp: new Date().toISOString(),
+    }],
+  };
+
+  try {
+    const response = await fetch(DISCORD_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      console.error(`[Discord] Falha ao enviar alerta: ${response.status} ${truncateDiscord(detail, 180)}`);
+    }
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error(`[Discord] Falha ao enviar alerta: ${error.message}`);
+  }
+}
+
+async function enviarWatchDiscord(alerta: WatchAlertRow, precoAtualCents: number, precoAtualText: string, parcelamento: string | null): Promise<boolean> {
+  if (!DISCORD_WEBHOOK_URL) return false;
+
+  const body = {
+    username: 'Scraper de Preços',
+    ...(DISCORD_WEBHOOK_AVATAR_URL ? { avatar_url: DISCORD_WEBHOOK_AVATAR_URL } : {}),
+    embeds: [{
+      title: 'Preço alvo atingido',
+      description: [
+        `**${truncateDiscord(alerta.nome, 120)}**`,
+        `Loja: ${siteNome(alerta.site)}`,
+        `Preço atual: **${precoAtualText}**`,
+        `Preço alvo: **${centsToBrl(alerta.preco_alvo_cents)}**`,
+        parcelamento ? `Parcelamento: ${truncateDiscord(parcelamento, 120)}` : null,
+        `[Abrir produto](${alerta.url})`,
+      ].filter(Boolean).join('\n'),
+      color: 0x22c55e,
+      timestamp: new Date().toISOString(),
+    }],
+  };
+
+  try {
+    const response = await fetch(DISCORD_WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      console.error(`[Watch Discord] Falha ao enviar alerta: ${response.status} ${truncateDiscord(detail, 180)}`);
+      return false;
+    }
+    return true;
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error(`[Watch Discord] Falha ao enviar alerta: ${error.message}`);
+    return false;
+  }
+}
+
+function normalizarWatchAlert(row: WatchAlertRow) {
+  return {
+    ...row,
+    ativo: Boolean(row.ativo),
+    ultimo_check_em: dbDatetimeToApi(row.ultimo_check_em),
+    disparado_em: dbDatetimeToApi(row.disparado_em),
+    criado_em: dbDatetimeToApi(row.criado_em),
+    atualizado_em: dbDatetimeToApi(row.atualizado_em),
+  };
+}
+
+function calcularProximoHorarioIntervalo(intervalHours: number): Date {
   const now = new Date();
   const hours = now.getHours();
-  const nextHour = (Math.floor(hours / AUTO_INTERVAL_HOURS) + 1) * AUTO_INTERVAL_HOURS;
+  const nextHour = (Math.floor(hours / intervalHours) + 1) * intervalHours;
   const next = new Date(now);
   if (nextHour >= 24) {
     next.setDate(next.getDate() + 1);
@@ -232,6 +467,14 @@ function calcularProximoHorario(): Date {
     next.setHours(nextHour, 0, 0, 0);
   }
   return next;
+}
+
+function calcularProximoHorario(): Date {
+  return calcularProximoHorarioIntervalo(AUTO_INTERVAL_HOURS);
+}
+
+function calcularProximoWatchHorario(): Date {
+  return calcularProximoHorarioIntervalo(WATCH_INTERVAL_HOURS);
 }
 
 async function executarAutoBuscas(): Promise<void> {
@@ -301,9 +544,88 @@ async function executarAutoBuscas(): Promise<void> {
   const totalProdutos = resultados.reduce((acc, r) => acc + (r.total || 0), 0);
 
   console.log(`[Busca Automática] Concluída — ${resultados.length} termo(s), ${ok} ok, ${erros} erro(s), ${totalProdutos} produto(s) no total`);
+  await enviarAlertaDiscord(execucaoId);
 
   schedulerStatus = 'agendado';
   proximaExecucao = formatApiDatetime(calcularProximoHorario());
+}
+
+async function executarWatchAlerts(): Promise<void> {
+  if (watchStatus === 'executando') return;
+  watchStatus = 'executando';
+  proximaWatchExecucao = null;
+
+  const alertas = db.prepare(
+    `SELECT * FROM watch_alerts WHERE ativo = 1 AND status = 'ativo' ORDER BY id`
+  ).all() as WatchAlertRow[];
+
+  if (alertas.length === 0) {
+    watchStatus = 'agendado';
+    proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
+    return;
+  }
+
+  const insertCheck = db.prepare(
+    `INSERT INTO watch_checks (alert_id, checked_at, status, preco_cents, preco_text, erro, notified)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  );
+
+  for (const alerta of alertas) {
+    const checkedAt = formatDbDatetime();
+    try {
+      const produto = await buscarProdutoPorUrl(alerta.site, alerta.url, alerta.nome);
+      const precoCents = brlToCents(produto.price);
+      salvarPrecos([produto], alerta.site);
+
+      if (precoCents === null) {
+        const erro = 'Preço atual não identificado';
+        insertCheck.run(alerta.id, checkedAt, 'erro', null, produto.price, erro, 0);
+        db.prepare(
+          `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
+        ).run(checkedAt, erro, checkedAt, alerta.id);
+        continue;
+      }
+
+      if (precoCents <= alerta.preco_alvo_cents) {
+        const notified = await enviarWatchDiscord(alerta, precoCents, produto.price || centsToBrl(precoCents), produto.parcelamento);
+        const erro = notified ? null : 'Falha ao enviar notificação Discord';
+        insertCheck.run(alerta.id, checkedAt, notified ? 'disparado' : 'erro', precoCents, produto.price, erro, notified ? 1 : 0);
+        db.prepare(
+          `UPDATE watch_alerts
+           SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, status = ?, ativo = ?, disparado_em = ?, erro = ?, atualizado_em = ?
+           WHERE id = ?`
+        ).run(
+          precoCents,
+          produto.price,
+          produto.parcelamento,
+          checkedAt,
+          notified ? 'disparado' : 'ativo',
+          notified ? 0 : 1,
+          notified ? checkedAt : null,
+          erro,
+          checkedAt,
+          alerta.id,
+        );
+      } else {
+        insertCheck.run(alerta.id, checkedAt, 'ok', precoCents, produto.price, null, 0);
+        db.prepare(
+          `UPDATE watch_alerts
+           SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, erro = NULL, atualizado_em = ?
+           WHERE id = ?`
+        ).run(precoCents, produto.price, produto.parcelamento, checkedAt, checkedAt, alerta.id);
+      }
+    } catch (err: unknown) {
+      const error = err as Error;
+      insertCheck.run(alerta.id, checkedAt, 'erro', null, null, error.message, 0);
+      db.prepare(
+        `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
+      ).run(checkedAt, error.message, checkedAt, alerta.id);
+    }
+  }
+
+  console.log(`[Watch] Verificação concluída — ${alertas.length} alerta(s) processado(s)`);
+  watchStatus = 'agendado';
+  proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
 }
 
 function iniciarScheduler(): void {
@@ -342,6 +664,18 @@ function iniciarScheduler(): void {
   }, delay);
 }
 
+function iniciarWatchScheduler(): void {
+  const next = calcularProximoWatchHorario();
+  const delay = Math.max(0, next.getTime() - Date.now());
+  proximaWatchExecucao = formatApiDatetime(next);
+  if (watchStatus === 'idle') watchStatus = 'agendado';
+
+  setTimeout(() => {
+    executarWatchAlerts();
+    watchTimer = setInterval(executarWatchAlerts, WATCH_INTERVALO_MS);
+  }, delay);
+}
+
 function getAutoStatus(): {
   status: string;
   ultima_execucao: string | null;
@@ -364,7 +698,38 @@ function getAutoStatus(): {
   };
 }
 
-const server = http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
+function getWatchStatus(): {
+  status: string;
+  ultima_execucao: string | null;
+  proxima_execucao: string | null;
+  total_ativos: number;
+  total_disparados: number;
+  webhook_configurado: boolean;
+} {
+  const ultimaCheck = db.prepare(
+    `SELECT checked_at FROM watch_checks ORDER BY id DESC LIMIT 1`
+  ).get() as { checked_at: string } | undefined;
+
+  const totalAtivos = db.prepare(
+    `SELECT COUNT(*) as c FROM watch_alerts WHERE ativo = 1 AND status = 'ativo'`
+  ).get() as { c: number };
+
+  const totalDisparados = db.prepare(
+    `SELECT COUNT(*) as c FROM watch_alerts WHERE status = 'disparado'`
+  ).get() as { c: number };
+
+  return {
+    status: watchStatus,
+    ultima_execucao: ultimaCheck ? dbDatetimeToApi(ultimaCheck.checked_at) : null,
+    proxima_execucao: proximaWatchExecucao,
+    total_ativos: totalAtivos.c,
+    total_disparados: totalDisparados.c,
+    webhook_configurado: Boolean(DISCORD_WEBHOOK_URL),
+  };
+}
+
+function createServer(): http.Server {
+  return http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
   const parsedUrl = new URL(req.url!, `http://localhost:${PORT}`);
   const pathname = parsedUrl.pathname;
 
@@ -523,6 +888,141 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
     return;
   }
 
+  if (pathname === '/api/watch/alerts' && req.method === 'GET') {
+    const alertas = db.prepare(
+      `SELECT * FROM watch_alerts WHERE ativo = 1 OR status = 'disparado' ORDER BY ativo DESC, id DESC`
+    ).all() as WatchAlertRow[];
+    sendJson(res, 200, alertas.map(normalizarWatchAlert));
+    return;
+  }
+
+  if (pathname === '/api/watch/alerts' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body) as { nome?: string; url?: string; site?: string; canal?: string; preco_alvo?: unknown; preco_alvo_cents?: unknown };
+        const nome = (data.nome || '').trim();
+        const url = (data.url || '').trim();
+        const site = (data.site || '').trim();
+        const canal = (data.canal || 'discord').trim();
+        const precoAlvo = parseTargetPrice(data.preco_alvo_cents ?? data.preco_alvo);
+
+        if (!nome || !url || !site || precoAlvo === null) {
+          sendJson(res, 400, { erro: true, mensagem: 'Informe nome, URL, site e preço-alvo' });
+          return;
+        }
+        if (!SITES[site]) {
+          sendJson(res, 400, { erro: true, mensagem: `Site "${site}" não encontrado` });
+          return;
+        }
+        if (canal !== 'discord') {
+          sendJson(res, 400, { erro: true, mensagem: 'Canal suportado: discord' });
+          return;
+        }
+        try {
+          const parsed = new URL(url);
+          if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('protocolo inválido');
+        } catch {
+          sendJson(res, 400, { erro: true, mensagem: 'URL inválida' });
+          return;
+        }
+
+        const now = formatDbDatetime();
+        const result = db.prepare(
+          `INSERT INTO watch_alerts (nome, url, site, canal, preco_alvo_cents, criado_em, atualizado_em)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`
+        ).run(nome, url, site, canal, precoAlvo, now, now);
+
+        const alerta = db.prepare(`SELECT * FROM watch_alerts WHERE id = ?`).get(result.lastInsertRowid) as WatchAlertRow;
+        sendJson(res, 201, normalizarWatchAlert(alerta));
+      } catch {
+        sendJson(res, 400, { erro: true, mensagem: 'JSON inválido' });
+      }
+    });
+    return;
+  }
+
+  const watchAlertMatch = pathname.match(/^\/api\/watch\/alerts\/(\d+)$/);
+  if (watchAlertMatch && req.method === 'PATCH') {
+    const id = parseInt(watchAlertMatch[1], 10);
+    let body = '';
+    req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+    req.on('end', () => {
+      try {
+        const current = db.prepare(`SELECT * FROM watch_alerts WHERE id = ?`).get(id) as WatchAlertRow | undefined;
+        if (!current) {
+          sendJson(res, 404, { erro: true, mensagem: 'Alerta não encontrado' });
+          return;
+        }
+
+        const data = JSON.parse(body) as { nome?: string; url?: string; site?: string; canal?: string; preco_alvo?: unknown; preco_alvo_cents?: unknown; status?: string };
+        const nome = data.nome !== undefined ? data.nome.trim() : current.nome;
+        const url = data.url !== undefined ? data.url.trim() : current.url;
+        const site = data.site !== undefined ? data.site.trim() : current.site;
+        const canal = data.canal !== undefined ? data.canal.trim() : current.canal;
+        const precoAlvo = data.preco_alvo !== undefined || data.preco_alvo_cents !== undefined
+          ? parseTargetPrice(data.preco_alvo_cents ?? data.preco_alvo)
+          : current.preco_alvo_cents;
+        const status = data.status !== undefined ? data.status.trim() : current.status;
+
+        if (!nome || !url || !site || precoAlvo === null) {
+          sendJson(res, 400, { erro: true, mensagem: 'Informe nome, URL, site e preço-alvo' });
+          return;
+        }
+        if (!SITES[site]) {
+          sendJson(res, 400, { erro: true, mensagem: `Site "${site}" não encontrado` });
+          return;
+        }
+        if (canal !== 'discord') {
+          sendJson(res, 400, { erro: true, mensagem: 'Canal suportado: discord' });
+          return;
+        }
+        if (!['ativo', 'pausado', 'disparado'].includes(status)) {
+          sendJson(res, 400, { erro: true, mensagem: 'Status inválido' });
+          return;
+        }
+
+        const now = formatDbDatetime();
+        db.prepare(
+          `UPDATE watch_alerts
+           SET nome = ?, url = ?, site = ?, canal = ?, preco_alvo_cents = ?, status = ?, ativo = ?, atualizado_em = ?
+           WHERE id = ?`
+        ).run(nome, url, site, canal, precoAlvo, status, status === 'ativo' ? 1 : 0, now, id);
+
+        const alerta = db.prepare(`SELECT * FROM watch_alerts WHERE id = ?`).get(id) as WatchAlertRow;
+        sendJson(res, 200, normalizarWatchAlert(alerta));
+      } catch {
+        sendJson(res, 400, { erro: true, mensagem: 'JSON inválido' });
+      }
+    });
+    return;
+  }
+
+  if (watchAlertMatch && req.method === 'DELETE') {
+    const id = parseInt(watchAlertMatch[1], 10);
+    db.prepare(
+      `UPDATE watch_alerts SET ativo = 0, status = 'pausado', atualizado_em = ? WHERE id = ?`
+    ).run(formatDbDatetime(), id);
+    sendJson(res, 200, { ok: true });
+    return;
+  }
+
+  if (pathname === '/api/watch/status' && req.method === 'GET') {
+    sendJson(res, 200, getWatchStatus());
+    return;
+  }
+
+  if (pathname === '/api/watch/run' && req.method === 'POST') {
+    if (watchStatus === 'executando') {
+      sendJson(res, 409, { erro: true, mensagem: 'Já existe uma verificação em andamento' });
+      return;
+    }
+    executarWatchAlerts();
+    sendJson(res, 202, { ok: true, mensagem: 'Verificação iniciada' });
+    return;
+  }
+
   // ─── API: price history summary ──────────────────────────────
   if (pathname === '/api/history/summary' && req.method === 'GET') {
     const url = parsedUrl.searchParams.get('url');
@@ -618,15 +1118,45 @@ const server = http.createServer((req: http.IncomingMessage, res: http.ServerRes
   // ─── Legacy: servir da raiz ─────────────────────────────────
   const url = pathname === '/' ? '/index.html' : pathname;
   sendStatic(res, path.join(ROOT, url));
-});
+  });
+}
 
-server.listen(PORT, () => {
+function startServer(): http.Server {
+  const server = createServer();
+  server.listen(PORT, () => {
   iniciarScheduler();
+  iniciarWatchScheduler();
   console.log('');
   console.log('  ┌──────────────────────────────────────┐');
   console.log(`  │  🚀  ${String('http://localhost:' + String(PORT)).padEnd(26)}│`);
   console.log('  │                                      │');
   console.log(`  │  ⏰  Auto-busca a cada ${String(AUTO_INTERVAL_HOURS + 'h').padEnd(13)}│`);
+  console.log(`  │  🔔  Watch a cada ${String(WATCH_INTERVAL_HOURS + 'h').padEnd(18)}│`);
   console.log('  └──────────────────────────────────────┘');
   console.log('');
-});
+  });
+  return server;
+}
+
+export {
+  AUTO_INTERVAL_HOURS,
+  WATCH_INTERVAL_HOURS,
+  brlToCents,
+  calcularProximoHorarioIntervalo,
+  centsToBrl,
+  createServer,
+  db,
+  executarWatchAlerts,
+  formatApiDatetime,
+  formatDbDatetime,
+  getAutoStatus,
+  getWatchStatus,
+  initDatabase,
+  normalizarWatchAlert,
+  parseTargetPrice,
+  startServer,
+};
+
+if (require.main === module) {
+  startServer();
+}

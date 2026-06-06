@@ -54,6 +54,12 @@ interface ResultadoErro {
 
 type Resultado = ResultadoSucesso | ResultadoErro;
 
+type ResultadoProdutoUrl = Produto & {
+  site: string;
+  siteNome: string;
+  timestamp: string;
+};
+
 // ─── CONFIGURAÇÃO GLOBAL ────────────────────────────────────────────────
 const HEADLESS = true;
 const TIMEOUT = 30000;
@@ -688,6 +694,142 @@ async function buscarProduto(siteKey: string, termoBusca: string): Promise<Resul
   }
 }
 
+async function buscarProdutoPorUrl(siteKey: string, produtoUrl: string, nomeFallback = ''): Promise<ResultadoProdutoUrl> {
+  const site = SITES[siteKey];
+  if (!site) throw new Error(`Site "${siteKey}" não encontrado.`);
+
+  chromium.use(StealthPlugin());
+
+  const fingerprint = gerarFingerprint(siteKey);
+  const browser = await chromium.launch({
+    headless: HEADLESS,
+    args: ['--disable-blink-features=AutomationControlled'],
+  });
+  const context = await browser.newContext({
+    userAgent: fingerprint.userAgent,
+    viewport: fingerprint.viewport,
+    locale: 'pt-BR',
+    timezoneId: 'America/Sao_Paulo',
+  });
+  const page = await context.newPage();
+
+  await page.addInitScript((fp: Fingerprint) => {
+    Object.defineProperty(navigator, 'webdriver', { get: () => false });
+    Object.defineProperty(navigator, 'hardwareConcurrency', { get: () => fp.hardwareConcurrency });
+    Object.defineProperty(navigator, 'deviceMemory', { get: () => fp.deviceMemory });
+    Object.defineProperty(navigator, 'languages', { get: () => fp.languages });
+    Object.defineProperty(navigator, 'language', { get: () => fp.languages[0] });
+    Object.defineProperty(navigator, 'platform', { get: () => fp.platform });
+
+    const mimeTypes: any[] = [];
+    const pluginList = fp.plugins.map((plugin) => {
+      const pluginMimeTypes = plugin.mimeTypes.map((mimeType, mimeIndex) => {
+        const item = {
+          ...mimeType,
+          enabledPlugin: null as any,
+        };
+        mimeTypes.push(item);
+        return { item, mimeIndex };
+      });
+      const pluginObject: any = {
+        name: plugin.name,
+        filename: plugin.filename,
+        description: plugin.description,
+        length: pluginMimeTypes.length,
+        item: (i: number) => pluginMimeTypes[i]?.item || null,
+        namedItem: (name: string) => pluginMimeTypes.find(({ item }) => item.type === name)?.item || null,
+      };
+      pluginMimeTypes.forEach(({ item, mimeIndex }) => {
+        item.enabledPlugin = pluginObject;
+        Object.defineProperty(pluginObject, mimeIndex, { value: item, enumerable: true });
+      });
+      return pluginObject;
+    });
+
+    Object.defineProperty(navigator, 'plugins', {
+      get: () => ({
+        ...pluginList,
+        length: pluginList.length,
+        item: (i: number) => pluginList[i] || null,
+        namedItem: (name: string) => pluginList.find((plugin: any) => plugin.name === name) || null,
+        [Symbol.iterator]: function* () { for (const p of pluginList) yield p; },
+      }),
+    });
+    Object.defineProperty(navigator, 'mimeTypes', {
+      get: () => ({
+        ...mimeTypes,
+        length: mimeTypes.length,
+        item: (i: number) => mimeTypes[i] || null,
+        namedItem: (name: string) => mimeTypes.find((mimeType: any) => mimeType.type === name) || null,
+        [Symbol.iterator]: function* () { for (const mimeType of mimeTypes) yield mimeType; },
+      }),
+    });
+
+    const origGetParam = WebGLRenderingContext.prototype.getParameter;
+    WebGLRenderingContext.prototype.getParameter = function (p: number) {
+      if (p === 37445) return fp.webglVendor;
+      if (p === 37446) return fp.webglRenderer;
+      return origGetParam.call(this, p);
+    };
+    if (typeof WebGL2RenderingContext !== 'undefined') {
+      const origGetParam2 = WebGL2RenderingContext.prototype.getParameter;
+      WebGL2RenderingContext.prototype.getParameter = function (p: number) {
+        if (p === 37445) return fp.webglVendor;
+        if (p === 37446) return fp.webglRenderer;
+        return origGetParam2.call(this, p);
+      };
+    }
+  }, fingerprint);
+
+  try {
+    await page.goto(produtoUrl, { waitUntil: site.waitStrategy || 'domcontentloaded', timeout: TIMEOUT });
+    await randomWait(1200, 2500);
+    await comportamentoHumano(page, fingerprint.viewport);
+
+    const isChallenge = await detectarChallenge(page);
+    if (isChallenge) {
+      throw new Error('O site ativou um desafio de segurança.');
+    }
+
+    const produto = await page.evaluate((fallback: string) => {
+      const clean = (value: string | null | undefined) => (value || '').replace(/\s+/g, ' ').trim();
+      const meta = (selector: string) => clean(document.querySelector(selector)?.getAttribute('content'));
+      const title = clean(document.querySelector('h1')?.textContent)
+        || meta('meta[property="og:title"]')
+        || clean(document.title)
+        || fallback;
+      const bodyText = clean(document.body?.textContent);
+      const priceMatch = bodyText.match(/R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/);
+      const parcelMatch = bodyText.match(/\d{1,2}x\s+de\s+R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/i);
+      const image = meta('meta[property="og:image"]')
+        || meta('meta[name="twitter:image"]')
+        || clean(document.querySelector('img')?.getAttribute('src'));
+
+      return {
+        title,
+        price: priceMatch ? priceMatch[0] : null,
+        parcelamento: parcelMatch ? parcelMatch[0] : null,
+        image: image.startsWith('http') ? image : '',
+        url: location.href,
+        relevancia: 0,
+      };
+    }, nomeFallback);
+
+    if (!produto.title || !produto.price) {
+      throw new Error('Não foi possível identificar o preço atual na página do produto.');
+    }
+
+    return {
+      ...produto,
+      site: siteKey,
+      siteNome: site.nome,
+      timestamp: new Date().toISOString(),
+    };
+  } finally {
+    await browser.close();
+  }
+}
+
 // ─── PARSER DE ARGUMENTOS ───────────────────────────────────────────────
 
 function parseArgs(): { site: string; termo: string | null } {
@@ -708,8 +850,8 @@ function parseArgs(): { site: string; termo: string | null } {
 
 // ─── EXPORTS ────────────────────────────────────────────────────────────
 
-export { buscarProduto, SITES };
-export type { Produto, SiteConfig, Resultado };
+export { buscarProduto, buscarProdutoPorUrl, gerarCacheKey, normalizarTermo, ordenarPorRelevancia, SITES };
+export type { Produto, SiteConfig, Resultado, ResultadoProdutoUrl };
 
 // ─── EXECUÇÃO VIA CLI ───────────────────────────────────────────────────
 

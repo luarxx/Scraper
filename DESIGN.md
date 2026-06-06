@@ -111,7 +111,8 @@ Quatro estados visuais centralizados:
 6. **Trend badge** — indicador ▲/▼ com percentual (resumo do histórico)
 7. **Parcelamento** — badge slate-800/50 com borda, inline
 8. **PriceHistoryChart** — colapsável com sparkline e KPI (in/out), site color accent
-9. **Botão "Ir para a Loja"** — gradiente por loja, largura total, hover scale 1.02, active scale 0.98
+9. **Botão "Criar alerta"** — botão secundário slate com ícone `BellPlus`, usado para preencher a aba Watch com o produto atual
+10. **Botão "Ir para a Loja"** — gradiente por loja, largura total, hover scale 1.02, active scale 0.98
 
 **Comportamento:**
 - Fallback de imagem: mostra "∅" se `onError` disparar
@@ -152,6 +153,14 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - **Status "Não salvo"**: badge laranja quando há mudanças pendentes
 - **Botão "Salvar"**: mostra spinner durante save, checkmark quando salvo
 
+### WatchPanel
+- **Status bar**: 4 KPI tiles (Status, Próximo check, Alertas, Discord + botão Verificar)
+- **Formulário**: campos Nome, URL, Preço-alvo e seletor de site em button-group com cores por loja
+- **Lista de alertas**: cards compactos com nome, site, status, preço-alvo, último preço, último check e canal/disparo
+- **Discord state**: tile mostra "Configurado" ou "Sem webhook" para evitar falha silenciosa
+- **Estados**: loading inline, empty state com ícone `Bell`, erro em banner vermelho e badge "Salvo" após criação
+- **Produto específico**: quando aberto pelo ProductCard, preenche nome, URL, site e preço atual como sugestão de alvo
+
 ## Responsividade
 
 - Breakpoints Tailwind padrão (sm: 640px, md: 768px, lg: 1024px, xl: 1280px)
@@ -167,7 +176,8 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - Fundo `bg-surface/80` com `backdrop-blur-md`
 - Borda inferior sutil `border-white/[0.06]`
 - Mode toggle com botões `rounded-xl`, `font-bold`, padding `px-4 py-2`
-- Fonte Display para labels dos modos (Manual / Automática)
+- Modos: Manual, Automática e Watch
+- Fonte Display para labels dos modos
 - SearchForm em modo compacto dentro do header (apenas modo manual)
 
 ## Tipografia

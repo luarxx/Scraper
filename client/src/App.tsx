@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Search, Clock } from 'lucide-react';
+import { Search, Clock, Bell } from 'lucide-react';
 import { useSearch } from './hooks/useSearch';
 import { useSearchHistory } from './hooks/useSearchHistory';
 import { SearchForm } from './components/SearchForm';
@@ -7,7 +7,9 @@ import { SearchHistory } from './components/SearchHistory';
 import { ProductGrid } from './components/ProductGrid';
 import { StateMessage } from './components/StateMessage';
 import { AutoSearchPanel } from './components/AutoSearchPanel';
+import { WatchPanel } from './components/WatchPanel';
 import { Icon } from './components/Icon';
+import type { Produto, WatchDraft } from './types';
 import { formatBrazilDateTime } from './utils/date';
 
 const SITE_COLORS: Record<string, { text: string }> = {
@@ -16,9 +18,15 @@ const SITE_COLORS: Record<string, { text: string }> = {
   terabyteshop: { text: '#34d399' },
 };
 
+function priceToInput(price: string | null): string {
+  if (!price) return '';
+  return price.replace(/R\$\s*/i, '').trim();
+}
+
 export default function App() {
   const { loading, produtos, termo, siteKey, siteNome, timestamp, erro, search, fetchSites, sites } = useSearch();
-  const [modo, setModo] = useState<'manual' | 'auto'>('manual');
+  const [modo, setModo] = useState<'manual' | 'auto' | 'watch'>('manual');
+  const [watchDraft, setWatchDraft] = useState<WatchDraft | null>(null);
 
   useEffect(() => {
     fetchSites();
@@ -36,6 +44,16 @@ export default function App() {
 
   function handleHistorySelect(t: string, s: string) {
     search(t, s);
+  }
+
+  function handleCreateAlert(produto: Produto, productSiteKey: string) {
+    setWatchDraft({
+      nome: produto.title,
+      url: produto.url,
+      site: productSiteKey,
+      preco_alvo: priceToInput(produto.price),
+    });
+    setModo('watch');
   }
 
   const state = (() => {
@@ -76,6 +94,17 @@ export default function App() {
             >
               <Icon icon={Clock} size={14} /> <span>Automática</span>
             </button>
+            <button
+              onClick={() => setModo('watch')}
+              aria-pressed={modo === 'watch'}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                modo === 'watch'
+                  ? 'bg-accent text-white'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
+              }`}
+            >
+              <Icon icon={Bell} size={14} /> <span>Watch</span>
+            </button>
           </div>
           {modo === 'manual' && (
             <>
@@ -100,6 +129,14 @@ export default function App() {
         <main className="flex-1">
           <AutoSearchPanel sites={sites} />
         </main>
+      ) : modo === 'watch' ? (
+        <main className="flex-1">
+          <WatchPanel
+            sites={sites}
+            draft={watchDraft}
+            onDraftConsumed={() => setWatchDraft(null)}
+          />
+        </main>
       ) : (
         <>
           <SearchHistory history={history} onSelect={handleHistorySelect} />
@@ -115,7 +152,7 @@ export default function App() {
                     </span>
                   </span>
                 </div>
-                <ProductGrid produtos={produtos} siteKey={siteKey} />
+                <ProductGrid produtos={produtos} siteKey={siteKey} onCreateAlert={handleCreateAlert} />
                 <footer className="mt-14 text-center animate-[fadeIn_0.6s_ease-out_0.3s_both]">
                   <div className="w-6 h-px bg-white/[0.06] mx-auto mb-4" />
                   <p className="text-xs text-text-muted">

@@ -1,0 +1,26 @@
+@echo off
+setlocal
+
+set "VPS_USER=seu-usuario"
+set "VPS_HOST=seu-host-ou-ip"
+set "VPS_PORT=22"
+set "SSH_KEY=C:\caminho\para\sua-chave-privada"
+
+echo Conectando na VPS %VPS_USER%@%VPS_HOST%...
+echo.
+
+if defined SSH_KEY (
+  ssh -i "%SSH_KEY%" -p %VPS_PORT% %VPS_USER%@%VPS_HOST%
+) else (
+  ssh -p %VPS_PORT% %VPS_USER%@%VPS_HOST%
+)
+
+if errorlevel 1 (
+  echo.
+  echo Nao foi possivel conectar na VPS.
+  echo.
+  echo Verifique se a chave privada e o host estao corretos.
+  pause
+)
+
+endlocal

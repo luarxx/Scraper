@@ -39,7 +39,7 @@ export function StateMessage({ type, message, siteColor }: StateMessageProps) {
             />
           </div>
           <div className="flex items-center gap-1.5">
-            <p className="text-sm text-text-muted">Buscando</p>
+            <p className="text-sm text-text-muted">Consultando lojas de informatica...</p>
             <span className="flex gap-1">
               <span className="w-1 h-1 rounded-full bg-text-muted animate-[dotPulse_1.4s_ease-in-out_infinite]" />
               <span className="w-1 h-1 rounded-full bg-text-muted animate-[dotPulse_1.4s_ease-in-out_infinite]" style={{ animationDelay: '0.2s' }} />
@@ -64,10 +64,10 @@ export function StateMessage({ type, message, siteColor }: StateMessageProps) {
       {type === 'initial' && (
         <>
           <h2 className="font-sans text-lg font-medium text-text-primary mb-2">
-            Busque por produtos
+            Compare antes de comprar
           </h2>
           <p className="text-sm text-text-secondary leading-relaxed max-w-[280px]">
-            Digite o nome de um produto e escolha uma loja
+            Use a busca acima para encontrar precos, parcelamento e alertas de queda em lojas de hardware.
           </p>
         </>
       )}
@@ -75,10 +75,10 @@ export function StateMessage({ type, message, siteColor }: StateMessageProps) {
       {type === 'empty' && (
         <>
           <h2 className="font-sans text-lg font-medium text-text-primary mb-2">
-            Nenhum resultado
+            Nenhuma oferta encontrada
           </h2>
           <p className="text-sm text-text-secondary leading-relaxed max-w-[280px]">
-            Tente outro termo de busca
+            Tente buscar pelo modelo exato, como RTX 4060 8GB ou SSD NVMe 1TB.
           </p>
         </>
       )}
@@ -89,7 +89,7 @@ export function StateMessage({ type, message, siteColor }: StateMessageProps) {
             Algo deu errado
           </h2>
           <p className="text-sm text-text-secondary leading-relaxed max-w-[280px]">
-            {message || 'Ocorreu um erro inesperado.'}
+            {message || 'Nao consegui consultar as lojas agora. Tente novamente em alguns instantes.'}
           </p>
         </>
       )}

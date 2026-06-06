@@ -242,6 +242,14 @@ function extrairPrecoAtualTexto(siteKey: string, html: string): string | null {
   const $ = cheerio.load(html);
   const candidatos: { price: string; cents: number; score: number; index: number }[] = [];
   const seen = new Set<string>();
+  const bodyText = cleanText($('body').text());
+  const parcelTotals = Array.from(bodyText.matchAll(/(\d{1,2})x\s+de\s+R\$\s*(\d{1,3}(?:\.\d{3})*,\d{2})/gi))
+    .map((match) => {
+      const parcelas = Number(match[1]);
+      const valorParcela = centsFromPrice(`R$ ${match[2]}`);
+      return Number.isFinite(parcelas) && Number.isFinite(valorParcela) ? parcelas * valorParcela : null;
+    })
+    .filter((value): value is number => value !== null && value > 0);
 
   function centsFromPrice(price: string): number {
     return Number(price.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')) * 100;
@@ -267,6 +275,7 @@ function extrairPrecoAtualTexto(siteKey: string, html: string): string | null {
 
       const cents = Math.round(centsFromPrice(price));
       if (!Number.isFinite(cents) || cents <= 0) continue;
+      if (siteKey === 'kabum' && parcelTotals.some((total) => cents < total * 0.6)) continue;
       const key = `${price}:${match.index}`;
       if (seen.has(key)) continue;
       seen.add(key);
@@ -290,7 +299,7 @@ function extrairPrecoAtualTexto(siteKey: string, html: string): string | null {
     $(selector).each((_, el) => addFromText($(el).text(), 4));
   });
 
-  addFromText($('body').text(), 0);
+  addFromText(bodyText, 0);
 
   if (candidatos.length === 0) return null;
   candidatos.sort((a, b) => b.score - a.score || a.cents - b.cents || a.index - b.index);

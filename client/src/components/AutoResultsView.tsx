@@ -17,6 +17,7 @@ interface AutoResultsViewProps {
   loading: boolean;
   running: boolean;
   onRefresh: () => void;
+  onCreateAlert?: (produto: Produto, siteKey: string) => void;
 }
 
 function parsePrice(price: string | null): number {
@@ -89,9 +90,11 @@ interface TermoSectionProps {
   resultado: AutoResultadoItem;
   isOpen: boolean;
   onToggle: (id: number) => void;
+  updatedAt?: string | null;
+  onCreateAlert?: (produto: Produto, siteKey: string) => void;
 }
 
-const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle }: TermoSectionProps) {
+const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle, updatedAt, onCreateAlert }: TermoSectionProps) {
   const siteColor = SITE_COLORS[r.site] || SITE_COLORS.kabum;
   const stats = useMemo(
     () => (r.status === 'ok' ? getTermoStats(r.produtos) : null),
@@ -204,7 +207,7 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
                       </span>
                     </div>
                   )}
-                  <ProductGrid produtos={r.produtos} siteKey={r.site} />
+                  <ProductGrid produtos={r.produtos} siteKey={r.site} updatedAt={updatedAt} onCreateAlert={onCreateAlert} />
                 </>
               ) : r.status === 'ok' && r.produtos.length === 0 ? (
                 <div className="px-4 py-8 text-center text-sm text-text-muted">
@@ -228,7 +231,7 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
 });
 
 /* ─── Main Component ─────────────────────────────────────── */
-export function AutoResultsView({ execucao, resultados, loading, running, onRefresh }: AutoResultsViewProps) {
+export function AutoResultsView({ execucao, resultados, loading, running, onRefresh, onCreateAlert }: AutoResultsViewProps) {
   const [expanded, setExpanded] = useState<Set<number>>(() => new Set());
   const initializedRef = useRef(false);
 
@@ -381,6 +384,8 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
             resultado={r}
             isOpen={expanded.has(r.id)}
             onToggle={toggleExpand}
+            updatedAt={execucao.finalizada_em || execucao.iniciada_em}
+            onCreateAlert={onCreateAlert}
           />
         ))
       )}

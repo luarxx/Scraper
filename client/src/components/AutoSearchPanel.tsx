@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { Zap, Clock, Pause, CalendarClock, ClipboardList, Play, Settings, BarChart3 } from 'lucide-react';
+import { Zap, Clock, Pause, CalendarClock, ClipboardList, Play, Settings, BarChart3, ShieldCheck } from 'lucide-react';
 import type { Site } from '../types';
 import { useAutoConfig } from '../hooks/useAutoConfig';
 import { useAutoResults } from '../hooks/useAutoResults';
@@ -7,12 +7,14 @@ import { AutoConfigList } from './AutoConfigList';
 import { AutoResultsView } from './AutoResultsView';
 import { Icon } from './Icon';
 import { formatBrazilDateMonthTime } from '../utils/date';
+import type { Produto } from '../types';
 
 interface AutoSearchPanelProps {
   sites: Site[];
+  onCreateAlert?: (produto: Produto, siteKey: string) => void;
 }
 
-export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
+export function AutoSearchPanel({ sites, onCreateAlert }: AutoSearchPanelProps) {
   const [tab, setTab] = useState<'config' | 'results'>('config');
   const [nowMs, setNowMs] = useState(() => Date.now());
   const { configs, status, loading: configLoading, saving, error: configError, fetchConfig, fetchStatus, saveConfig, removeConfig } = useAutoConfig();
@@ -96,9 +98,41 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 pb-20 sm:pb-24 animate-[fadeIn_0.3s_ease-out]">
-      {/* Status bar — KPI tiles */}
+      <section className="mb-5 flex flex-col gap-4 rounded-xl border border-white/[0.06] bg-surface/45 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="max-w-3xl">
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-orange-300">
+            <Icon icon={ShieldCheck} size={14} />
+            Acompanhamento automatico
+          </div>
+          <h1 className="text-lg font-bold text-text-primary sm:text-xl">
+            Salve buscas para acompanhar novos precos sem repetir pesquisa
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            Cadastre ate 10 termos. O sistema consulta as lojas em ciclos agendados e guarda os resultados para comparar quando vale a pena comprar.
+          </p>
+        </div>
+        <button
+          onClick={handleTriggerRun}
+          disabled={running || isExecutando}
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {running ? (
+            <>
+              <span className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+              Iniciando
+            </>
+          ) : isExecutando ? (
+            'Executando agora'
+          ) : (
+            <>
+              <Icon icon={Play} size={15} />
+              Rodar busca agora
+            </>
+          )}
+        </button>
+      </section>
+
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 mb-6">
-        {/* Tile: Status */}
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]"
           style={{ animation: 'kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) 0s both' }}
@@ -119,7 +153,6 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           </div>
         </div>
 
-        {/* Tile: Next run */}
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]"
           style={{ animation: 'kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) 0.06s both' }}
@@ -137,7 +170,6 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           </div>
         </div>
 
-        {/* Tile: Last execution */}
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]"
           style={{ animation: 'kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) 0.12s both' }}
@@ -155,7 +187,6 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           </div>
         </div>
 
-        {/* Tile: Configured count */}
         <div
           className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]"
           style={{ animation: 'kpiStagger 0.4s cubic-bezier(0.16,1,0.3,1) 0.18s both' }}
@@ -169,29 +200,12 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
               {status?.total_configurados ?? 0} / 10
             </span>
           </div>
-          {/* Trigger button */}
-          <button
-            onClick={handleTriggerRun}
-            disabled={running || isExecutando}
-            className="shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg bg-accent text-white hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            {running ? (
-              <span className="flex items-center gap-1.5">
-                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Iniciando
-              </span>
-            ) : isExecutando ? (
-              'Executando…'
-            ) : (
-              <span className="flex items-center gap-1.5">
-                <Icon icon={Play} size={14} /> Executar
-              </span>
-            )}
-          </button>
+          <span className="shrink-0 rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[11px] font-semibold text-text-secondary">
+            Limite 10
+          </span>
         </div>
       </div>
 
-      {/* Sub-tabs */}
       <div className="flex gap-1 mb-6 p-1 rounded-xl bg-surface/60 border border-white/[0.06] w-fit">
         <button
           onClick={() => setTab('config')}
@@ -202,7 +216,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
               : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
           }`}
         >
-          <Icon icon={Settings} size={15} /> Configurar
+          <Icon icon={Settings} size={15} /> Configurar buscas
         </button>
         <button
           onClick={() => setTab('results')}
@@ -213,7 +227,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
               : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
           }`}
         >
-          <Icon icon={BarChart3} size={15} /> Resultados
+          <Icon icon={BarChart3} size={15} /> Precos encontrados
           {execucao && (
             <span className="ml-1.5 text-xs opacity-70">
               ({resultados.filter(r => r.status === 'ok').length}/{resultados.length})
@@ -222,14 +236,12 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
         </button>
       </div>
 
-      {/* Error banner */}
       {(configError || resultsError) && (
         <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-sm text-red-400">
           {configError || resultsError}
         </div>
       )}
 
-      {/* Content */}
       {tab === 'config' ? (
         <AutoConfigList
           sites={sites}
@@ -246,6 +258,7 @@ export function AutoSearchPanel({ sites }: AutoSearchPanelProps) {
           loading={resultsLoading}
           running={running || status?.status === 'executando'}
           onRefresh={fetchResults}
+          onCreateAlert={onCreateAlert}
         />
       )}
     </div>

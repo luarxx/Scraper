@@ -1,5 +1,13 @@
 # Design System — Scraper
 
+## Uso eficiente deste guia
+
+- Consulte este arquivo apenas em tarefas de UI, UX, layout, responsividade, motion, cores, tipografia ou componentes visuais.
+- Para ajustes pequenos em um componente, leia primeiro a seção do componente afetado e depois, se necessário, `Identidade Visual`, `Responsividade` ou `Convenções de Código`.
+- Não releia todo o guia para mudanças de backend, scraper, SQLite, deploy, testes ou documentação não visual.
+- Ao alterar um componente já documentado, mantenha a seção correspondente atualizada com uma frase curta; evite duplicar detalhes que já existem em `AGENTS.md`.
+- Para decisões rápidas, preserve o tema dark, accent laranja, cores por loja, foco visível e motion usado como feedback de estado.
+
 ## Identidade Visual
 
 | Atributo | Valor |
@@ -17,6 +25,12 @@
 | Texto secundário | `#94a3b8` (slate-400) |
 | Texto muted | `#64748b` (slate-500) |
 
+As cores principais são expostas por variáveis CSS customizadas via `@theme` em `client/src/index.css`. O accent laranja aparece em inputs, badges, botões, foco e seleção de texto.
+
+### Logo
+
+A marca usa o componente `Logo` com o asset `client/public/Logo.png`: símbolo com "S", lupa, tag de preço e acentos laranja/esmeralda. O mesmo PNG é usado como favicon para manter consistência entre header e aba do navegador.
+
 ## Cores por Loja
 
 | Loja | Cor Texto | Fundo Badge | Fundo Botão |
@@ -24,6 +38,8 @@
 | KaBuM! | `#f97316` laranja | `rgba(249,115,22,0.1)` | `linear-gradient(to right, #f97316, #f59e0b)` |
 | Pichau | `#ef4444` vermelho | `rgba(239,68,68,0.1)` | `linear-gradient(to right, #ef4444, #f43f5e)` |
 | Terabyte | `#34d399` esmeralda | `rgba(52,211,153,0.1)` | `linear-gradient(to right, #10b981, #14b8a6)` |
+
+As cores por loja devem permanecer sincronizadas entre `App.tsx`, `ProductCard.tsx`, `SearchHistory.tsx`, `AutoResultsView.tsx` e as variáveis/classes de apoio em `index.css`.
 
 ## Background
 
@@ -65,21 +81,24 @@ Uma camada sutil de ruído fractal (SVG `feTurbulence`, 35% opacity, `mix-blend-
 | `sparkDraw` | 0.6s | Desenho de sparkline SVG |
 | `panelSlideIn` | 0.35s | Conteúdo expansível (painéis de resultado) |
 | `kpiStagger` | 0.4s | KPI cards em cascata (entrada com translateY) |
+| `dotPing` | — | Indicadores pontuais de status |
 
 Todas as animações respeitam `prefers-reduced-motion: reduce`, que reduz transições/animações a duração mínima e desativa loops decorativos.
 
 ## Componentes
 
 ### SearchForm
-- Input de texto com placeholder "Ex: Ryzen 5 5600GT, RTX 4060"
+- Input de texto com placeholder "Ex: RTX 4060, Ryzen 7 5700X, SSD NVMe 1TB"
 - Borda laranja com ring discreto ao focar
 - Seletor de site em **abas** (botões lado a lado com fundo slate-900 e borda slate-800)
 - Aba ativa: cor da loja + fundo translúcido + animação `tabActivate`
-- Botão "Buscar" com cor sólida `accent`, hover `accent-hover` e foco visível
+- Botão "Comparar precos agora" com cor sólida `accent`, hover `accent-hover` e foco visível
 - Modo `compact` (header sticky) vs modo normal (página inicial)
+- A primeira tela do modo Buscar apresenta a promessa "Compare precos de informatica sem abrir varias abas" antes do input.
+- No estado inicial, o SearchForm aparece apenas no hero; o header compacto entra depois que a busca sai do estado inicial.
 
 ### SearchHistory
-- Aparece como pills horizontais abaixo do header
+- Aparece como pills contextuais abaixo do formulário no hero inicial ou junto do cabeçalho de resultados
 - Cada pill mostra o termo entre aspas e badge da loja
 - Máximo 5 entradas no localStorage
 - Clique reexecuta a busca
@@ -90,9 +109,9 @@ Quatro estados visuais centralizados:
 
 | Estado | Ícone | Título | Descrição |
 |---|---|---|---|
-| `initial` | Barra horizontal `w-5 h-px bg-accent` em círculo | "Busque por produtos" | "Digite o nome de um produto e escolha uma loja" |
-| `loading` | Radar animado (3 rings + sweep cônico + dot pulsante) + dots animados | — | "Buscando" + 3 dots pulsantes |
-| `empty` | Mesmo ícone do initial | "Nenhum resultado" | "Tente outro termo de busca" |
+| `initial` | Barra horizontal `w-5 h-px bg-accent` em círculo | "Compare antes de comprar" | Explica que a busca mostra precos, parcelamento e alertas |
+| `loading` | Radar animado (3 rings + sweep cônico + dot pulsante) + dots animados | — | "Consultando lojas de informatica..." |
+| `empty` | Mesmo ícone do initial | "Nenhuma oferta encontrada" | Sugere buscar pelo modelo exato |
 | `error` | Círculo com "!" em accent | "Algo deu errado" | Mensagem do erro ou fallback |
 
 ### ProductGrid
@@ -106,13 +125,14 @@ Quatro estados visuais centralizados:
 1. **Imagem no topo** — container branco com padding, imagem `object-contain`, hover scale 1.1; shimmer placeholder animado enquanto carrega
 2. **Badge "Melhor Opção"** — absoluta no canto superior esquerdo, cor da loja
 3. **Store badge** — nome da loja com cor + borda translúcida
-4. **Título** — fonte bold, `line-clamp-3`
-5. **Preço** — esmeralda, `font-black`, tamanho `text-xl sm:text-2xl`, com "De:" riscado se houver preço original
-6. **Trend badge** — indicador ▲/▼ com percentual (resumo do histórico)
-7. **Parcelamento** — badge slate-800/50 com borda, inline
-8. **PriceHistoryChart** — colapsável com sparkline e KPI (in/out), site color accent
-9. **Botão "Criar alerta"** — botão secundário slate com ícone `BellPlus`, usado para preencher a aba Watch com o produto atual
-10. **Botão "Ir para a Loja"** — gradiente por loja, largura total, hover scale 1.02, active scale 0.98
+4. **Linha de confianca** — origem da loja e ultima atualizacao da busca atual
+5. **Título** — fonte bold, `line-clamp-3`
+6. **Preço** — esmeralda, `font-black`, tamanho `text-xl sm:text-2xl`, com "De:" riscado se houver preço original
+7. **Trend badge** — indicador ▲/▼ com percentual (resumo do histórico)
+8. **Parcelamento** — badge slate-800/50 com borda, inline
+9. **PriceHistoryChart** — colapsável com sparkline e KPI (in/out), site color accent
+10. **Botão "Avisar quando baixar"** — botão secundário slate com ícone `BellPlus`, usado para preencher a aba Alertas com o produto atual
+11. **Botão "Ver oferta na loja"** — gradiente por loja, largura total, hover scale 1.02, active scale 0.98
 
 **Comportamento:**
 - Fallback de imagem: mostra "∅" se `onError` disparar
@@ -134,9 +154,10 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - Cor do valor configurável via prop `accent`
 
 ### AutoSearchPanel
-- **Status bar**: 3 KPI tiles (Status com dot animado, Próxima busca com countdown, Produtos configurados + botão Executar)
-- **Sub-tabs**: "⚙️ Configurar" e "📊 Resultados" com contagem de resultados
-- Trigger button: permanece estável quando idle e mostra spinner durante execução
+- **Painel de contexto**: explica o valor de salvar buscas para acompanhar novos precos sem repetir pesquisa e concentra o CTA "Rodar busca agora"
+- **Status bar**: 4 KPI tiles (Status com dot animado, Próxima busca com countdown, Última execução e Produtos configurados)
+- **Sub-tabs**: "Configurar buscas" e "Precos encontrados" com contagem de resultados
+- Trigger button: permanece estável quando idle e mostra spinner durante execução, fora dos KPI tiles para preservar leitura das métricas
 
 ### AutoResultsView
 - **Execution summary**: grid de 4 KPI cards (⏱ Início, ✅ Fim, 📦 Produtos, 👍 Sucesso/⚠️ Erros)
@@ -149,14 +170,15 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 ### AutoConfigList
 - **Entradas inline**: termo input + seletor de site em button-group (cores por loja) + drag handle funcional com card flutuante, slot de destino e suporte a teclado + botão remover
 - **Animações**: sem animação de entrada nas entries editáveis; usar apenas transições de borda/fundo para evitar flicker ao adicionar, editar ou reordenar
-- **Empty state**: ilustração SVG (caixa + lupa), título + descrição + CTA
+- **Empty state**: ilustração SVG (caixa + lupa), título, exemplos de termos e CTA "Salvar primeira busca"
 - **Status "Não salvo"**: badge laranja quando há mudanças pendentes
 - **Botão "Salvar"**: mostra spinner durante save, checkmark quando salvo
 
 ### WatchPanel
-- **Status bar**: 4 KPI tiles (Status, Próximo check, Alertas, Discord + botão Verificar)
+- **Painel de contexto**: explica que o alerta compara uma URL com o preco-alvo e envia aviso pelo Discord, com CTA "Verificar alertas"
+- **Status bar**: 4 KPI tiles (Status, Próximo check, Alertas e Discord)
 - **Formulário**: campos URL, Nome, Preço-alvo e seletor de site em button-group com cores por loja; Nome fica bloqueado enquanto a URL está sendo identificada
-- **Lista de alertas**: cards compactos com nome, site, status, preço-alvo, último preço, último check e canal/disparo
+- **Lista de alertas**: cards compactos com nome, site, status, preço-alvo, último preço, último check, canal/disparo e texto de confiança sobre a próxima verificação
 - **Discord state**: tile mostra "Configurado" ou "Sem webhook" para evitar falha silenciosa
 - **Estados**: loading inline, empty state com ícone `Bell`, erro em banner vermelho e badge "Salvo" após criação
 - **Produto específico**: quando aberto pelo ProductCard, preenche nome, URL, site e preço atual como sugestão de alvo
@@ -175,10 +197,11 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - Sticky no topo, `z-20`
 - Fundo `bg-surface/80` com `backdrop-blur-md`
 - Borda inferior sutil `border-white/[0.06]`
+- Logo à esquerda no desktop e centralizada no mobile, preservando o toggle de modos como controle principal
 - Mode toggle com botões `rounded-xl`, `font-bold`, padding `px-4 py-2`
-- Modos: Manual, Automática e Watch
+- Modos: Buscar, Buscas salvas e Alertas
 - Fonte Display para labels dos modos
-- SearchForm em modo compacto dentro do header (apenas modo manual)
+- SearchForm em modo compacto dentro do header (modo Buscar após o estado inicial)
 
 ## Tipografia
 

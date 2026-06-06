@@ -7,6 +7,8 @@ interface WatchAlertInput {
   site: string;
   canal: 'discord';
   preco_alvo: string;
+  ultimo_preco?: string | null;
+  ultimo_parcelamento?: string | null;
 }
 
 export function useWatchAlerts() {

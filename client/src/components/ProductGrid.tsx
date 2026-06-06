@@ -5,6 +5,7 @@ import { ProductCard } from './ProductCard';
 interface ProductGridProps {
   produtos: Produto[];
   siteKey: string;
+  updatedAt?: string | null;
   onCreateAlert?: (produto: Produto, siteKey: string) => void;
 }
 
@@ -13,7 +14,7 @@ function parsePrice(price: string | null): number {
   return parseFloat(price.replace(/[^\d,]/g, '').replace(',', '.'));
 }
 
-function ProductGridInner({ produtos, siteKey, onCreateAlert }: ProductGridProps) {
+function ProductGridInner({ produtos, siteKey, updatedAt, onCreateAlert }: ProductGridProps) {
   const { maxRelevancia, minPrice } = useMemo(() => {
     if (produtos.length === 0) return { maxRelevancia: 0, minPrice: Infinity };
     let maxRel = produtos[0].relevancia;
@@ -35,6 +36,7 @@ function ProductGridInner({ produtos, siteKey, onCreateAlert }: ProductGridProps
           produto={p}
           index={i}
           siteKey={siteKey}
+          updatedAt={updatedAt}
           onCreateAlert={onCreateAlert}
           isBestOption={
             p.relevancia === maxRelevancia && parsePrice(p.price) === minPrice

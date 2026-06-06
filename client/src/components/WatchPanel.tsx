@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Bell, CalendarClock, CheckCircle2, Clock, ExternalLink, Play, Trash2, Webhook, Zap } from 'lucide-react';
+import { Bell, CalendarClock, CheckCircle2, Clock, ExternalLink, Play, ShieldCheck, Trash2, Webhook, Zap } from 'lucide-react';
 import type { FormEvent } from 'react';
 import type { Site, WatchAlert, WatchDraft } from '../types';
 import { useWatchAlerts } from '../hooks/useWatchAlerts';
@@ -55,6 +55,7 @@ function isValidHttpUrl(value: string): boolean {
 function WatchAlertRow({ alert, onRemove }: { alert: WatchAlert; onRemove: (id: number) => void }) {
   const siteColor = SITE_COLORS[alert.site] ?? SITE_COLORS.kabum;
   const isDone = alert.status === 'disparado';
+  const currentPrice = alert.ultimo_preco_text || centsToBrl(alert.ultimo_preco_cents);
 
   return (
     <div className="rounded-xl border border-white/[0.06] bg-surface/60 p-4 animate-[fadeInUp_0.25s_ease-out_forwards]">
@@ -120,6 +121,11 @@ function WatchAlertRow({ alert, onRemove }: { alert: WatchAlert; onRemove: (id: 
           {alert.erro}
         </div>
       )}
+      {!alert.erro && !isDone && (
+        <p className="mt-3 text-xs leading-relaxed text-text-muted">
+          O proximo check compara o preco da pagina com seu alvo. Ultimo preco conhecido: <span className="font-semibold text-text-secondary">{currentPrice}</span>.
+        </p>
+      )}
     </div>
   );
 }
@@ -130,6 +136,8 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
   const [url, setUrl] = useState('');
   const [site, setSite] = useState('kabum');
   const [precoAlvo, setPrecoAlvo] = useState('');
+  const [ultimoPreco, setUltimoPreco] = useState<string | null>(null);
+  const [ultimoParcelamento, setUltimoParcelamento] = useState<string | null>(null);
   const [autoNome, setAutoNome] = useState('');
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [savedPulse, setSavedPulse] = useState(false);
@@ -162,6 +170,8 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
     setUrl(draft.url);
     setSite(draft.site);
     setPrecoAlvo(draft.preco_alvo);
+    setUltimoPreco(draft.ultimo_preco ?? null);
+    setUltimoParcelamento(draft.ultimo_parcelamento ?? null);
     setAutoNome(draft.nome);
     setPreviewError(null);
     onDraftConsumed();
@@ -211,10 +221,14 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
       site,
       canal: 'discord',
       preco_alvo: precoAlvo.trim(),
+      ultimo_preco: ultimoPreco,
+      ultimo_parcelamento: ultimoParcelamento,
     });
     setNome('');
     setUrl('');
     setPrecoAlvo('');
+    setUltimoPreco(null);
+    setUltimoParcelamento(null);
     setAutoNome('');
     setPreviewError(null);
     setSavedPulse(true);
@@ -228,6 +242,29 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-5 sm:pt-8 pb-20 sm:pb-24 animate-[fadeIn_0.3s_ease-out]">
+      <section className="mb-5 flex flex-col gap-4 rounded-xl border border-white/[0.06] bg-surface/45 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="max-w-3xl">
+          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+            <Icon icon={ShieldCheck} size={14} />
+            Aviso quando baixar
+          </div>
+          <h1 className="text-lg font-bold text-text-primary sm:text-xl">
+            Defina o preco ideal e receba alerta quando a loja chegar nele
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+            Cole a URL do produto, escolha a loja e informe seu preco-alvo. O monitor verifica a pagina periodicamente e envia o aviso pelo Discord.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleRun}
+          disabled={running || isRunning}
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {running || isRunning ? 'Verificando agora' : <><Icon icon={Play} size={15} /> Verificar alertas</>}
+        </button>
+      </section>
+
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 mb-6">
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface/60 border border-white/[0.06]">
           <span className="relative flex h-3 w-3 shrink-0">
@@ -267,14 +304,9 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
               {status?.webhook_configurado ? 'Configurado' : 'Sem webhook'}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={handleRun}
-            disabled={running || isRunning}
-            className="shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg bg-accent text-white hover:bg-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          >
-            {running || isRunning ? 'Verificando…' : <span className="flex items-center gap-1.5"><Icon icon={Play} size={14} /> Verificar</span>}
-          </button>
+          <span className="shrink-0 rounded-md border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[11px] font-semibold text-text-secondary">
+            Discord
+          </span>
         </div>
       </div>
 
@@ -284,11 +316,11 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,420px)_1fr] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,360px)_1fr] gap-5">
         <form onSubmit={handleSubmit} className="rounded-xl bg-surface/60 border border-white/[0.06] p-4 sm:p-5 h-fit">
           <div className="flex items-center gap-2 mb-4">
             <Icon icon={Bell} size={18} style={{ color: '#f97316' }} />
-            <h2 className="text-base font-semibold text-text-primary">Novo alerta</h2>
+            <h2 className="text-base font-semibold text-text-primary">Novo alerta de preco</h2>
             {savedPulse && (
               <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-emerald-300">
                 <Icon icon={CheckCircle2} size={14} /> Salvo
@@ -302,7 +334,7 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             className="w-full rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-orange-400"
-            placeholder="https://..."
+            placeholder="https://www.kabum.com.br/produto/..."
           />
           {(previewing || previewError) && (
             <p className={`mt-2 text-xs ${previewError ? 'text-amber-300' : 'text-text-muted'}`}>
@@ -324,7 +356,7 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
             placeholder={previewing ? 'Identificando produto...' : 'Ex: RTX 4060 branca'}
           />
 
-          <label className="block text-xs font-medium text-text-secondary mb-1.5 mt-4" htmlFor="watch-price">Preço-alvo</label>
+          <label className="block text-xs font-medium text-text-secondary mb-1.5 mt-4" htmlFor="watch-price">Preco-alvo para avisar</label>
           <input
             id="watch-price"
             value={precoAlvo}
@@ -358,12 +390,16 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
             })}
           </div>
 
+          <p className="mt-4 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs leading-relaxed text-text-secondary">
+            O preco atual do card vira sugestao quando voce cria o alerta a partir de uma oferta. Ajuste para o valor que faria a compra valer a pena.
+          </p>
+
           <button
             type="submit"
             disabled={saving}
             className="mt-5 w-full rounded-lg bg-accent px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {saving ? 'Salvando…' : 'Criar alerta'}
+            {saving ? 'Salvando...' : 'Avisar quando baixar'}
           </button>
         </form>
 
@@ -375,8 +411,8 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
           ) : alerts.length === 0 ? (
             <div className="rounded-xl border border-white/[0.06] bg-surface/60 p-8 text-center">
               <Icon icon={Bell} size={28} className="mx-auto text-slate-500" />
-              <p className="mt-3 text-sm font-semibold text-text-primary">Nenhum alerta cadastrado</p>
-              <p className="mt-1 text-xs text-text-muted">Crie pelo formulário ou pelo botão em um card de produto.</p>
+              <p className="mt-3 text-sm font-semibold text-text-primary">Nenhum alerta de preco ainda</p>
+              <p className="mt-1 text-xs text-text-muted">Use o botao "Avisar quando baixar" em uma oferta ou cole a URL do produto aqui.</p>
             </div>
           ) : (
             alerts.map((alert) => (

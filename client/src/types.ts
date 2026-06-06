@@ -128,6 +128,8 @@ export interface WatchDraft {
   url: string;
   site: string;
   preco_alvo: string;
+  ultimo_preco?: string | null;
+  ultimo_parcelamento?: string | null;
 }
 
 export interface WatchProductPreview extends Produto {

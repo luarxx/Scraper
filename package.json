@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently --kill-others \"cd client && npx vite\" \"tsx watch server.ts\"",
+    "dev": "node scripts/dev-local.mjs",
+    "dev:fixed": "concurrently --kill-others \"cd client && vite\" \"tsx watch server.ts\"",
+    "dev:local": "node scripts/dev-local.mjs",
     "dev:server": "tsx server.ts",
-    "dev:client": "cd client && npx vite",
+    "dev:client": "cd client && vite",
     "build": "tsc",
     "build:client": "cd client && npm run build",
     "build:prod": "npm run build:client && npm run build",

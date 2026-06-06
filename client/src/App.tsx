@@ -55,6 +55,7 @@ export default function App() {
       preco_alvo: priceToInput(produto.price),
       ultimo_preco: produto.price,
       ultimo_parcelamento: produto.parcelamento,
+      skipPreview: true,
     });
     setModo('watch');
   }

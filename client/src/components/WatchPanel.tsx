@@ -142,6 +142,8 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [savedPulse, setSavedPulse] = useState(false);
   const previewKeyRef = useRef('');
+  const skipPreviewKeyRef = useRef('');
+  const prevStatusRef = useRef<string | undefined>(undefined);
   const { alerts, status, loading, saving, running, previewing, error, fetchAlerts, fetchStatus, previewProduct, createAlert, removeAlert, triggerRun } = useWatchAlerts();
 
   const activeSites = useMemo(() => sites.length > 0 ? sites : [
@@ -165,6 +167,32 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
   }, []);
 
   useEffect(() => {
+    if (status?.status !== 'executando') return;
+    const id = setInterval(() => {
+      fetchStatus();
+    }, 5000);
+    return () => clearInterval(id);
+  }, [status?.status, fetchStatus]);
+
+  useEffect(() => {
+    if (!status?.proxima_execucao || status.status === 'executando') return;
+    const delay = Math.max(new Date(status.proxima_execucao).getTime() - Date.now() + 1500, 0);
+    const id = setTimeout(() => {
+      fetchStatus();
+    }, delay);
+    return () => clearTimeout(id);
+  }, [status?.proxima_execucao, status?.status, fetchStatus]);
+
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    const curr = status?.status;
+    if (prev === 'executando' && curr !== 'executando') {
+      fetchAlerts();
+    }
+    prevStatusRef.current = curr;
+  }, [status?.status, fetchAlerts]);
+
+  useEffect(() => {
     if (!draft) return;
     setNome(draft.nome);
     setUrl(draft.url);
@@ -174,6 +202,8 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
     setUltimoParcelamento(draft.ultimo_parcelamento ?? null);
     setAutoNome(draft.nome);
     setPreviewError(null);
+    skipPreviewKeyRef.current = draft.skipPreview ? `${draft.site}|${draft.url.trim()}` : '';
+    previewKeyRef.current = '';
     onDraftConsumed();
   }, [draft, onDraftConsumed]);
 
@@ -186,6 +216,7 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
     }
     if (nome.trim() && nome !== autoNome) return;
     const previewKey = `${site}|${trimmedUrl}`;
+    if (skipPreviewKeyRef.current === previewKey) return;
     if (previewKeyRef.current === previewKey) return;
 
     const controller = new AbortController();
@@ -237,6 +268,7 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
 
   async function handleRun() {
     await triggerRun();
+    fetchStatus();
     setTimeout(refreshAll, 1600);
   }
 
@@ -316,7 +348,7 @@ export function WatchPanel({ sites, draft, onDraftConsumed }: WatchPanelProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,360px)_1fr] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(320px,360px)_minmax(0,1fr)] gap-5">
         <form onSubmit={handleSubmit} className="rounded-xl bg-surface/60 border border-white/[0.06] p-4 sm:p-5 h-fit">
           <div className="flex items-center gap-2 mb-4">
             <Icon icon={Bell} size={18} style={{ color: '#f97316' }} />

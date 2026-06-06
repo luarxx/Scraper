@@ -130,6 +130,7 @@ export interface WatchDraft {
   preco_alvo: string;
   ultimo_preco?: string | null;
   ultimo_parcelamento?: string | null;
+  skipPreview?: boolean;
 }
 
 export interface WatchProductPreview extends Produto {

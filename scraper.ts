@@ -240,9 +240,9 @@ function cleanText(value: string | null | undefined): string {
 
 function extrairPrecoAtualTexto(siteKey: string, html: string): string | null {
   const $ = cheerio.load(html);
-  const candidatos: { price: string; cents: number; score: number; index: number }[] = [];
-  const seen = new Set<string>();
+  type PrecoCandidato = { price: string; cents: number; score: number; index: number };
   const bodyText = cleanText($('body').text());
+  const priceRegex = /R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/g;
   const parcelTotals = Array.from(bodyText.matchAll(/(\d{1,2})x\s+de\s+R\$\s*(\d{1,3}(?:\.\d{3})*,\d{2})/gi))
     .map((match) => {
       const parcelas = Number(match[1]);
@@ -255,55 +255,141 @@ function extrairPrecoAtualTexto(siteKey: string, html: string): string | null {
     return Number(price.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')) * 100;
   }
 
-  function addFromText(text: string, baseScore = 0): void {
-    const source = cleanText(text);
-    const regex = /R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/g;
-    let match: RegExpExecArray | null;
+  function criarColetor(): { candidatos: PrecoCandidato[]; addFromText: (text: string, baseScore?: number) => void } {
+    const candidatos: PrecoCandidato[] = [];
+    const seen = new Set<string>();
 
-    while ((match = regex.exec(source))) {
-      const price = match[0].trim();
-      const before = source.slice(Math.max(0, match.index - 80), match.index).toLowerCase();
-      const after = source.slice(match.index + price.length, match.index + price.length + 120).toLowerCase();
-      const context = `${before} ${after}`;
-      if (/\d{1,2}\s*x\s*(?:de)?\s*$/.test(before) || /parcel|sem juros|juros|cart[aã]o|boleto/.test(context)) continue;
+    function addFromText(text: string, baseScore = 0): void {
+      const source = cleanText(text);
+      let match: RegExpExecArray | null;
 
-      let score = baseScore;
-      if (/pix|à vista|a vista|pre[cç]o final|pre[cç]o atual|cash/.test(context)) score += 8;
-      if (/desconto|promo[cç][aã]o|oferta|por\b/.test(context)) score += 3;
-      if (/\bde\s*$|pre[cç]o antigo|pre[cç]o anterior|economize/.test(before)) score -= 8;
-      if (siteKey === 'kabum' && /pix|à vista|a vista/.test(context)) score += 4;
+      while ((match = priceRegex.exec(source))) {
+        const price = match[0].trim();
+        const before = source.slice(Math.max(0, match.index - 80), match.index).toLowerCase();
+        const after = source.slice(match.index + price.length, match.index + price.length + 120).toLowerCase();
+        const context = `${before} ${after}`;
+        const beforeNear = before.slice(-24);
+        const afterNear = after.slice(0, 42);
+        if (/\d{1,2}\s*x\s*(?:de)?\s*$/.test(beforeNear) || /^(?:\s*(?:sem juros|juros|no cart[aã]o|cart[aã]o|em at[eé]|s\/juros))/.test(afterNear)) continue;
 
-      const cents = Math.round(centsFromPrice(price));
-      if (!Number.isFinite(cents) || cents <= 0) continue;
-      if (siteKey === 'kabum' && parcelTotals.some((total) => cents < total * 0.6)) continue;
-      const key = `${price}:${match.index}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      candidatos.push({ price, cents, score, index: match.index });
+        let score = baseScore;
+        if (/pix|à vista|a vista|boleto|pre[cç]o final|cash/.test(context)) score += 8;
+        if (/pre[cç]o atual/.test(context)) score += siteKey === 'terabyteshop' ? 1 : 5;
+        if (/desconto|promo[cç][aã]o|oferta|por\b/.test(context)) score += 3;
+        if (siteKey === 'terabyteshop' && /pix|à vista|a vista|boleto/.test(context)) score += 8;
+        if (siteKey === 'terabyteshop' && /\bpor:\s*$/.test(before)) score += 10;
+        if (/\bde:?\s*$|pre[cç]o antigo|pre[cç]o anterior|economize|era\s*$/.test(before)) score -= 14;
+        if (/hist[oó]rico|compre junto|comprar junto|veja tamb[eé]m|produto recomendado|t[ií]tulo do produto|link de compartilhamento/.test(context)) score -= 12;
+        if (siteKey === 'kabum' && /pix|à vista|a vista/.test(context)) score += 4;
+        if (siteKey === 'pichau' && /à vista|a vista|pix|boleto/.test(context)) score += 6;
+
+        const cents = Math.round(centsFromPrice(price));
+        if (!Number.isFinite(cents) || cents <= 0) continue;
+        if (parcelTotals.some((total) => cents < total * 0.6)) continue;
+        const key = `${price}:${match.index}:${baseScore}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        candidatos.push({ price, cents, score, index: match.index });
+      }
+
+      priceRegex.lastIndex = 0;
     }
+
+    return { candidatos, addFromText };
   }
 
-  const selectors = [
-    '[class*="finalPrice"]',
-    '[class*="priceCard"]',
-    '[class*="price"]',
-    '[data-testid*="price"]',
-    '[id*="price"]',
-    '[class*="pix"]',
-    '[data-testid*="pix"]',
-    '[class*="avista"]',
-    '[class*="aVista"]',
+  function melhor(candidatos: PrecoCandidato[]): string | null {
+    if (candidatos.length === 0) return null;
+    candidatos.sort((a, b) => b.score - a.score || a.index - b.index || a.cents - b.cents);
+    return candidatos[0].price;
+  }
+
+  function coletarPorSeletores(selectors: { selector: string; score: number }[]): PrecoCandidato[] {
+    const coletor = criarColetor();
+    selectors.forEach(({ selector, score }) => {
+      $(selector).each((_, el) => {
+        const attrText = cleanText([
+          $(el).attr('class'),
+          $(el).attr('id'),
+          $(el).attr('data-testid'),
+          $(el).attr('aria-label'),
+        ].filter(Boolean).join(' ')).toLowerCase();
+        if (/hist[oó]rico|review|rating|seller|similar|recomend/.test(attrText)) return;
+        coletor.addFromText($(el).text(), score);
+      });
+    });
+    return coletor.candidatos;
+  }
+
+  function extrairKabum(): string | null {
+    const coletor = criarColetor();
+    Array.from(bodyText.matchAll(/(R\$\s*\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:à vista|a vista)\s+no\s+pix[\s\S]{0,180}comprar agora/gi))
+      .forEach((match) => coletor.addFromText(`${match[1]} à vista no PIX comprar agora`, 44));
+    Array.from(bodyText.matchAll(/(R\$\s*\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:à vista|a vista)\s+no\s+pix\s+com\s+\d+%\s+de\s+desconto/gi))
+      .forEach((match) => coletor.addFromText(`${match[1]} à vista no PIX com desconto`, 30));
+    coletarPorSeletores([
+      { selector: '[class*="finalPrice"], [data-testid*="finalPrice"]', score: 24 },
+      { selector: '[class*="pix"], [data-testid*="pix"]', score: 20 },
+      { selector: '[class*="aVista"], [class*="avista"]', score: 18 },
+      { selector: '[class*="priceCard"]', score: 8 },
+      { selector: '[class*="price"], [data-testid*="price"], [id*="price"]', score: 4 },
+    ]).forEach((candidato) => coletor.candidatos.push(candidato));
+    return melhor(coletor.candidatos);
+  }
+
+  function extrairPichau(): string | null {
+    const candidatos = coletarPorSeletores([
+      { selector: '[class*="price_vista"], [class*="priceVista"], [data-testid*="price-vista"]', score: 24 },
+      { selector: '[class*="price_total"], [class*="priceTotal"], [data-testid*="price-total"]', score: 18 },
+      { selector: '[class*="pix"], [class*="boleto"], [class*="avista"], [class*="aVista"]', score: 16 },
+      { selector: '[class*="price"], [data-testid*="price"], [id*="price"]', score: 4 },
+    ]);
+    return melhor(candidatos);
+  }
+
+  function extrairTerabyte(): string | null {
+    const coletor = criarColetor();
+    Array.from(bodyText.matchAll(/(?:^|\s)por:\s*(R\$\s*\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:à vista|a vista|com|no pix|pix|boleto)/gi))
+      .forEach((match) => coletor.addFromText(match[0], 32));
+    Array.from(bodyText.matchAll(/(R\$\s*\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:à vista|a vista)\s+(?:com|no|pix|boleto)/gi))
+      .forEach((match) => coletor.addFromText(match[0], 26));
+    coletarPorSeletores([
+      { selector: '[class*="valVista"], [id*="valVista"], [class*="vista"], [class*="pix"], [class*="boleto"]', score: 22 },
+      { selector: '[class*="prod-new-price"], [class*="new-price"], [class*="price"]', score: 6 },
+    ]).forEach((candidato) => coletor.candidatos.push(candidato));
+    return melhor(coletor.candidatos);
+  }
+
+  const especifico = siteKey === 'kabum'
+    ? extrairKabum()
+    : siteKey === 'pichau'
+      ? extrairPichau()
+      : siteKey === 'terabyteshop'
+        ? extrairTerabyte()
+        : null;
+  if (especifico) return especifico;
+
+  const fallback = criarColetor();
+  const selectors: { selector: string; score: number }[] = [
+    { selector: '[class*="finalPrice"], [data-testid*="finalPrice"]', score: 14 },
+    { selector: '[class*="priceCard"]', score: 4 },
+    { selector: '[class*="price"], [data-testid*="price"], [id*="price"]', score: 4 },
+    { selector: '[class*="pix"], [data-testid*="pix"]', score: 6 },
+    { selector: '[class*="avista"], [class*="aVista"]', score: 6 },
   ];
 
-  selectors.forEach((selector) => {
-    $(selector).each((_, el) => addFromText($(el).text(), 4));
-  });
+  coletarPorSeletores(selectors).forEach((candidato) => fallback.candidatos.push(candidato));
 
-  addFromText(bodyText, 0);
+  if (siteKey === 'terabyteshop') {
+    Array.from(bodyText.matchAll(/(?:^|\s)por:\s*(R\$\s*\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:à vista|a vista|com)/gi))
+      .forEach((match) => fallback.addFromText(match[0], 18));
+    Array.from(bodyText.matchAll(/(R\$\s*\d{1,3}(?:\.\d{3})*,\d{2})\s*(?:à vista|a vista)\s+com\s+\d+%\s+de\s+desconto/gi))
+      .forEach((match) => fallback.addFromText(match[0], 18));
+  }
 
-  if (candidatos.length === 0) return null;
-  candidatos.sort((a, b) => b.score - a.score || a.cents - b.cents || a.index - b.index);
-  return candidatos[0].price;
+  fallback.addFromText(bodyText, 0);
+
+  return melhor(fallback.candidatos);
 }
 
 function extrairProdutoPorUrlHtml(siteKey: string, html: string, url: string, nomeFallback = ''): Produto {

@@ -26,16 +26,16 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
   }
 
   const inputClasses = compact
-    ? 'py-2.5 pl-11 pr-28 text-sm'
-    : 'py-4 pl-12 pr-32 text-base';
+    ? 'py-2.5 pl-11 pr-44 text-sm'
+    : 'py-4 pl-12 pr-56 text-base max-sm:pr-4';
 
   const btnClasses = compact
-    ? 'px-4 py-1.5 text-xs'
-    : 'px-6 py-3 text-sm';
+    ? 'px-3 py-1.5 text-[11px] max-[420px]:px-2 max-[420px]:text-[10px]'
+    : 'px-6 py-3 text-sm max-sm:static max-sm:w-full max-sm:justify-center';
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="relative flex items-center">
+      <div className={`relative flex ${compact ? 'items-center' : 'items-center max-sm:flex-col max-sm:items-stretch max-sm:gap-2'}`}>
         <span className="absolute left-4 text-slate-500 pointer-events-none z-10">
           <Icon icon={Search} size={20} strokeWidth={2.5} />
         </span>
@@ -45,7 +45,7 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
           onChange={e => setQ(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="Ex: Ryzen 5 5600GT, RTX 4060"
+          placeholder="Ex: RTX 4060, Ryzen 7 5700X, SSD NVMe 1TB"
           className={`w-full bg-slate-900 border rounded-xl text-slate-100 placeholder-slate-400 focus:outline-none transition-colors ${inputClasses}`}
           style={{
             borderColor: focused ? 'rgba(249, 115, 22, 0.65)' : '#1e293b',
@@ -59,7 +59,7 @@ export function SearchForm({ onSearch, loading, compact }: SearchFormProps) {
           disabled={loading}
           className={`absolute right-2 bg-accent hover:bg-accent-hover text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300 ${btnClasses}`}
         >
-          {loading ? 'Buscando…' : 'Buscar'}
+          {loading ? 'Comparando...' : 'Comparar precos agora'}
         </button>
       </div>
 

@@ -62,6 +62,31 @@ describe('site extractors', () => {
     });
   });
 
+  it('ignora valor de parcela como preço atual por URL da KaBuM!', () => {
+    const produto = extrairProdutoPorUrlHtml('kabum', `
+      <html>
+        <head>
+          <meta property="og:title" content="Placa De Video RTX5050">
+        </head>
+        <body>
+          <h1>Placa De Video RTX5050</h1>
+          <section>
+            <span class="price-installment">R$ 289,99</span>
+            <span>10x de R$ 252,84 sem juros</span>
+            <strong class="finalPrice">R$ 2.224,99 no Pix</strong>
+          </section>
+        </body>
+      </html>
+    `, 'https://www.kabum.com.br/produto/905341/placa-de-video-rtx5050', 'Fallback');
+
+    expect(produto).toMatchObject({
+      title: 'Placa De Video RTX5050',
+      price: 'R$ 2.224,99',
+      parcelamento: '10x de R$ 252,84',
+      url: 'https://www.kabum.com.br/produto/905341/placa-de-video-rtx5050',
+    });
+  });
+
   it('extrai produtos KaBuM! de fixture HTML', () => {
     const produtos = withDocument(`
       <a href="/produto/1/placa-video">

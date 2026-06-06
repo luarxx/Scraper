@@ -10,6 +10,8 @@ loadEnv();
 process.env.TZ = 'America/Sao_Paulo';
 
 const PORT = Number(process.env.PORT || 3000);
+const PORT_AUTO_FALLBACK = !process.env.PORT && process.env.PORT_STRICT !== '1';
+const PORT_MAX_ATTEMPTS = Number(process.env.PORT_MAX_ATTEMPTS || 10);
 const APP_TIME_ZONE = 'America/Sao_Paulo';
 const APP_TIME_OFFSET = '-03:00';
 const CLIENT_DIST = path.join(ROOT, 'client', 'dist');
@@ -133,6 +135,8 @@ function brlToCents(price: string | null): number | null {
   const lastComma = s.lastIndexOf(',');
   if (lastComma > lastDot) {
     s = s.replace(/\./g, '').replace(',', '.');
+  } else if (lastDot !== -1 && lastComma === -1 && /^\d{1,3}(?:\.\d{3})+$/.test(s)) {
+    s = s.replace(/\./g, '');
   } else {
     s = s.replace(/,/g, '');
   }
@@ -264,10 +268,6 @@ const AUTO_INTERVAL_HOURS = Number.isFinite(configuredIntervalHours)
 const INTERVALO_MS = AUTO_INTERVAL_HOURS * 60 * 60 * 1000;
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 const DISCORD_WEBHOOK_AVATAR_URL = process.env.DISCORD_WEBHOOK_AVATAR_URL || '';
-const configuredDiscordTopN = Number(process.env.DISCORD_ALERT_TOP_N);
-const DISCORD_ALERT_TOP_N = Number.isFinite(configuredDiscordTopN)
-  ? Math.max(1, Math.min(5, Math.floor(configuredDiscordTopN)))
-  : 1;
 let schedulerStatus: 'idle' | 'executando' | 'agendado' = 'idle';
 let proximaExecucao: string | null = null;
 let schedulerTimer: ReturnType<typeof setInterval> | null = null;
@@ -301,106 +301,12 @@ type WatchAlertRow = {
   atualizado_em: string;
 };
 
-type DiscordResultado = {
-  termo: string;
-  site: string;
-  status: string;
-  total: number;
-  produtos: Produto[] | null;
-  erro: string | null;
-};
-
 function truncateDiscord(value: string, max: number): string {
   return value.length > max ? `${value.slice(0, max - 1)}…` : value;
 }
 
 function siteNome(site: string): string {
   return SITES[site]?.nome || site;
-}
-
-function produtoParaLinha(produto: Produto, index: number): string {
-  const preco = produto.price || 'Preço indisponível';
-  const parcelas = produto.parcelamento ? ` | ${produto.parcelamento}` : '';
-  return `${index + 1}. [${truncateDiscord(produto.title, 90)}](${produto.url}) — ${preco}${parcelas}`;
-}
-
-function parseProdutosJson(value: string | null): Produto[] | null {
-  if (!value) return null;
-  try {
-    return JSON.parse(value) as Produto[];
-  } catch {
-    return null;
-  }
-}
-
-async function enviarAlertaDiscord(execucaoId: number): Promise<void> {
-  if (!DISCORD_WEBHOOK_URL) return;
-
-  const resultados = db.prepare(
-    `SELECT termo, site, status, total, produtos, erro FROM auto_resultados WHERE execucao_id = ? ORDER BY id`
-  ).all(execucaoId) as {
-    termo: string;
-    site: string;
-    status: string;
-    total: number;
-    produtos: string | null;
-    erro: string | null;
-  }[];
-
-  const parsed: DiscordResultado[] = resultados.map((r) => ({
-    ...r,
-    produtos: parseProdutosJson(r.produtos),
-  }));
-
-  const ok = parsed.filter((r) => r.status === 'ok').length;
-  const erros = parsed.filter((r) => r.status === 'erro').length;
-  const totalProdutos = parsed.reduce((acc, r) => acc + (r.total || 0), 0);
-
-  const description = parsed.map((resultado) => {
-    if (resultado.status === 'erro') {
-      return `**${resultado.termo}** (${siteNome(resultado.site)}): erro ao buscar - ${truncateDiscord(resultado.erro || 'sem detalhes', 120)}`;
-    }
-
-    const produtos = (resultado.produtos || []).slice(0, DISCORD_ALERT_TOP_N);
-    if (produtos.length === 0) {
-      return `**${resultado.termo}** (${siteNome(resultado.site)}): nenhum produto encontrado`;
-    }
-
-    return [
-      `**${resultado.termo}** (${siteNome(resultado.site)})`,
-      ...produtos.map(produtoParaLinha),
-    ].join('\n');
-  }).join('\n\n');
-
-  const body = {
-    username: 'Scraper de Preços',
-    ...(DISCORD_WEBHOOK_AVATAR_URL ? { avatar_url: DISCORD_WEBHOOK_AVATAR_URL } : {}),
-    embeds: [{
-      title: 'Alertas de preço',
-      description: truncateDiscord(description || 'Nenhum resultado para enviar.', 3900),
-      color: erros > 0 ? 0xf97316 : 0x22c55e,
-      footer: {
-        text: `${parsed.length} termo(s) | ${ok} ok | ${erros} erro(s) | ${totalProdutos} produto(s)`,
-      },
-      timestamp: new Date().toISOString(),
-    }],
-  };
-
-  try {
-    const response = await fetch(DISCORD_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const detail = await response.text();
-      console.error(`[Discord] Falha ao enviar alerta: ${response.status} ${truncateDiscord(detail, 180)}`);
-    }
-  } catch (err: unknown) {
-    const error = err as Error;
-    console.error(`[Discord] Falha ao enviar alerta: ${error.message}`);
-  }
 }
 
 async function enviarWatchDiscord(alerta: WatchAlertRow, precoAtualCents: number, precoAtualText: string, parcelamento: string | null): Promise<boolean> {
@@ -544,7 +450,6 @@ async function executarAutoBuscas(): Promise<void> {
   const totalProdutos = resultados.reduce((acc, r) => acc + (r.total || 0), 0);
 
   console.log(`[Busca Automática] Concluída — ${resultados.length} termo(s), ${ok} ok, ${erros} erro(s), ${totalProdutos} produto(s) no total`);
-  await enviarAlertaDiscord(execucaoId);
 
   schedulerStatus = 'agendado';
   proximaExecucao = formatApiDatetime(calcularProximoHorario());
@@ -745,7 +650,7 @@ function getWatchStatus(): {
 
 function createServer(): http.Server {
   return http.createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-  const parsedUrl = new URL(req.url!, `http://localhost:${PORT}`);
+  const parsedUrl = new URL(req.url!, `http://${req.headers.host || `localhost:${PORT}`}`);
   const pathname = parsedUrl.pathname;
 
   // ─── API: busca ────────────────────────────────────────────────
@@ -949,12 +854,31 @@ function createServer(): http.Server {
     req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
     req.on('end', () => {
       try {
-        const data = JSON.parse(body) as { nome?: string; url?: string; site?: string; canal?: string; preco_alvo?: unknown; preco_alvo_cents?: unknown };
+        const data = JSON.parse(body) as {
+          nome?: string;
+          url?: string;
+          site?: string;
+          canal?: string;
+          preco_alvo?: unknown;
+          preco_alvo_cents?: unknown;
+          ultimo_preco?: unknown;
+          ultimo_preco_cents?: unknown;
+          ultimo_parcelamento?: unknown;
+        };
         const nome = (data.nome || '').trim();
         const url = (data.url || '').trim();
         const site = (data.site || '').trim();
         const canal = (data.canal || 'discord').trim();
         const precoAlvo = parseTargetPrice(data.preco_alvo_cents ?? data.preco_alvo);
+        const ultimoPreco = data.ultimo_preco !== undefined || data.ultimo_preco_cents !== undefined
+          ? parseTargetPrice(data.ultimo_preco_cents ?? data.ultimo_preco)
+          : null;
+        const ultimoPrecoText = typeof data.ultimo_preco === 'string' && data.ultimo_preco.trim()
+          ? data.ultimo_preco.trim()
+          : null;
+        const ultimoParcelamento = typeof data.ultimo_parcelamento === 'string' && data.ultimo_parcelamento.trim()
+          ? data.ultimo_parcelamento.trim()
+          : null;
 
         if (!nome || !url || !site || precoAlvo === null) {
           sendJson(res, 400, { erro: true, mensagem: 'Informe nome, URL, site e preço-alvo' });
@@ -978,9 +902,10 @@ function createServer(): http.Server {
 
         const now = formatDbDatetime();
         const result = db.prepare(
-          `INSERT INTO watch_alerts (nome, url, site, canal, preco_alvo_cents, criado_em, atualizado_em)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`
-        ).run(nome, url, site, canal, precoAlvo, now, now);
+          `INSERT INTO watch_alerts
+             (nome, url, site, canal, preco_alvo_cents, ultimo_preco_cents, ultimo_preco_text, ultimo_parcelamento, criado_em, atualizado_em)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        ).run(nome, url, site, canal, precoAlvo, ultimoPreco, ultimoPrecoText, ultimoParcelamento, now, now);
 
         const alerta = db.prepare(`SELECT * FROM watch_alerts WHERE id = ?`).get(result.lastInsertRowid) as WatchAlertRow;
         sendJson(res, 201, normalizarWatchAlert(alerta));
@@ -1171,9 +1096,19 @@ function createServer(): http.Server {
 
 function startServer(): http.Server {
   const server = createServer();
+  let currentPort = PORT;
+  let attempts = 0;
   server.on('error', (err: NodeJS.ErrnoException) => {
     if (err.code === 'EADDRINUSE') {
-      console.error(`[Servidor] Porta ${PORT} já está em uso. Encerre o processo existente ou rode com PORT=${PORT + 1}.`);
+      if (PORT_AUTO_FALLBACK && attempts < PORT_MAX_ATTEMPTS) {
+        attempts += 1;
+        currentPort += 1;
+        console.warn(`[Servidor] Porta ${currentPort - 1} em uso. Tentando http://localhost:${currentPort}...`);
+        server.listen(currentPort);
+        return;
+      }
+
+      console.error(`[Servidor] Porta ${currentPort} já está em uso. Encerre o processo existente ou rode com PORT=${currentPort + 1}.`);
       process.exitCode = 1;
       return;
     }
@@ -1181,12 +1116,12 @@ function startServer(): http.Server {
     console.error('[Servidor] Falha ao iniciar:', err.message);
     process.exitCode = 1;
   });
-  server.listen(PORT, () => {
+  server.listen(currentPort, () => {
   iniciarScheduler();
   iniciarWatchScheduler();
   console.log('');
   console.log('  ┌──────────────────────────────────────┐');
-  console.log(`  │  🚀  ${String('http://localhost:' + String(PORT)).padEnd(26)}│`);
+  console.log(`  │  🚀  ${String('http://localhost:' + String(currentPort)).padEnd(26)}│`);
   console.log('  │                                      │');
   console.log(`  │  ⏰  Auto-busca a cada ${String(AUTO_INTERVAL_HOURS + 'h').padEnd(13)}│`);
   console.log(`  │  🔔  Watch a cada ${String(WATCH_INTERVAL_HOURS + 'h').padEnd(18)}│`);
@@ -1204,6 +1139,7 @@ export {
   centsToBrl,
   createServer,
   db,
+  executarAutoBuscas,
   executarWatchAlerts,
   formatApiDatetime,
   formatDbDatetime,

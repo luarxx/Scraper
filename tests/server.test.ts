@@ -19,7 +19,6 @@ async function importServer(options: { auto?: string; watch?: string; webhook?: 
   process.env.WATCH_INTERVAL_HOURS = options.watch;
   process.env.DISCORD_WEBHOOK_URL = options.webhook || '';
   process.env.DISCORD_WEBHOOK_AVATAR_URL = '';
-  process.env.DISCORD_ALERT_TOP_N = '1';
 
   vi.doMock('../scraper', () => ({
     SITES: {
@@ -89,8 +88,12 @@ describe('server helpers', () => {
 
     expect(mod.brlToCents('R$ 1.234,56')).toBe(123456);
     expect(mod.brlToCents('1299.90')).toBe(129990);
+    expect(mod.brlToCents('4.490')).toBe(449000);
+    expect(mod.brlToCents('4.490,00')).toBe(449000);
+    expect(mod.brlToCents('4490')).toBe(449000);
     expect(mod.centsToBrl(123456).replace(/\s/, ' ')).toBe('R$ 1.234,56');
     expect(mod.parseTargetPrice('R$ 799,90')).toBe(79990);
+    expect(mod.parseTargetPrice('4.490')).toBe(449000);
     expect(mod.parseTargetPrice(79990)).toBe(79990);
 
     mod.db.close();
@@ -177,10 +180,15 @@ describe('server API', () => {
         site: 'kabum',
         canal: 'discord',
         preco_alvo: 'R$ 299,90',
+        ultimo_preco: 'R$ 329,90',
+        ultimo_parcelamento: 'No PIX ou 10x de R$ 36,65',
       }),
     });
     expect(created.res.status).toBe(201);
     expect(created.body.preco_alvo_cents).toBe(29990);
+    expect(created.body.ultimo_preco_cents).toBe(32990);
+    expect(created.body.ultimo_preco_text).toBe('R$ 329,90');
+    expect(created.body.ultimo_parcelamento).toBe('No PIX ou 10x de R$ 36,65');
     expect(created.body.ativo).toBe(true);
 
     const patched = await jsonRequest(baseUrl, `/api/watch/alerts/${created.body.id}`, {
@@ -228,6 +236,37 @@ describe('server API', () => {
 });
 
 describe('watch scheduler rules', () => {
+  it('não envia Discord para resultados da busca automática', async () => {
+    const mod = await importServer({ webhook: 'https://discord.test/webhook' });
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, text: async () => '' })));
+    buscarProdutoMock.mockResolvedValue({
+      termo: 'ssd',
+      site: 'kabum',
+      siteNome: 'KaBuM!',
+      timestamp: new Date().toISOString(),
+      total: 1,
+      produtos: [{
+        title: 'SSD NVMe',
+        price: 'R$ 199,90',
+        parcelamento: null,
+        image: '',
+        url: 'https://www.kabum.com.br/produto/1',
+        relevancia: 1,
+      }],
+    });
+
+    mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+      .run('ssd', 'kabum', 1, '2026-06-05 10:00:00');
+
+    await mod.executarAutoBuscas();
+
+    const resultado = mod.db.prepare(`SELECT status, total FROM auto_resultados`).get() as { status: string; total: number };
+    expect(resultado).toEqual({ status: 'ok', total: 1 });
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+
+    mod.db.close();
+  });
+
   it('dispara Discord e desativa alerta quando preço atual atinge o alvo', async () => {
     const mod = await importServer({ webhook: 'https://discord.test/webhook' });
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, text: async () => '' })));
@@ -253,6 +292,11 @@ describe('watch scheduler rules', () => {
     expect(alerta).toEqual({ status: 'disparado', ativo: 0, erro: null });
     expect(check).toEqual({ status: 'disparado', notified: 1 });
     expect(globalThis.fetch).toHaveBeenCalled();
+    const webhookBody = JSON.parse((vi.mocked(globalThis.fetch).mock.calls[0][1] as RequestInit).body as string);
+    const description = webhookBody.embeds[0].description.replace(/\u00a0/g, ' ');
+    expect(description).toContain('Preço atual: **R$ 199,90**');
+    expect(description).toContain('Preço alvo: **R$ 299,90**');
+    expect(description).toContain('Parcelamento: 10x de R$ 19,99');
 
     mod.db.close();
   });

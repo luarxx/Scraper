@@ -114,7 +114,7 @@ Atualmente pega apenas a primeira página. Adicionar navegação para coletar si
 Existe cache local JSON com SHA256 e TTL de 10 minutos. Ainda falta o comportamento stale-while-revalidate com atualização em background.
 **Valor:** Médio | **Complexidade:** Média
 
-### 3.5 Parsing avançado de parcelamento (CET, juros) ⬜
+### 3.5 Parsing avançado de parcelamento (CET, juros) ✅
 Extrair dados mais ricos: com/sem juros, valor total a prazo, taxa de juros efetiva.
 **Valor:** Médio | **Complexidade:** Baixa
 
@@ -132,6 +132,7 @@ Prevenir abuso (ex.: 100 requisições/min). Protege o servidor e evita bloqueio
 
 ### 4.2 Endpoint de busca multi-site ⬜
 `/api/search/all?q=...` busca em todos os sites simultaneamente e agrega os resultados.
+Criar categorias por exemplo: Busque em sites de informática(seria kabum, terabyte e Pichau por exemplo), Busque em marketplaces(seria mercado livre e shopee)
 **Valor:** Alto | **Complexidade:** Média
 
 ### 4.3 Endpoint de sugestão / autocomplete ⬜

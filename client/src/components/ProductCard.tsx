@@ -4,11 +4,13 @@ import type { Produto } from '../types';
 import { usePriceHistory } from '../hooks/usePriceHistory';
 import { PriceHistoryChart } from './PriceHistoryChart';
 import { Icon } from './Icon';
+import { formatBrazilDateTime } from '../utils/date';
 
 interface ProductCardProps {
   produto: Produto;
   index: number;
   siteKey: string;
+  updatedAt?: string | null;
   isBestOption?: boolean;
   onCreateAlert?: (produto: Produto, siteKey: string) => void;
 }
@@ -25,7 +27,7 @@ const SITE_NAMES: Record<string, string> = {
   pichau: 'Pichau',
 };
 
-export const ProductCard = memo(function ProductCard({ produto, index, siteKey, isBestOption, onCreateAlert }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ produto, index, siteKey, updatedAt, isBestOption, onCreateAlert }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const siteStyle = SITE_COLORS[siteKey] ?? SITE_COLORS.kabum;
@@ -112,6 +114,14 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
         >
           {siteName}
         </span>
+        {updatedAt && (
+          <div className="mb-2 text-[11px] text-text-muted leading-snug">
+            Fonte: <span className="text-text-secondary">{siteName}</span>
+            <span className="text-white/[0.18]"> · </span>
+            Atualizado em{' '}
+            <time className="text-text-secondary tabular-nums">{formatBrazilDateTime(updatedAt)}</time>
+          </div>
+        )}
 
         <h3 className="text-sm sm:text-base font-semibold text-white leading-snug line-clamp-3 min-h-[3.6rem] sm:min-h-[4.125rem]">
           {produto.title}
@@ -152,7 +162,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
             onClick={() => onCreateAlert?.(produto, siteKey)}
             className="w-full text-slate-100 font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.99] border border-slate-700/70 bg-slate-800/70 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
           >
-            <Icon icon={BellPlus} size={16} /> Criar alerta
+            <Icon icon={BellPlus} size={16} /> Avisar quando baixar
           </button>
           <a
             href={produto.url}
@@ -161,7 +171,7 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
             className="w-full text-slate-950 font-semibold text-sm px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.99] no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
             style={{ background: siteStyle.btnBg }}
           >
-            Ir para a Loja
+            Ver oferta na loja
           </a>
         </div>
       </div>

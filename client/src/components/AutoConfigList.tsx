@@ -253,8 +253,8 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
             </svg>
           </div>
           <p className="text-sm text-text-secondary mb-2 font-semibold">Nenhum produto configurado</p>
-          <p className="text-xs text-text-muted/60 mb-5 max-w-xs mx-auto leading-relaxed">
-            Adicione até 10 produtos para busca automática a cada 6 horas
+          <p className="text-xs text-text-muted/80 mb-5 max-w-xs mx-auto leading-relaxed">
+            Salve termos como "RTX 4060" ou "SSD NVMe 1TB" para revisar os melhores precos encontrados nas proximas execucoes.
           </p>
           <button
             onClick={addEntry}
@@ -262,7 +262,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
           >
             <span className="inline-flex items-center gap-1.5">
               <Icon icon={Plus} size={16} />
-              Adicionar primeiro produto
+              Salvar primeira busca
             </span>
           </button>
         </div>
@@ -413,7 +413,7 @@ export function AutoConfigList({ sites, configs, onSave, saving, loading }: Auto
                 className="text-sm px-4 py-2 rounded-lg border border-dashed border-white/[0.12] text-text-secondary hover:text-text-primary hover:border-accent/40 hover:bg-accent/5 transition-colors font-medium flex items-center gap-1.5"
               >
                 <Icon icon={Plus} size={16} />
-                Adicionar
+                Adicionar busca
               </button>
             )}
             {entries.length >= 10 && (

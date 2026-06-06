@@ -3,6 +3,8 @@ import type { SearchHistoryEntry } from '../hooks/useSearchHistory';
 interface SearchHistoryProps {
   history: SearchHistoryEntry[];
   onSelect: (termo: string, site: string) => void;
+  compact?: boolean;
+  align?: 'start' | 'center';
 }
 
 const SITE_BADGES: Record<string, string> = {
@@ -17,12 +19,12 @@ const SITE_COLORS: Record<string, { text: string; bg: string }> = {
   terabyteshop: { text: '#34d399', bg: 'rgba(52, 211, 153, 0.1)' },
 };
 
-export function SearchHistory({ history, onSelect }: SearchHistoryProps) {
+export function SearchHistory({ history, onSelect, compact, align = 'start' }: SearchHistoryProps) {
   if (history.length === 0) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-2 pb-1">
-      <div className="flex flex-wrap items-center gap-1.5">
+    <div className={compact ? 'w-full' : 'max-w-7xl mx-auto px-4 sm:px-6'}>
+      <div className={`flex flex-wrap items-center gap-1.5 ${align === 'center' ? 'justify-center' : ''}`}>
         <span className="text-[11px] font-medium text-text-muted mr-0.5">
           Últimas buscas
         </span>

@@ -45,7 +45,7 @@ Server (server.ts — Node.js http)
      │    └── watch_checks     (histórico de verificações)
      │
      └── Scheduler (configurável via AUTO_INTERVAL_HOURS, mínimo 3h)
-          └── Itera auto_config → buscarProduto() sequencial → salva resultados → alerta Discord opcional
+          └── Itera auto_config → buscarProduto() sequencial → salva resultados
      └── Watch Scheduler (WATCH_INTERVAL_HOURS, mínimo 3h)
           └── Itera watch_alerts → buscarProdutoPorUrl() → dispara Discord quando preço ≤ alvo
 ```
@@ -78,7 +78,9 @@ Server (server.ts — Node.js http)
 │
 ├── client/             # Frontend React (sub-projeto ESM)
 │   ├── index.html
-│   ├── vite.config.ts  # Proxy /api → localhost:3000
+│   ├── public/
+│   │   └── Logo.png         # Asset público da logo e favicon
+│   ├── vite.config.ts  # Proxy /api → localhost:3000 ou API_PORT/PORT
 │   ├── package.json    # React 19, Vite 8, Tailwind 4
 │   ├── tsconfig.json   # Project references
 │   ├── src/
@@ -94,6 +96,7 @@ Server (server.ts — Node.js http)
 │   │   │   └── useWatchAlerts.ts    # CRUD/status/execução manual de alertas Watch
 │   │   └── components/
 │   │       ├── SearchForm.tsx       # Input + site tabs + submit button
+│   │       ├── Logo.tsx             # Marca vetorial do Scraper usada no header
 │   │       ├── SearchHistory.tsx    # Recent searches pills
 │   │       ├── ProductGrid.tsx      # Grid layout + best-option logic
 │   │       ├── ProductCard.tsx      # Individual product card
@@ -227,19 +230,7 @@ Watch:
 
 ### Styling
 
-- **Tema escuro**: fundo `#020617` (slate-950), superfície `#0f172a` (slate-900), variáveis CSS customizadas via `@theme`
-- **Cor de destaque**: laranja (`--color-accent: #f97316`), aplicada em inputs, badges e botões
-- **Cores por loja**: KaBuM! laranja, Pichau vermelho, Terabyte verde — definidas em `App.tsx`, `ProductCard.tsx`, `SearchHistory.tsx`, `AutoResultsView.tsx`
-- **Fontes**: **Inter** (UI principal, Google Fonts) + **DM Sans** (Display pontual, Google Fonts) — carregadas via `<link>` em `index.html`
-- **Background**: gradientes radiais fixos e discretos + textura noise SVG `feTurbulence` overlay (35% opacity, `mix-blend-mode: overlay`), sem animação contínua por padrão
-- **Scrollbar customizada**: 6px largura, thumb `rgba(249,115,22,0.25)` com hover mais claro
-- **Animações**: `fadeIn`, `fadeInUp`, `badgePop`, `dotPulse`, `spinSlow`, `spinReverse`, `shimmer`, `breathe`, `tabActivate`, `radarRing`, `radarSweep`, `numberTick`, `sparkDraw`, `panelSlideIn`, `kpiStagger`, `dotPing` — definidas em `index.css`
-- **Motion**: usar animação para feedback de estado, carregamento e expansão/recolhimento; evitar loops decorativos e respeitar `prefers-reduced-motion`
-- Efeito vidro (`backdrop-blur-md`) no header sticky
-- **KPI cards**: grid de cards com ícone + label + valor + animação curta `kpiStagger`. Usado em status bar (`AutoSearchPanel`) e execution summary + per-termo (`AutoResultsView`)
-- **Polimento operacional**: priorizar comparação rápida e confiança visual; sombras moderadas, botões estáveis, labels em sentence case e foco visível preservado
-- **Acessibilidade UI**: controles selecionáveis usam `aria-pressed`; botões iconográficos usam `aria-label`; não remover outline/foco sem substituto visível
-- **Termo sections**: gradient wash `linear-gradient(135deg, ${siteColor.light}, transparent 70%)` no background, com barra lateral e border highlight na cor da loja
+Detalhes de tema, cores, tipografia, background, animações, componentes visuais, responsividade e acessibilidade ficam em `DESIGN.md`. Consulte esse arquivo apenas em tarefas de UI/UX, layout, motion ou mudanças visuais.
 
 ### Hooks
 
@@ -255,14 +246,11 @@ Watch:
 
 O scraper pode ser configurado para buscar até 10 produtos automaticamente. O intervalo padrão é 6 horas, configurável por `AUTO_INTERVAL_HOURS` no `.env`, com mínimo obrigatório de 3 horas.
 
-### Alertas no Discord
+### Persistência de resultados
 
-- Alertas são enviados por **Discord Webhook**, sem dependência de bot/token/intents
-- Configurar `DISCORD_WEBHOOK_URL` no `.env` com a URL do webhook do canal desejado
-- `DISCORD_WEBHOOK_AVATAR_URL` personaliza a imagem exibida nas mensagens do webhook
-- `DISCORD_ALERT_TOP_N` controla quantos produtos por termo entram no alerta (1 a 5, padrão 1)
-- O envio acontece ao final de cada execução automática, incluindo execuções manuais via `/api/auto/run`
-- Se `DISCORD_WEBHOOK_URL` estiver vazio, o servidor apenas salva os resultados no SQLite e não envia alerta
+- A busca automática apenas salva resultados no SQLite e atualiza o histórico de preços
+- Ela não envia Discord, mesmo quando `DISCORD_WEBHOOK_URL` está configurado
+- Alertas no Discord pertencem exclusivamente ao fluxo Watch, baseado em URLs específicas e preço-alvo
 
 ### Database
 
@@ -306,7 +294,9 @@ SQLite em `data/scraper.db` com 3 tabelas:
 ## Commands
 
 ```bash
-npm run dev           # Dev completo: servidor + client (Vite HMR) em paralelo
+npm run dev           # Dev local com descoberta automática de portas livres
+npm run dev:local     # Alias do dev local automático
+npm run dev:fixed     # Dev completo fixo: client 5173 + servidor 3000
 npm run dev:server    # Apenas servidor (tsx watch server.ts)
 npm run dev:client    # Apenas client (Vite dev server)
 npm run build         # Compila TypeScript (tsc, para deploy)
@@ -326,10 +316,23 @@ cd client && npm test # Testes Vitest do React/hooks em jsdom
 ```bash
 AUTO_INTERVAL_HOURS=3
 WATCH_INTERVAL_HOURS=3
+PORT=3000
+API_PORT=3000
+CLIENT_PORT=5173
 DISCORD_WEBHOOK_URL=
 DISCORD_WEBHOOK_AVATAR_URL=https://alguma-url-da-imagem.png
-DISCORD_ALERT_TOP_N=1
 ```
+
+## Economia de contexto e tokens
+
+- Antes de ler arquivos grandes, use `rg` para localizar símbolos, rotas, hooks, componentes ou testes relevantes.
+- Leia apenas os arquivos diretamente relacionados à tarefa atual; não reabra documentação de deploy, VPS ou comandos operacionais salvo quando a tarefa envolver deploy/produção.
+- Para mudanças de frontend, priorize `client/src/App.tsx`, o componente/hook afetado, `client/src/types.ts` quando necessário e `DESIGN.md` apenas para mudanças visuais.
+- Para mudanças de backend/API, priorize `server.ts`, `scraper.ts` e testes relacionados em `tests/`; não abrir arquivos do client sem necessidade.
+- Para mudanças no scraper de um site específico, leia somente a configuração/extração daquele site em `scraper.ts` e fixtures/testes correspondentes.
+- Rode validações proporcionais ao escopo: backend/root → `npm run typecheck` e/ou `npm test`; client → `cd client && npm run build` e testes do hook/componente afetado quando houver; docs → não rodar build/testes salvo se solicitado.
+- Evite resumir ou colar grandes trechos de código na resposta final; cite arquivos e explique apenas o que mudou ou foi verificado.
+- Não investigar `data/`, `client/dist/`, `dist/`, `node_modules/` ou caches, salvo quando a tarefa pedir explicitamente build, persistência ou artefatos gerados.
 
 ### OpenCode Slash Commands
 
@@ -340,7 +343,7 @@ DISCORD_ALERT_TOP_N=1
 **Workflow padrão:**
 1. `cd client && npm run build` — após qualquer mudança em `client/`
 2. `npm run dev:server` — testar servidor servindo o build
-3. Ou `npm run dev` — desenvolvimento com HMR
+3. Ou `npm run dev` — desenvolvimento com HMR escolhendo portas livres automaticamente
 
 **Workflow de testes:**
 1. `npm run typecheck` — valida TypeScript do root
@@ -369,7 +372,7 @@ DISCORD_ALERT_TOP_N=1
 - **Logs operacionais** — sempre que possível, fluxos manuais, schedulers e endpoints que disparam processamento devem registrar `console.log` ao concluir, com prefixo do módulo e resumo curto de totais, sucessos, erros e itens processados (ex.: `[Busca Manual]`, `[Busca Automática]`, `[Watch]`)
 - **Horários** — usar `America/Sao_Paulo` no backend e nos formatadores do frontend para evitar diferença de fuso em VPS UTC
 - **Intervalo automático** — usar `AUTO_INTERVAL_HOURS` no `.env`; valores abaixo de 3 são elevados para 3
-- **Alertas Discord** — usar `DISCORD_WEBHOOK_URL` para webhook do canal e `DISCORD_ALERT_TOP_N` para limitar produtos por termo
+- **Alertas Discord** — usar `DISCORD_WEBHOOK_URL` apenas no Watch; auto-busca não envia notificações
 - **Watch** — alertas de queda ficam em `/api/watch/*`; usar soft delete/status em vez de remover fisicamente
 - **Após editar `client/`**, rebuildar com `cd client && npm run build` — o servidor serve arquivos estáticos de `client/dist/`
 - **Testes automatizados** — usar Vitest; testes de scraper/servidor não devem acessar lojas reais nem tocar `data/scraper.db`; use `SCRAPER_DB_PATH` para SQLite temporário e mocks de `buscarProduto()`/`buscarProdutoPorUrl()`

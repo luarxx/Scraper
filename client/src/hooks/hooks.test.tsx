@@ -205,13 +205,13 @@ describe('useWatchAlerts', () => {
 describe('critical UI states', () => {
   it('renderiza estados principais de busca', () => {
     const { rerender } = render(<StateMessage type="initial" />);
-    expect(screen.queryByText('Busque por produtos')).not.toBeNull();
+    expect(screen.queryByText('Compare antes de comprar')).not.toBeNull();
 
     rerender(<StateMessage type="loading" />);
-    expect(screen.queryByText('Buscando')).not.toBeNull();
+    expect(screen.queryByText('Consultando lojas de informatica...')).not.toBeNull();
 
     rerender(<StateMessage type="empty" />);
-    expect(screen.queryByText('Nenhum resultado')).not.toBeNull();
+    expect(screen.queryByText('Nenhuma oferta encontrada')).not.toBeNull();
 
     rerender(<StateMessage type="error" message="Falha de rede" />);
     expect(screen.queryByText('Falha de rede')).not.toBeNull();
@@ -224,13 +224,14 @@ describe('critical UI states', () => {
       title: 'SSD NVMe 1TB',
       price: 'R$ 299,90',
       parcelamento: '10x de R$ 29,99',
+      parcelamento_info: null,
       image: '',
       url: 'https://www.kabum.com.br/produto/1',
       relevancia: 2,
     };
 
     render(<ProductCard produto={produto} index={0} siteKey="kabum" onCreateAlert={onCreateAlert} />);
-    await user.click(screen.getByRole('button', { name: /criar alerta/i }));
+    await user.click(screen.getByRole('button', { name: /avisar quando baixar/i }));
 
     await waitFor(() => expect(onCreateAlert).toHaveBeenCalledWith(produto, 'kabum'));
   });

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, memo } from 'react';
-import { TrendingUp, TrendingDown, ImageOff } from 'lucide-react';
+import { TrendingUp, TrendingDown, ImageOff, BellPlus } from 'lucide-react';
 import type { Produto } from '../types';
 import { usePriceHistory } from '../hooks/usePriceHistory';
 import { PriceHistoryChart } from './PriceHistoryChart';
@@ -10,6 +10,7 @@ interface ProductCardProps {
   index: number;
   siteKey: string;
   isBestOption?: boolean;
+  onCreateAlert?: (produto: Produto, siteKey: string) => void;
 }
 
 const SITE_COLORS: Record<string, { text: string; bg: string; btnBg: string }> = {
@@ -24,7 +25,7 @@ const SITE_NAMES: Record<string, string> = {
   pichau: 'Pichau',
 };
 
-export const ProductCard = memo(function ProductCard({ produto, index, siteKey, isBestOption }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ produto, index, siteKey, isBestOption, onCreateAlert }: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const siteStyle = SITE_COLORS[siteKey] ?? SITE_COLORS.kabum;
@@ -145,15 +146,24 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
           summary={summary}
         />
 
-        <a
-          href={produto.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 w-full text-slate-950 font-semibold text-sm px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.99] no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
-          style={{ background: siteStyle.btnBg }}
-        >
-          Ir para a Loja
-        </a>
+        <div className="mt-3 grid grid-cols-1 gap-2">
+          <button
+            type="button"
+            onClick={() => onCreateAlert?.(produto, siteKey)}
+            className="w-full text-slate-100 font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.99] border border-slate-700/70 bg-slate-800/70 hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
+          >
+            <Icon icon={BellPlus} size={16} /> Criar alerta
+          </button>
+          <a
+            href={produto.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full text-slate-950 font-semibold text-sm px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.99] no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
+            style={{ background: siteStyle.btnBg }}
+          >
+            Ir para a Loja
+          </a>
+        </div>
       </div>
     </div>
   );

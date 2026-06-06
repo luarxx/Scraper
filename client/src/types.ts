@@ -89,3 +89,43 @@ export interface AutoResultsResponse {
   execucao: AutoExecucao | null;
   resultados: AutoResultadoItem[];
 }
+
+// ─── Watch alerts ─────────────────────────────────────────────
+
+export type WatchCanal = 'discord';
+export type WatchStatusValue = 'ativo' | 'pausado' | 'disparado';
+
+export interface WatchAlert {
+  id: number;
+  nome: string;
+  url: string;
+  site: string;
+  canal: WatchCanal;
+  preco_alvo_cents: number;
+  ultimo_preco_cents: number | null;
+  ultimo_preco_text: string | null;
+  ultimo_parcelamento: string | null;
+  status: WatchStatusValue;
+  ativo: boolean;
+  ultimo_check_em: string | null;
+  disparado_em: string | null;
+  erro: string | null;
+  criado_em: string;
+  atualizado_em: string;
+}
+
+export interface WatchStatus {
+  status: 'idle' | 'executando' | 'agendado';
+  ultima_execucao: string | null;
+  proxima_execucao: string | null;
+  total_ativos: number;
+  total_disparados: number;
+  webhook_configurado: boolean;
+}
+
+export interface WatchDraft {
+  nome: string;
+  url: string;
+  site: string;
+  preco_alvo: string;
+}

@@ -11,7 +11,10 @@
     "build:client": "cd client && npm run build",
     "build:prod": "npm run build:client && npm run build",
     "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:discord": "tsx scripts/test-discord.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:all": "npm test && cd client && npm test",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [],
@@ -29,7 +32,9 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.9.1",
     "concurrently": "^10.0.0",
+    "jsdom": "^27.3.0",
     "tsx": "^4.22.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.0.15"
   }
 }

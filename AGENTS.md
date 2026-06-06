@@ -15,6 +15,7 @@ Web scraper de e-commerces brasileiros usando Playwright. Busca produtos em múl
 | Servidor | Node.js `http` module puro (sem Express/Fastify) |
 | Frontend | React 19 + Vite 8 + Tailwind CSS 4 |
 | Dev tools | `tsx` (TypeScript execution), `concurrently` |
+| Tests | Vitest (root + client), jsdom, Testing Library |
 
 ---
 
@@ -22,8 +23,8 @@ Web scraper de e-commerces brasileiros usando Playwright. Busca produtos em múl
 
 ```
 Browser (React SPA)
-     │  GET /api/search?q=...&site=...   │   ⏰ Aba "Automática"
-     ▼                                   ▼
+     │  GET /api/search?q=...&site=...   │   ⏰ Aba "Automática"   │   🔔 Aba "Watch"
+     ▼                                   ▼                         ▼
 Server (server.ts — Node.js http)
      │
      ├── serve SPA from client/dist/ (production, even when running dist/server.js)
@@ -39,8 +40,14 @@ Server (server.ts — Node.js http)
      │    ├── auto_execucoes   (cada ciclo de 6h)
      │    └── auto_resultados  (resultados por termo)
      │
+     ├── /api/watch/* → SQLite + Discord Webhook
+     │    ├── watch_alerts     (alertas por URL de produto)
+     │    └── watch_checks     (histórico de verificações)
+     │
      └── Scheduler (configurável via AUTO_INTERVAL_HOURS, mínimo 3h)
-          └── Itera auto_config → buscarProduto() sequencial → salva resultados
+          └── Itera auto_config → buscarProduto() sequencial → salva resultados → alerta Discord opcional
+     └── Watch Scheduler (WATCH_INTERVAL_HOURS, mínimo 3h)
+          └── Itera watch_alerts → buscarProdutoPorUrl() → dispara Discord quando preço ≤ alvo
 ```
 
 ---
@@ -49,18 +56,19 @@ Server (server.ts — Node.js http)
 
 ```
 /
-├── scraper.ts          # Core: tipos, config dos sites, lógica de scraping, CLI
-├── server.ts           # HTTP server: API endpoints + static + SQLite DB + scheduler configurável
+├── scraper.ts          # Core: tipos, config dos sites, busca por termo/URL, lógica de scraping, CLI
+├── server.ts           # HTTP server: API endpoints + static + SQLite DB + schedulers
 ├── AGENTS.md           # ← este arquivo
 ├── DESIGN.md           # Documentação do design system e UI/UX
 ├── DEPLOY_ORACLE_VPS.md # Guia de deploy na Oracle VPS com FileZilla, Nginx e PM2
 ├── DEPLOY_GITHUB_ACTIONS.md # Guia do deploy automático via GitHub Actions
 ├── COMANDOS_VPS.md     # Comandos operacionais para administrar a VPS em produção
 ├── ATUALIZAR_SITE_VPS.md # Fluxo curto para atualizar a VPS após mudanças locais
-├── .env                # Configuração local/produção (AUTO_INTERVAL_HOURS)
+├── .env                # Configuração local/produção (AUTO_INTERVAL_HOURS, WATCH_INTERVAL_HOURS, DISCORD_WEBHOOK_URL)
 ├── .env.example        # Exemplo das variáveis de ambiente
 ├── opencode.json       # Config do opencode (default agent: scraper)
 ├── tsconfig.json       # TS config (root, CommonJS)
+├── scripts/            # Scripts operacionais manuais (ex.: teste de webhook Discord)
 ├── package.json        # Scripts: dev, dev:server, typecheck, build
 │
 ├── client/             # Frontend React (sub-projeto ESM)
@@ -70,14 +78,15 @@ Server (server.ts — Node.js http)
 │   ├── tsconfig.json   # Project references
 │   ├── src/
 │   │   ├── main.tsx
-│   │   ├── App.tsx           # Layout + state machine + toggle Manual/Auto
+│   │   ├── App.tsx           # Layout + state machine + toggle Manual/Auto/Watch
 │   │   ├── index.css         # Tailwind + custom CSS
 │   │   ├── types.ts          # Shared types (Produto, Site, Resultado, Auto*, PricePoint...)
 │   │   ├── hooks/
 │   │   │   ├── useSearch.ts         # API calls + search state
 │   │   │   ├── useSearchHistory.ts  # localStorage history (max 5)
 │   │   │   ├── useAutoConfig.ts     # CRUD configuração automática
-│   │   │   └── useAutoResults.ts    # Resultados execução automática
+│   │   │   ├── useAutoResults.ts    # Resultados execução automática
+│   │   │   └── useWatchAlerts.ts    # CRUD/status/execução manual de alertas Watch
 │   │   └── components/
 │   │       ├── SearchForm.tsx       # Input + site tabs + submit button
 │   │       ├── SearchHistory.tsx    # Recent searches pills
@@ -87,7 +96,8 @@ Server (server.ts — Node.js http)
 │   │       ├── PriceHistoryChart.tsx # Gráfico de histórico de preços
 │   │       ├── AutoSearchPanel.tsx  # Container da aba Automática (status + sub-abas)
 │   │       ├── AutoConfigList.tsx   # Lista/reordenação de até 10 produtos configurados
-│   │       └── AutoResultsView.tsx  # Resultados da última execução automática
+│   │       ├── AutoResultsView.tsx  # Resultados da última execução automática
+│   │       └── WatchPanel.tsx       # Cadastro/lista/status dos alertas de queda
 │   └── dist/            # Build output (served in production)
 │
 ├── data/
@@ -155,6 +165,12 @@ interface SiteConfig {
 | `/api/auto/status` | GET | — | Status do scheduler + última/próxima execução |
 | `/api/auto/results` | GET | — | Última execução com resultados por termo |
 | `/api/auto/run` | POST | — | Dispara execução manual imediatamente |
+| `/api/watch/alerts` | GET | — | Lista alertas ativos e disparados |
+| `/api/watch/alerts` | POST | Body: `{ nome, url, preco_alvo, site, canal: "discord" }` | Cria alerta de preço |
+| `/api/watch/alerts/:id` | PATCH | Body parcial | Atualiza alerta/status |
+| `/api/watch/alerts/:id` | DELETE | — | Remove alerta (soft delete/pausa) |
+| `/api/watch/status` | GET | — | Status do scheduler Watch + webhook |
+| `/api/watch/run` | POST | — | Dispara verificação manual dos alertas |
 
 ### Static serving
 
@@ -174,16 +190,17 @@ App
 ├── SearchHistory       # "Últimas buscas" pills (localStorage)
 ├── StateMessage        # initial | loading | empty | error
 ├── ProductGrid
-│   └── ProductCard[]   # Card com imagem, store badge, preço, botão "Ir para a Loja"
-└── AutoSearchPanel     # (quando modo='auto')
+│   └── ProductCard[]   # Card com imagem, preço, botão "Criar alerta" e "Ir para a Loja"
+├── AutoSearchPanel     # (quando modo='auto')
     ├── AutoConfigList  # Lista de até 10 produtos configurados com add/remove/reorder
     └── AutoResultsView # Resultados da última execução por termo com ProductGrid
+└── WatchPanel          # (quando modo='watch') status + formulário + lista de alertas
 ```
 
 ### State Machine (App.tsx)
 
 ```
-modo: 'manual' | 'auto'
+modo: 'manual' | 'auto' | 'watch'
 
 Manual:
   initial → (search) → loading → results | empty | error
@@ -194,6 +211,12 @@ Auto:
   AutoSearchPanel
     ├── tab 'config' → AutoConfigList (local edit/reorder → save → POST /api/auto/config)
     └── tab 'results' → AutoResultsView (fetch /api/auto/results)
+
+Watch:
+  WatchPanel
+    ├── status → GET /api/watch/status
+    ├── form/list → GET/POST/DELETE/PATCH /api/watch/alerts
+    └── run → POST /api/watch/run
 ```
 
 ### Styling
@@ -218,12 +241,22 @@ Auto:
 - **`useSearchHistory`** (`client/src/hooks/useSearchHistory.ts`): Persiste últimas 5 buscas no `localStorage`. `addEntry()` evita duplicatas.
 - **`useAutoConfig`** (`client/src/hooks/useAutoConfig.ts`): CRUD da configuração automática. `fetchConfig()`, `saveConfig(entries)`, `removeConfig(id)`, `fetchStatus()`. A ordem visual editada em `AutoConfigList` é persistida pela posição enviada ao `saveConfig`.
 - **`useAutoResults`** (`client/src/hooks/useAutoResults.ts`): Resultados automáticos. `fetchResults()` carrega última execução, `triggerRun()` dispara execução manual.
+- **`useWatchAlerts`** (`client/src/hooks/useWatchAlerts.ts`): Alertas Watch. `fetchAlerts()`, `fetchStatus()`, `createAlert(input)`, `removeAlert(id)`, `triggerRun()`.
 
 ---
 
 ## Auto-Search (intervalo configurável)
 
 O scraper pode ser configurado para buscar até 10 produtos automaticamente. O intervalo padrão é 6 horas, configurável por `AUTO_INTERVAL_HOURS` no `.env`, com mínimo obrigatório de 3 horas.
+
+### Alertas no Discord
+
+- Alertas são enviados por **Discord Webhook**, sem dependência de bot/token/intents
+- Configurar `DISCORD_WEBHOOK_URL` no `.env` com a URL do webhook do canal desejado
+- `DISCORD_WEBHOOK_AVATAR_URL` personaliza a imagem exibida nas mensagens do webhook
+- `DISCORD_ALERT_TOP_N` controla quantos produtos por termo entram no alerta (1 a 5, padrão 1)
+- O envio acontece ao final de cada execução automática, incluindo execuções manuais via `/api/auto/run`
+- Se `DISCORD_WEBHOOK_URL` estiver vazio, o servidor apenas salva os resultados no SQLite e não envia alerta
 
 ### Database
 
@@ -251,6 +284,17 @@ SQLite em `data/scraper.db` com 3 tabelas:
   - **Sub-aba "⚙️ Configurar"**: AutoConfigList — formulário inline para adicionar/remover/reordenar produtos com termo + site selector
   - **Sub-aba "📊 Resultados"**: AutoResultsView — lista da última execução com ProductGrid por termo
 
+## Watch de preços (alertas de queda)
+
+- Alertas monitoram uma **URL específica** de produto, não uma busca por termo
+- Cadastro: nome, URL, preço-alvo, site e canal `discord`
+- O botão "Criar alerta" em `ProductCard` abre a aba Watch com nome/URL/site/preço preenchidos
+- O scheduler roda a cada `WATCH_INTERVAL_HOURS` (padrão 3h, mínimo 3h)
+- Cada verificação usa `buscarProdutoPorUrl(site, url, nome)` e salva histórico em `price_history`
+- Quando `preço atual <= preço-alvo`, envia Discord webhook e marca o alerta como `disparado` + `ativo = 0`
+- Se `DISCORD_WEBHOOK_URL` estiver vazio ou o envio falhar, o alerta permanece ativo e registra erro
+- `watch_checks` armazena cada tentativa com status `ok`, `erro` ou `disparado`
+
 ---
 
 ## Commands
@@ -263,7 +307,22 @@ npm run build         # Compila TypeScript (tsc, para deploy)
 npm run build:client  # Build do frontend React → client/dist/
 npm run build:prod    # Build completo para VPS/FileZilla: client/dist + dist/
 npm run start         # Node production (dist/server.js)
+npm run test:discord  # Envia uma mensagem de teste no webhook DISCORD_WEBHOOK_URL
+npm test              # Testes Vitest do backend/scraper sem rede real
+npm run test:watch    # Testes Vitest do backend/scraper em watch mode
+npm run test:all      # Testes root + client
 npm run typecheck     # TypeScript check (root + client via npm -w)
+cd client && npm test # Testes Vitest do React/hooks em jsdom
+```
+
+### Variáveis de ambiente
+
+```bash
+AUTO_INTERVAL_HOURS=3
+WATCH_INTERVAL_HOURS=3
+DISCORD_WEBHOOK_URL=
+DISCORD_WEBHOOK_AVATAR_URL=https://alguma-url-da-imagem.png
+DISCORD_ALERT_TOP_N=1
 ```
 
 ### OpenCode Slash Commands
@@ -276,6 +335,12 @@ npm run typecheck     # TypeScript check (root + client via npm -w)
 1. `cd client && npm run build` — após qualquer mudança em `client/`
 2. `npm run dev:server` — testar servidor servindo o build
 3. Ou `npm run dev` — desenvolvimento com HMR
+
+**Workflow de testes:**
+1. `npm run typecheck` — valida TypeScript do root
+2. `npm test` — cobre helpers do scraper, rotas HTTP, SQLite temporário, scheduler e Watch sem acessar lojas reais
+3. `cd client && npm test` — cobre hooks/componentes críticos com `fetch` mockado
+4. `cd client && npm run build` — obrigatório após mudanças em `client/`
 
 **Deploy VPS/FileZilla:**
 1. `npm run build:prod` — gera `client/dist/` e `dist/`
@@ -297,7 +362,11 @@ npm run typecheck     # TypeScript check (root + client via npm -w)
 - **Scheduler** — execução sequencial (1 busca por vez), recuperação de crash na inicialização
 - **Horários** — usar `America/Sao_Paulo` no backend e nos formatadores do frontend para evitar diferença de fuso em VPS UTC
 - **Intervalo automático** — usar `AUTO_INTERVAL_HOURS` no `.env`; valores abaixo de 3 são elevados para 3
+- **Alertas Discord** — usar `DISCORD_WEBHOOK_URL` para webhook do canal e `DISCORD_ALERT_TOP_N` para limitar produtos por termo
+- **Watch** — alertas de queda ficam em `/api/watch/*`; usar soft delete/status em vez de remover fisicamente
 - **Após editar `client/`**, rebuildar com `cd client && npm run build` — o servidor serve arquivos estáticos de `client/dist/`
+- **Testes automatizados** — usar Vitest; testes de scraper/servidor não devem acessar lojas reais nem tocar `data/scraper.db`; use `SCRAPER_DB_PATH` para SQLite temporário e mocks de `buscarProduto()`/`buscarProdutoPorUrl()`
+- **Funcionalidades importantes exigem testes** — ao adicionar ou alterar scraping, rotas de API, scheduler, persistência SQLite, alertas Watch/Discord ou hooks/componentes críticos, criar ou atualizar testes automatizados junto com a mudança
 - **Exports nomeados** (evitar `export default` em componentes utilitários)
 - **Sem comentários em linha** no código-fonte (documentação concentrada aqui)
 - **Português** para nomes de domínio (`Produto`, `buscarProduto`, `SiteConfig`, `termo`, `preco`); inglês para código genérico

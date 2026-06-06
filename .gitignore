@@ -2,3 +2,4 @@ data/cache/
 node_modules/
 teste.ts
 dist/
+.env

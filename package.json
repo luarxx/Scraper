@@ -7,7 +7,7 @@
     "dev": "node scripts/dev-local.mjs",
     "dev:fixed": "concurrently --kill-others \"cd client && vite\" \"tsx watch server.ts\"",
     "dev:local": "node scripts/dev-local.mjs",
-    "dev:server": "tsx server.ts",
+    "dev:server": "tsx watch server.ts",
     "dev:client": "cd client && vite",
     "build": "tsc",
     "build:client": "cd client && npm run build",

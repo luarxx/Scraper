@@ -1,5 +1,6 @@
 import { buscarProduto } from '../scraper';
 import { db } from './db';
+import { registrarMetricaBusca } from './metrics';
 import { salvarPrecos } from './priceHistory';
 import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime, parseLocalDatetime } from './time';
 
@@ -78,23 +79,50 @@ export async function executarAutoBuscas(): Promise<void> {
   insertMany(configs);
 
   await executarComConcorrencia(configs, AUTO_MAX_CONCURRENCY, async (config) => {
+    const startedAt = Date.now();
     try {
       const data = await buscarProduto(config.site, config.termo);
       if ('erro' in data && data.erro) {
         db.prepare(
           `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
         ).run(data.mensagem, execucaoId, config.id);
+        registrarMetricaBusca({
+          origem: 'auto',
+          site: config.site,
+          termo: config.termo,
+          status: 'erro',
+          total: 0,
+          duracaoMs: Date.now() - startedAt,
+          erro: data.mensagem,
+        });
       } else {
         db.prepare(
           `UPDATE auto_resultados SET status = 'ok', total = ?, produtos = ? WHERE execucao_id = ? AND config_id = ?`
         ).run(data.total, JSON.stringify(data.produtos), execucaoId, config.id);
         salvarPrecos(data.produtos, config.site);
+        registrarMetricaBusca({
+          origem: 'auto',
+          site: config.site,
+          termo: config.termo,
+          status: 'ok',
+          total: data.total,
+          duracaoMs: Date.now() - startedAt,
+        });
       }
     } catch (err: unknown) {
       const error = err as Error;
       db.prepare(
         `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
       ).run(error.message, execucaoId, config.id);
+      registrarMetricaBusca({
+        origem: 'auto',
+        site: config.site,
+        termo: config.termo,
+        status: 'erro',
+        total: 0,
+        duracaoMs: Date.now() - startedAt,
+        erro: error.message,
+      });
     }
   });
 

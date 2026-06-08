@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Search, Clock, Bell } from 'lucide-react';
+import { Search, Clock, Bell, BarChart3 } from 'lucide-react';
 import { useSearch } from './hooks/useSearch';
 import { useSearchHistory } from './hooks/useSearchHistory';
 import { SearchForm } from './components/SearchForm';
@@ -8,6 +8,7 @@ import { ProductGrid } from './components/ProductGrid';
 import { StateMessage } from './components/StateMessage';
 import { AutoSearchPanel } from './components/AutoSearchPanel';
 import { WatchPanel } from './components/WatchPanel';
+import { StatsDashboardPanel } from './components/StatsDashboardPanel';
 import { Icon } from './components/Icon';
 import { Logo } from './components/Logo';
 import type { Produto, WatchDraft } from './types';
@@ -26,7 +27,7 @@ function priceToInput(price: string | null): string {
 
 export default function App() {
   const { loading, produtos, termo, siteKey, siteNome, timestamp, erro, search, fetchSites, sites } = useSearch();
-  const [modo, setModo] = useState<'manual' | 'auto' | 'watch'>('manual');
+  const [modo, setModo] = useState<'manual' | 'auto' | 'watch' | 'dashboard'>('manual');
   const [watchDraft, setWatchDraft] = useState<WatchDraft | null>(null);
 
   useEffect(() => {
@@ -112,6 +113,17 @@ export default function App() {
               >
                 <Icon icon={Bell} size={14} /> <span>Alertas</span>
               </button>
+              <button
+                onClick={() => setModo('dashboard')}
+                aria-pressed={modo === 'dashboard'}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                  modo === 'dashboard'
+                    ? 'bg-accent text-white'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
+                }`}
+              >
+                <Icon icon={BarChart3} size={14} /> <span>Dashboard</span>
+              </button>
             </div>
           </div>
           {modo === 'manual' && state !== 'initial' && (
@@ -131,6 +143,10 @@ export default function App() {
             draft={watchDraft}
             onDraftConsumed={() => setWatchDraft(null)}
           />
+        </main>
+      ) : modo === 'dashboard' ? (
+        <main className="flex-1">
+          <StatsDashboardPanel />
         </main>
       ) : (
         <>

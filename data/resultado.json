@@ -1,305 +1,297 @@
 {
-  "termo": "Attack shark",
+  "termo": "ssd nvme",
   "site": "pichau",
   "siteNome": "Pichau",
-  "timestamp": "2026-06-08T16:39:30.788Z",
-  "total": 37,
+  "timestamp": "2026-06-08T18:30:56.675Z",
+  "total": 36,
   "produtos": [
     {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C01PRO, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Preto, C01PRO-BLACK",
-      "price": "R$ 69,99",
-      "parcelamento": "8x de R$ 10,29",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c01pro-black.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c01pro-com-conector-aviator-usb-a-para-tipo-c-1-65m-preto-c01pro-black",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C01PRO, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Rosa, C01PRO-PINK",
-      "price": "R$ 69,99",
-      "parcelamento": "8x de R$ 10,29",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c01pro-pink.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c01pro-com-conector-aviator-usb-a-para-tipo-c-1-65m-rosa-c01pro-pink",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C03, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Dark Blue, C03-DARK-BLUE",
-      "price": "R$ 89,99",
-      "parcelamento": "10x de R$ 10,59",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c03-dark-blue.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c03-com-conector-aviator-usb-a-para-tipo-c-1-65m-dark-blue-c03-dark-blue",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C03, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Deep Rose Red, C03-DEEP-ROSE-RED",
-      "price": "R$ 89,99",
-      "parcelamento": "10x de R$ 10,59",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c03-deep-rose-red.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c03-com-conector-aviator-usb-a-para-tipo-c-1-65m-deep-rose-red-c03-deep-rose-red",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C03, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Vermelho, C03-RED",
-      "price": "R$ 89,99",
-      "parcelamento": "10x de R$ 10,59",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c03-red.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c03-com-conector-aviator-usb-a-para-tipo-c-1-65m-vermelho-c03-red",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C03, Com Conector Aviator, USB-A Para Tipo-C, 1.65m, Preto, C03-BLACK",
-      "price": "R$ 89,99",
-      "parcelamento": "10x de R$ 10,59",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c03-black.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c03-com-conector-aviator-usb-a-para-tipo-c-1-65m-preto-c03-black",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X5, RGB, 4000DPI, 5 Botoes, Tri-Mode, Branco, X5-WHITE",
-      "price": "R$ 129,99",
-      "parcelamento": "12x de R$ 12,74",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/5/x5-white.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x5-rgb-4000dpi-5-botoes-tri-mode-branco-x5-white",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X11 SE, 22000DPI, 6 Botoes, Tri-Mode, Branco, X11-SE-WH",
-      "price": "R$ 149,99",
-      "parcelamento": "12x de R$ 14,71",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11-se-wh.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-se-22000dpi-6-botoes-tri-mode-branco-x11-se-wh",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X11 SE, 22000DPI, 5 Botoes, Tri-Mode, Preto, X11-SE-BK",
-      "price": "R$ 149,99",
-      "parcelamento": "12x de R$ 14,71",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11se-black.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-se-22000dpi-5-botoes-tri-mode-preto-x11-se-bk",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X11 SE, 22000DPI, 6 Botoes, Tri-Mode, Vermelho, X11-SE-RED",
-      "price": "R$ 149,99",
-      "parcelamento": "12x de R$ 14,71",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11-se-red455.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-se-22000dpi-6-botoes-tri-mode-vermelho-x11-se-red",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X11 SE, 22000DPI, 6 Botoes, Tri-Mode, Rosa, X11-SE-PK",
-      "price": "R$ 149,99",
-      "parcelamento": "12x de R$ 14,71",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11-se-pk4555.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-se-22000dpi-6-botoes-tri-mode-rosa-x11-se-pk",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X11, RGB, 22000DPI, 7 Botoes, Tri-Mode, Branco, X11-WH",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11-wh145002.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-rgb-22000dpi-7-botoes-tri-mode-branco-x11-wh",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C05, Tipo-C Para USB-A, 1.6m, Preto, C05-BLACK",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c05-black.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c05-tipo-c-para-usb-a-1-6m-preto-c05-black",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark G3, 25000DPI, 5 Botoes, Tri-Mode, Rosa, G3-PK",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/g/3/g3-pk.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-g3-25000dpi-5-botoes-tri-mode-rosa-g3-pk",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark G3, 25000DPI, 5 Botoes, Tri-Mode, Preto, G3-BK",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/g/3/g3-bk.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-g3-25000dpi-5-botoes-tri-mode-preto-g3-bk",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark G3, 25000DPI, 5 Botoes, Tri-Mode, Branco, G3-WH",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/g/3/g3-wh1.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-g3-25000dpi-5-botoes-tri-mode-branco-g3-wh",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark X11, RGB, 22000DPI, 7 Botoes, Tri-Mode, Vermelho, X11-RED",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/1/x11-red.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-x11-rgb-22000dpi-7-botoes-tri-mode-vermelho-x11-red",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C05, Tipo-C Para USB-A, 1.6m, Azul, C05-BLUE",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c05-blue.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c05-tipo-c-para-usb-a-1-6m-azul-c05-blue",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C05, Tipo-C Para USB-A, 1.6m, Rosa, C05-PINK",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c05-pink.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c05-tipo-c-para-usb-a-1-6m-rosa-c05-pink",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C05, Tipo-C Para USB-A, 1.6m, Rose, C05-ROSE",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c05-rose.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c05-tipo-c-para-usb-a-1-6m-rose-c05-rose",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Cabo Para Teclado Attack Shark C05, Tipo-C Para USB-A, 1.6m, Branco, C05-WHITE",
-      "price": "R$ 159,99",
-      "parcelamento": "12x de R$ 15,69",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/0/c05-white.jpg",
-      "url": "https://www.pichau.com.br/cabo-para-teclado-attack-shark-c05-tipo-c-para-usb-a-1-6m-branco-c05-white",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark G3PRO, 25000DPI, 5 Botoes, Tri-Mode, Branco, G3-PRO-WHITE",
-      "price": "R$ 189,99",
-      "parcelamento": "12x de R$ 18,63",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/g/3/g3-pro-white1.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-g3pro-25000dpi-5-botoes-tri-mode-branco-g3-pro-white",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Mouse Gamer Attack Shark G3PRO, 25000DPI, 5 Botoes, Tri-Mode, Preto, G3-PRO-BLACK",
-      "price": "R$ 189,99",
-      "parcelamento": "12x de R$ 18,63",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/g/3/g3-pro-black1.jpg",
-      "url": "https://www.pichau.com.br/mouse-gamer-attack-shark-g3pro-25000dpi-5-botoes-tri-mode-preto-g3-pro-black",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Headset Gamer Attack Shark L60, Drivers 40mm, PC/PS4/Xbox, Tri-Mode, Branco, L60-WH",
-      "price": "R$ 229,99",
-      "parcelamento": "12x de R$ 22,55",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/6/l60-wh1.jpg",
-      "url": "https://www.pichau.com.br/headset-gamer-attack-shark-l60-drivers-40mm-pc-ps4-xbox-tri-mode-branco-l60-wh",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Headset Gamer Attack Shark L60, Drivers 40mm, PC/PS4/Xbox, Tri-Mode, Preto, L60-BK",
-      "price": "R$ 229,99",
-      "parcelamento": "12x de R$ 22,55",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/6/l60-bk1.jpg",
-      "url": "https://www.pichau.com.br/headset-gamer-attack-shark-l60-drivers-40mm-pc-ps4-xbox-tri-mode-preto-l60-bk",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68 HE, RGB, Switch Magnetico Linear, Preto, X68-HE-BLACK",
-      "price": "R$ 289,99",
-      "parcelamento": "12x de R$ 28,43",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-he-black.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68-he-rgb-switch-magnetico-linear-preto-x68-he-black",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68 HE, RGB, Switch Magnetico Linear, White Contours, X68-HE-WHITE-CONTOURS",
-      "price": "R$ 339,99",
-      "parcelamento": "12x de R$ 33,33",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-he-white-contours.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68-he-rgb-switch-magnetico-linear-white-contours-x68-he-white-contours",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Mecanico Attack Shark R82 HE, RGB, Switch Hall Effect Magnetico, Preto, R82-HE-BK",
-      "price": "R$ 349,99",
-      "parcelamento": "12x de R$ 34,31",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/r/8/r82-he-bk.jpg",
-      "url": "https://www.pichau.com.br/teclado-mecanico-attack-shark-r82-he-rgb-switch-hall-effect-magnetico-preto-r82-he-bk",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Mecanico Attack Shark R82 HE, RGB, Switch Hall Effect Magnetico, Branco, R82-HE-WH",
-      "price": "R$ 389,99",
-      "parcelamento": "12x de R$ 38,23",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/r/8/r82-he-wh.jpg",
-      "url": "https://www.pichau.com.br/teclado-mecanico-attack-shark-r82-he-rgb-switch-hall-effect-magnetico-branco-r82-he-wh",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Mecanico Attack Shark R82 HE, RGB, Switch Hall Effect Magnetico, Rosa, R82-HE-PK",
-      "price": "R$ 389,99",
-      "parcelamento": "12x de R$ 38,23",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/r/8/r82-he-pk.jpg",
-      "url": "https://www.pichau.com.br/teclado-mecanico-attack-shark-r82-he-rgb-switch-hall-effect-magnetico-rosa-r82-he-pk",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68MAX HE, RGB, Switch Magnetico Linear, Star White, X68-MAX-STAR-WHITE",
-      "price": "R$ 499,99",
-      "parcelamento": "12x de R$ 49,02",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-max-star-white.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68max-he-rgb-switch-magnetico-linear-star-white-x68-max-star-white",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68PRO HE, RGB, Switch Magnetico Linear, Tri-Mode, White Contours, X68-HE-PRO-WHITE-CONTOURS",
-      "price": "R$ 509,99",
-      "parcelamento": "12x de R$ 50,00",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-he-pro-white-contours.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68pro-he-rgb-switch-magnetico-linear-tri-mode-white-contours-x68-he-pro-white-contours",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68PRO HE, RGB, Switch Magnetico Linear, Tri-Mode, Black Contours, X68-HE-PRO-BLACK-CONTOURS",
-      "price": "R$ 509,99",
-      "parcelamento": "12x de R$ 50,00",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-he-pro-black-contours2.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68pro-he-rgb-switch-magnetico-linear-tri-mode-black-contours-x68-he-pro-black-contours",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Magnetico Attack Shark X68MAX HE, RGB, Switch Magnetico Linear, White Contours, X68-MAX-WH-CONTOURS",
-      "price": "R$ 529,99",
-      "parcelamento": "12x de R$ 51,96",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/6/x68-max-wh-contours.jpg",
-      "url": "https://www.pichau.com.br/teclado-magnetico-attack-shark-x68max-he-rgb-switch-magnetico-linear-white-contours-x68-max-wh-contours",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Mecanico Attack Shark X98PRO, RGB, Switch Blueberry, Tri-Mode, Gradient Black, X98-PRO-GRADIENT-BLACK",
-      "price": "R$ 539,99",
-      "parcelamento": "12x de R$ 52,94",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/9/x98-pro-gradient-black.jpg",
-      "url": "https://www.pichau.com.br/teclado-mecanico-attack-shark-x98pro-rgb-switch-blueberry-tri-mode-gradient-black-x98-pro-gradient-black",
-      "relevancia": 2
-    },
-    {
-      "title": "PRE VENDA - Teclado Mecanico Attack Shark X75, 75%, RGB, Switch Crystal, Tri-Mode, Branco, X75-WH",
-      "price": "R$ 849,99",
-      "parcelamento": "12x de R$ 83,33",
-      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/x/7/x75-wh1_1.jpg",
-      "url": "https://www.pichau.com.br/pre-venda-teclado-mecanico-attack-shark-x75-75-rgb-switch-crystal-tri-mode-branco-x75-wh",
+      "title": "SSD Team Group MP33 Pro, 512GB, M.2 2280, PCIe NVMe, Leitura 3500MB/s, Gravacao 3000MB/s, TM8FPD512G0C101",
+      "price": "R$ 779,99",
+      "parcelamento": "12x de R$ 76,47",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/m/tm8fpd512g0c101.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-mp33-pro-512gb-m-2-2280-pcie-nvme-leitura-3500mb-s-gravacao-3000mb-s-tm8fpd512g0c101",
       "relevancia": 2
     },
     {
       "title": "SSD Lexar NQ790, 512GB, M.2 2280, PCIe NVMe, Leitura 6400MB/s, Gravacao 2900MB/s, LNQ790X512G-RNNNG",
-      "price": null,
-      "parcelamento": null,
+      "price": "R$ 829,99",
+      "parcelamento": "12x de R$ 81,37",
       "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnq790x512g-rnnng.jpg",
       "url": "https://www.pichau.com.br/ssd-lexar-nq790-512gb-m-2-2280-pcie-nvme-leitura-6400mb-s-gravacao-2900mb-s-lnq790x512g-rnnng",
-      "relevancia": 0
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Black SN770M, 500GB, M.2 2230, PCIe NVMe, Leitura 5000MB/s, Gravacao 4000MB/s, WDS500G3X0G",
+      "price": "R$ 899,99",
+      "parcelamento": "12x de R$ 88,23",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds500g3x0g.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-black-sn770m-500gb-m-2-2230-pcie-nvme-leitura-5000mb-s-gravacao-4000mb-s-wds500g3x0g",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Kingston NV3, 1TB, M.2 2280, PCIe NVMe, Leitura 6000MB/s, Gravacao 4000MB/s, SNV3S-1000G",
+      "price": "R$ 999,99",
+      "parcelamento": "12x de R$ 98,04",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/n/snv3s-1000g2.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-nv3-1tb-m-2-2280-pcie-nvme-leitura-6000mb-s-gravacao-4000mb-s-snv3s-1000g",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Green SN3000, 500GB, M.2 2280, PCIe NVMe, Leitura 5000MB/s, Gravacao 4100MB/s, WDS500G4G0E",
+      "price": "R$ 1.019,99",
+      "parcelamento": "12x de R$ 100,00",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds500g4g0e.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-sn3000-500gb-m-2-2280-pcie-nvme-leitura-5000mb-s-gravacao-4100mb-s-wds500g4g0e",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Green SN350, 1TB, M.2 2280, PCIe NVMe, Leitura 2400 MB/s, Gravacao 1850 MB/s, WDS100T2G0C",
+      "price": "R$ 1.049,99",
+      "parcelamento": "12x de R$ 102,94",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds100t2g0c.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-sn350-1tb-m-2-2280-pcie-nvme-leitura-2400-mb-s-gravacao-1850-mb-s-wds100t2g0c",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Lexar NM610 Pro, 1TB, M.2 2280, PCIe NVMe, Leitura 3300MB/s, Gravacao 2600MB/s, LNM610P001T-RNNNG",
+      "price": "R$ 1.059,99",
+      "parcelamento": "12x de R$ 103,92",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnm610p001t-rnnng.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nm610-pro-1tb-m-2-2280-pcie-nvme-leitura-3300mb-s-gravacao-2600mb-s-lnm610p001t-rnnng",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Lexar NQ780, 1TB, M.2 2280, PCIe NVMe, Leitura 6500MB/s, Gravacao 2500MB/s, LNQ780X001T-RNNNG",
+      "price": "R$ 1.079,99",
+      "parcelamento": "12x de R$ 105,88",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnq780x001t-rnnng.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nq780-1tb-m-2-2280-pcie-nvme-leitura-6500mb-s-gravacao-2500mb-s-lnq780x001t-rnnng",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Green SN3000, 1TB, M.2 2280, PCIe NVMe, Leitura 5000MB/s, Gravacao 4200MB/s, WDS100T4G0E",
+      "price": "R$ 1.099,99",
+      "parcelamento": "12x de R$ 107,84",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds100t4g0e.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-sn3000-1tb-m-2-2280-pcie-nvme-leitura-5000mb-s-gravacao-4200mb-s-wds100t4g0e",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Lexar NM790, 1TB, M.2 2280, PCIe NVMe, Leitura 7400MB/s, Gravacao 6500MB/s, LNM790X001T-RNNNG",
+      "price": "R$ 1.239,99",
+      "parcelamento": "12x de R$ 121,57",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnm790x001t-rnnng.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nm790-1tb-m-2-2280-pcie-nvme-leitura-7400mb-s-gravacao-6500mb-s-lnm790x001t-rnnng",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Team Group MP44, 1TB, M.2 2280, PCIe NVMe, Leitura 7000 MB/s, Gravacao 6000 MB/s, TM8FPW001T0C101",
+      "price": "R$ 1.299,99",
+      "parcelamento": "12x de R$ 127,45",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/m/tm8fpw001t0c1013.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-mp44-1tb-m-2-2280-pcie-nvme-leitura-7000-mb-s-gravacao-6000-mb-s-tm8fpw001t0c101",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Team Group MP44L, 1TB, M.2 2280, PCIe NVMe, Leitura 5000MB/s, Gravacao 4.500MB/s, TM8FPK001T0C101",
+      "price": "R$ 1.499,99",
+      "parcelamento": "12x de R$ 147,06",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/m/tm8fpk001t0c1013.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-mp44l-1tb-m-2-2280-pcie-nvme-leitura-5000mb-s-gravacao-4-500mb-s-tm8fpk001t0c101",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Green SN3000, 2TB, M.2 2280, PCIe NVMe, Leitura 5000MB/s, Gravacao 4200MB/S, WDS200T4G0E",
+      "price": "R$ 1.749,99",
+      "parcelamento": "12x de R$ 171,57",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds200t4g0e.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-green-sn3000-2tb-m-2-2280-pcie-nvme-leitura-5000mb-s-gravacao-4200mb-s-wds200t4g0e",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Kingston Fury Renegade, 1TB, M.2 2280, PCIe NVMe, Leitura 7300MB/s, Gravacao 6000MB/s, SFYRSK-1000G",
+      "price": "R$ 1.749,99",
+      "parcelamento": "12x de R$ 171,57",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/f/sfyrsk-1000g1.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-fury-renegade-1tb-m-2-2280-pcie-nvme-leitura-7300mb-s-gravacao-6000mb-s-sfyrsk-1000g",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Kingston NV3, 1TB, M.2 2230, PCIe NVMe, Leitura 6000MB/s, Gravacao 4000MB/s, SNV3SM3-1T0",
+      "price": "R$ 1.899,99",
+      "parcelamento": "12x de R$ 186,27",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/n/snv3sm3-1t0.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-nv3-1tb-m-2-2230-pcie-nvme-leitura-6000mb-s-gravacao-4000mb-s-snv3sm3-1t0",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Team Group NV10000, 1TB, M.2 2280, PCIe NVMe, Leitura 10000 MB/s, Gravacao 8200 MB/s, TM8FGP001T0C101",
+      "price": "R$ 1.999,99",
+      "parcelamento": "12x de R$ 196,08",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/m/tm8fgp001t0c101.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-nv10000-1tb-m-2-2280-pcie-nvme-leitura-10000-mb-s-gravacao-8200-mb-s-tm8fgp001t0c101",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Lexar NQ780, 2TB, M.2 2280, PCIe NVMe, Leitura 7000MB/s, Gravacao 5000MB/s, LNQ780X002T-RNNNG",
+      "price": "R$ 2.199,99",
+      "parcelamento": "12x de R$ 215,69",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnq780x002trnnng.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nq780-2tb-m-2-2280-pcie-nvme-leitura-7000mb-s-gravacao-5000mb-s-lnq780x002t-rnnng",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Black SN850X, 1TB, M.2 2280, PCIe NVMe, Leitura 7300 MB/s, Gravacao 6300MB/s, WDS100T2XHE",
+      "price": "R$ 2.399,99",
+      "parcelamento": "12x de R$ 235,29",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds100t2xhe1012.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-black-sn850x-1tb-m-2-2280-pcie-nvme-leitura-7300-mb-s-gravacao-6300mb-s-wds100t2xhe",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Black SN8100, 1TB, M.2 2280, PICe NVMe, Leitura 14900MB/s, Gravacao 11000MB/s, WDS100T1X0M",
+      "price": "R$ 2.399,99",
+      "parcelamento": "12x de R$ 235,29",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds100t1x0m.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-black-sn8100-1tb-m-2-2280-pice-nvme-leitura-14900mb-s-gravacao-11000mb-s-wds100t1x0m",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Corsair MP600 PRO NH, 1TB, M.2 2280, PCIe NVMe, Leitura 7000MB/s, Gravacao 5700MB/s, CSSD-F1000GBMP600PNH",
+      "price": "R$ 2.499,99",
+      "parcelamento": "12x de R$ 245,10",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/s/cssd-f1000gbmp600pnh.jpg",
+      "url": "https://www.pichau.com.br/ssd-corsair-mp600-pro-nh-1tb-m-2-2280-pcie-nvme-leitura-7000mb-s-gravacao-5700mb-s-cssd-f1000gbmp600pnh",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Lexar NQ790, 2TB, M.2 2280, PCIe NVMe, Leitura 7000MB/s, Gravacao 6000MB/s, LNQ790X002T-RNNNG",
+      "price": "R$ 2.579,99",
+      "parcelamento": "12x de R$ 252,94",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnq790x002t-rnnng.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nq790-2tb-m-2-2280-pcie-nvme-leitura-7000mb-s-gravacao-6000mb-s-lnq790x002t-rnnng",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Corsair MP700 Pro, 1TB, M.2 2280, PCIe NVMe, Leitura 11700MB/s, Gravacao 9600MB/s, CSSD-F1000GBMP700PNH",
+      "price": "R$ 2.599,99",
+      "parcelamento": "12x de R$ 254,90",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/s/cssd-f1000gbmp700pnh.jpg",
+      "url": "https://www.pichau.com.br/ssd-corsair-mp700-pro-1tb-m-2-2280-pcie-nvme-leitura-11700mb-s-gravacao-9600mb-s-cssd-f1000gbmp700pnh",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Team Group MP44, 2TB, M.2 2280, PCIe NVMe, Leitura 7000 MB/s, Gravacao 6000 MB/s, TM8FPW002T0C101",
+      "price": "R$ 2.599,99",
+      "parcelamento": "12x de R$ 254,90",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/m/tm8fpw002t0c101.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-mp44-2tb-m-2-2280-pcie-nvme-leitura-7000-mb-s-gravacao-6000-mb-s-tm8fpw002t0c101",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Crucial T710, 1TB, M.2 2280, PCIe NVMe, Leitura 14900MB/s, Gravacao 13800MB/s, CT1000T710SSD5",
+      "price": "R$ 2.699,99",
+      "parcelamento": "12x de R$ 264,71",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/t/ct1000t710ssd5.jpg",
+      "url": "https://www.pichau.com.br/ssd-crucial-t710-1tb-m-2-2280-pcie-nvme-leitura-14900mb-s-gravacao-13800mb-s-ct1000t710ssd5",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Samsung 990 Evo, 2TB, M.2 2280, PCIe NVMe, Leitura 5000MB/s, Gravacao 4200MB/s, MZ-V9E2T0B-AM",
+      "price": "R$ 2.799,99",
+      "parcelamento": "12x de R$ 274,51",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/z/mz-v9e2t0b-am.jpg",
+      "url": "https://www.pichau.com.br/ssd-samsung-990-evo-2tb-m-2-2280-pcie-nvme-leitura-5000mb-s-gravacao-4200mb-s-mz-v9e2t0b-am",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Corsair MP700 Elite, 2TB, M.2 2280, PCIe NVMe, Leitura 10000MB/s, Gravacao 8500MB/s, CSSD-F2000GBMP700ENH",
+      "price": "R$ 2.799,99",
+      "parcelamento": "12x de R$ 274,51",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/s/cssd-f2000gbmp700enh.jpg",
+      "url": "https://www.pichau.com.br/ssd-corsair-mp700-elite-2tb-m-2-2280-pcie-nvme-leitura-10000mb-s-gravacao-8500mb-s-cssd-f2000gbmp700enh",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Team Group MP44L, 2TB, M.2 2280, PCIe NVMe, Leitura 4800MB/s, Gravacao 4400MB/s, TM8FPK002T0C101",
+      "price": "R$ 2.939,99",
+      "parcelamento": "12x de R$ 288,23",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/t/m/tm8fpk002t0c1012.jpg",
+      "url": "https://www.pichau.com.br/ssd-team-group-mp44l-2tb-m-2-2280-pcie-nvme-leitura-4800mb-s-gravacao-4400mb-s-tm8fpk002t0c101",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Corsair MP700 Pro, 2TB, M.2 2280, PCIe NVMe, Leitura 12400MB/s, 11800MB/s, CSSD-F2000GBMP700PRO",
+      "price": "R$ 2.999,99",
+      "parcelamento": "12x de R$ 294,12",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/s/cssd-f2000gbmp700pro2.jpg",
+      "url": "https://www.pichau.com.br/ssd-corsair-mp700-pro-2tb-m-2-2280-pcie-nvme-leitura-12400mb-s-11800mb-s-cssd-f2000gbmp700pro",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Blue SN5000, 4TB, M.2 2280, PCIe NVMe, Leitura 5500MB/s, Gravacao 5000MB/s, WDS400T4B0E",
+      "price": "R$ 3.299,99",
+      "parcelamento": "12x de R$ 323,53",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds400t4b0e.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-blue-sn5000-4tb-m-2-2280-pcie-nvme-leitura-5500mb-s-gravacao-5000mb-s-wds400t4b0e",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Kingston KC3000, 2TB, M.2 2280, PCIe NVMe, Leitura 7000MB/s, Gravacao 7000MB/s, SKC3000D/2048G",
+      "price": "R$ 3.599,99",
+      "parcelamento": "12x de R$ 352,94",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/k/skc3000d2048g2.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-kc3000-2tb-m-2-2280-pcie-nvme-leitura-7000mb-s-gravacao-7000mb-s-skc3000d-2048g",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Corsair MP600 Core XT, 4TB, M.2 2280, PCIe NVMe, Leitura 5000MB/s, Gravacao 4400MB/s, CSSD-F4000GBMP600CXT",
+      "price": "R$ 4.549,99",
+      "parcelamento": "12x de R$ 446,08",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/s/cssd-f4000gbmp600cxt1.jpg",
+      "url": "https://www.pichau.com.br/ssd-corsair-mp600-core-xt-4tb-m-2-2280-pcie-nvme-leitura-5000mb-s-gravacao-4400mb-s-cssd-f4000gbmp600cxt",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Corsair MP700 Elite, 2TB, M.2 2280, PCIe NVMe, Leitura 10000MB/s, Gravacao 8500MB/s, CSSD-F2000GBMP700EHS",
+      "price": "R$ 4.776,99",
+      "parcelamento": "12x de R$ 468,33",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/c/s/cssd-f2000gbmp700ehs.jpg",
+      "url": "https://www.pichau.com.br/ssd-corsair-mp700-elite-2tb-m-2-2280-pcie-nvme-leitura-10000mb-s-gravacao-8500mb-s-cssd-f2000gbmp700ehs",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Lexar NQ790, 4TB, M.2 2280, PCIe NVMe, Leitura 7000MB/s, Gravacao 6000MB/s, LNQ790X004T-RNNNG",
+      "price": "R$ 5.129,99",
+      "parcelamento": "12x de R$ 502,94",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/l/n/lnq790x004t-rnnng.jpg",
+      "url": "https://www.pichau.com.br/ssd-lexar-nq790-4tb-m-2-2280-pcie-nvme-leitura-7000mb-s-gravacao-6000mb-s-lnq790x004t-rnnng",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Kingston KC3000, 4TB, M.2 2280, PCIe NVMe, Leitura 7000MB/s, Gravacao 7000MB/s, SKC3000D/4096G",
+      "price": "R$ 6.499,99",
+      "parcelamento": "12x de R$ 637,25",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/s/k/skc3000d4096g2.jpg",
+      "url": "https://www.pichau.com.br/ssd-kingston-kc3000-4tb-m-2-2280-pcie-nvme-leitura-7000mb-s-gravacao-7000mb-s-skc3000d-4096g",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD Samsung 990 Pro, 4TB, M.2 2280, PCIe NVMe, Leitura 7450MB/s, Gravacao 6900MB/s, MZ-V9P4T0CW",
+      "price": "R$ 6.999,99",
+      "parcelamento": "12x de R$ 686,27",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/m/z/mz-v9p4t0cw2.jpg",
+      "url": "https://www.pichau.com.br/ssd-samsung-990-pro-4tb-m-2-2280-pcie-nvme-leitura-7450mb-s-gravacao-6900mb-s-mz-v9p4t0cw",
+      "relevancia": 2
+    },
+    {
+      "title": "SSD WD Black SN8100, 4TB, M.2 2280, PCIe NVMe, Leitura 14900MB/s, Gravacao 14000MB/s, WDS400T1X0M",
+      "price": "R$ 6.999,99",
+      "parcelamento": "12x de R$ 686,27",
+      "image": "https://media.pichau.com.br/media/catalog/product/cache/ef72d3c27864510e5d4c0ce69bade259/w/d/wds400t1x0m.jpg",
+      "url": "https://www.pichau.com.br/ssd-wd-black-sn8100-4tb-m-2-2280-pcie-nvme-leitura-14900mb-s-gravacao-14000mb-s-wds400t1x0m",
+      "relevancia": 2
     }
   ]
 }

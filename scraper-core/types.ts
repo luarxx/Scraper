@@ -15,6 +15,7 @@ export interface SiteConfig {
   searchUrl: ((termo: string) => string) | null;
   waitStrategy: 'networkidle' | 'domcontentloaded' | 'load' | null;
   precisaHomePrimeiro: boolean;
+  persistSession?: boolean;
   selectors: { productCard: string; title: string; priceContainer: string } | null;
   usaApi?: boolean;
   apiUrl?: (termo: string) => string;

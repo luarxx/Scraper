@@ -219,9 +219,13 @@ Exibir estimativas de cashback ou descontos para Pix/boleto.
 
 ## 7. Notificações e Automação
 
-### 7.1 Webhook Discord / Telegram ⬜
-Enviar resultado de busca ou alerta de preço para um canal.
+### 7.1 Webhook Discord / Telegram 🟡
+Webhook Discord implementado. Enviar resultado de busca ou alerta de preço para um canal.
 **Valor:** Médio | **Complexidade:** Média
+
+### 7.1.1 Adicionar link do Scraper na mensagem do bot do Discord ⬜
+Incluir no embed da mensagem do Discord um link direto para o Scraper (URL do servidor) para que o usuário possa clicar e abrir a interface.
+**Valor:** Baixo | **Complexidade:** Baixa
 
 ### 7.2 CLI interativa (prompt) ⬜
 Menu interativo com `readline` ou `inquirer` para escolher site e termo.

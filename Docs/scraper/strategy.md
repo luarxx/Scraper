@@ -13,6 +13,7 @@ interface SiteConfig {
   searchUrl: ((termo: string) => string) | null;
   waitStrategy: 'networkidle' | 'domcontentloaded' | 'load' | null;
   precisaHomePrimeiro: boolean;
+  persistSession?: boolean;
   selectors: { productCard: string; title: string; priceContainer: string } | null;
   usaApi?: boolean;
   apiUrl?: (termo: string) => string;
@@ -52,4 +53,18 @@ Para adicionar um site:
 
 O cache de resultados fica em `data/cache/` e tem TTL de 10 minutos.
 
+Buscas identicas em voo sao deduplicadas por site + termo para evitar abrir browsers duplicados antes do cache ser salvo.
+
 Nao investigar caches salvo quando a tarefa envolver explicitamente cache, persistencia ou artefatos gerados.
+
+## Session and Retries
+
+`scraper-core/browserSession.ts` carrega e salva `storageState` por site em `data/session-state/`.
+
+Por padrao, sites reaproveitam sessao; use `persistSession: false` em `SiteConfig` para desligar. O estado so e salvo depois de uma coleta bem-sucedida.
+
+`scraper-core/retry.ts` aplica:
+
+- ate 3 tentativas para falhas transitorias;
+- ate 2 tentativas para captcha/challenge;
+- sem retry para falhas estruturais de parsing.

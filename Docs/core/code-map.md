@@ -11,6 +11,8 @@ Mapa completo dos principais arquivos e diretorios do projeto.
 |   |-- search.ts           # buscarProduto() e buscarProdutoPorUrl()
 |   |-- productPageParser.ts # Parsing HTML de pagina de produto por URL
 |   |-- cache.ts            # Normalizacao de termo e cache por SHA256
+|   |-- browserSession.ts   # Reuso de storageState/cookies por site
+|   |-- retry.ts            # Backoff exponencial e retries limitados
 |   |-- fingerprint.ts      # Fingerprint e init script anti-deteccao
 |   |-- browserBehavior.ts  # Waits, mouse/scroll e deteccao de challenge
 |   `-- cli.ts              # Parser de argumentos e saida de terminal
@@ -79,7 +81,8 @@ Mapa completo dos principais arquivos e diretorios do projeto.
 |   |-- prices.db           # Legacy: historico de precos
 |   |-- resultado.json      # Ultimo resultado do scraper CLI
 |   |-- resultado.js        # Mesmo resultado, formato window.__RESULT
-|   `-- cache/              # Cache de resultados SHA256, TTL 10min
+|   |-- cache/              # Cache de resultados SHA256, TTL 10min
+|   `-- session-state/      # Playwright storageState por site
 `-- .opencode/              # Config do opencode
 ```
 

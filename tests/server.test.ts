@@ -73,6 +73,15 @@ describe('server helpers', () => {
     mod.db.close();
   });
 
+  it('resolve a raiz do projeto quando roda compilado em dist/server-core', async () => {
+    const mod = await importServer();
+
+    expect(mod.resolveProjectRoot(path.join('home', 'ubuntu', 'Scraper', 'dist', 'server-core')))
+      .toBe(path.resolve('home', 'ubuntu', 'Scraper'));
+
+    mod.db.close();
+  });
+
   it('calcula próxima execução na próxima grade horária', async () => {
     const mod = await importServer({ auto: '3', watch: '3' });
     vi.useFakeTimers();

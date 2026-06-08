@@ -38,8 +38,8 @@ Server (server.ts - Node.js http)
      |   |-- watch_alerts (alertas por URL de produto)
      |   `-- watch_checks (historico de verificacoes)
      |
-     |-- Scheduler (AUTO_INTERVAL_HOURS, minimo 3h)
-     |   `-- Itera auto_config -> buscarProduto() sequencial -> salva resultados
+     |-- Scheduler (AUTO_INTERVAL_HOURS, minimo 3h; AUTO_MAX_CONCURRENCY, default 3)
+     |   `-- Itera auto_config -> buscarProduto() com concorrencia limitada -> salva resultados
      |
      `-- Watch Scheduler (WATCH_INTERVAL_HOURS, minimo 3h)
          `-- Itera watch_alerts -> buscarProdutoPorUrl() -> Discord quando preco <= alvo

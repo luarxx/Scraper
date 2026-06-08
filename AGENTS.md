@@ -124,10 +124,11 @@ Para novos sites:
 - Horarios devem usar `America/Sao_Paulo`.
 - Auto/Watch tem intervalo minimo de 3h.
 - Auto Search usa `AUTO_INTERVAL_HOURS`; valores abaixo de 3 sao elevados para 3.
+- Auto Search usa `AUTO_MAX_CONCURRENCY`; default 3, minimo 1 e maximo 10.
 - Alertas Discord pertencem ao Watch; Auto Search nao envia notificacoes.
 - Usar soft delete/status em vez de remover fisicamente configs e alertas.
 - Resultados automaticos ficam como JSON text no SQLite, coluna `produtos`.
-- Schedulers executam buscas sequenciais e recuperam crash quando ultima execucao ficou `executando`.
+- Auto Search executa buscas com concorrencia limitada e recupera crash quando ultima execucao ficou `executando`.
 - Logs operacionais devem usar prefixo curto, por exemplo `[Busca Manual]`, `[Busca Automatica]`, `[Watch]`.
 - Server-side SQLite usa `better-sqlite3`, `db.prepare()` e transacoes com `db.transaction()`.
 - Documentacao viva: atualize `AGENTS.md` e/ou `Docs/` quando mudar funcionalidades, sites, comandos, arquitetura ou convencoes.

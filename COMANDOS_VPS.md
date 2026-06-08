@@ -104,9 +104,10 @@ Configuracao atual recomendada:
 
 ```env
 AUTO_INTERVAL_HOURS=3
+AUTO_MAX_CONCURRENCY=3
 ```
 
-O minimo aceito pelo servidor e 3 horas. Depois de alterar:
+O minimo aceito pelo servidor e 3 horas para o intervalo. A concorrencia da busca automatica aceita de 1 a 10, com 3 como padrao recomendado. Depois de alterar:
 
 ```bash
 pm2 restart scraper

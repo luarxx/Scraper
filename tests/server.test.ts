@@ -9,13 +9,14 @@ const buscarProdutoPorUrlMock = vi.fn();
 
 type ServerModule = typeof import('../server');
 
-async function importServer(options: { auto?: string; watch?: string; webhook?: string } = {}): Promise<ServerModule> {
+async function importServer(options: { auto?: string; autoConcurrency?: string; watch?: string; webhook?: string } = {}): Promise<ServerModule> {
   vi.resetModules();
   buscarProdutoMock.mockReset();
   buscarProdutoPorUrlMock.mockReset();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'scraper-tests-'));
   process.env.SCRAPER_DB_PATH = path.join(dir, 'scraper.db');
   process.env.AUTO_INTERVAL_HOURS = options.auto;
+  process.env.AUTO_MAX_CONCURRENCY = options.autoConcurrency;
   process.env.WATCH_INTERVAL_HOURS = options.watch;
   process.env.DISCORD_WEBHOOK_URL = options.webhook || '';
   process.env.DISCORD_WEBHOOK_AVATAR_URL = '';
@@ -47,6 +48,14 @@ async function closeServer(server: http.Server | null): Promise<void> {
   });
 }
 
+async function waitUntil(predicate: () => boolean): Promise<void> {
+  const start = Date.now();
+  while (!predicate()) {
+    if (Date.now() - start > 1000) throw new Error('Timeout aguardando condição');
+    await new Promise(resolve => setTimeout(resolve, 0));
+  }
+}
+
 async function jsonRequest(baseUrl: string, pathname: string, init?: RequestInit) {
   const res = await fetch(`${baseUrl}${pathname}`, init);
   const body = await res.json();
@@ -58,6 +67,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   delete process.env.SCRAPER_DB_PATH;
   delete process.env.AUTO_INTERVAL_HOURS;
+  delete process.env.AUTO_MAX_CONCURRENCY;
   delete process.env.WATCH_INTERVAL_HOURS;
   delete process.env.DISCORD_WEBHOOK_URL;
   vi.doUnmock('../scraper');
@@ -68,9 +78,28 @@ describe('server helpers', () => {
     const mod = await importServer({ auto: '1', watch: '2' });
 
     expect(mod.AUTO_INTERVAL_HOURS).toBe(3);
+    expect(mod.AUTO_MAX_CONCURRENCY).toBe(3);
     expect(mod.WATCH_INTERVAL_HOURS).toBe(3);
 
     mod.db.close();
+  });
+
+  it('normaliza concorrência máxima da busca automática', async () => {
+    const defaultMod = await importServer();
+    expect(defaultMod.AUTO_MAX_CONCURRENCY).toBe(3);
+    defaultMod.db.close();
+
+    const minMod = await importServer({ autoConcurrency: '0' });
+    expect(minMod.AUTO_MAX_CONCURRENCY).toBe(1);
+    minMod.db.close();
+
+    const invalidMod = await importServer({ autoConcurrency: 'abc' });
+    expect(invalidMod.AUTO_MAX_CONCURRENCY).toBe(3);
+    invalidMod.db.close();
+
+    const maxMod = await importServer({ autoConcurrency: '12' });
+    expect(maxMod.AUTO_MAX_CONCURRENCY).toBe(10);
+    maxMod.db.close();
   });
 
   it('resolve a raiz do projeto quando roda compilado em dist/server-core', async () => {
@@ -272,6 +301,62 @@ describe('watch scheduler rules', () => {
     const resultado = mod.db.prepare(`SELECT status, total FROM auto_resultados`).get() as { status: string; total: number };
     expect(resultado).toEqual({ status: 'ok', total: 1 });
     expect(globalThis.fetch).not.toHaveBeenCalled();
+
+    mod.db.close();
+  });
+
+  it('executa busca automática com até 3 buscas simultâneas', async () => {
+    const mod = await importServer({ autoConcurrency: '3' });
+    const started: string[] = [];
+    const resolvers = new Map<string, () => void>();
+
+    buscarProdutoMock.mockImplementation((site: string, termo: string) => {
+      started.push(termo);
+      return new Promise((resolve) => {
+        resolvers.set(termo, () => resolve({
+          termo,
+          site,
+          siteNome: site,
+          timestamp: new Date().toISOString(),
+          total: 1,
+          produtos: [{
+            title: termo,
+            price: 'R$ 199,90',
+            parcelamento: null,
+            image: '',
+            url: `https://loja.test/${termo}`,
+            relevancia: 1,
+          }],
+        }));
+      });
+    });
+
+    for (const [ordem, termo] of ['ssd', 'gpu', 'cpu', 'ram'].entries()) {
+      mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+        .run(termo, 'kabum', ordem, '2026-06-05 10:00:00');
+    }
+
+    const runPromise = mod.executarAutoBuscas();
+
+    await waitUntil(() => started.length === 3);
+    expect(started).toEqual(['ssd', 'gpu', 'cpu']);
+
+    resolvers.get('ssd')?.();
+    await waitUntil(() => started.length === 4);
+    expect(started).toEqual(['ssd', 'gpu', 'cpu', 'ram']);
+
+    resolvers.get('gpu')?.();
+    resolvers.get('cpu')?.();
+    resolvers.get('ram')?.();
+    await runPromise;
+
+    const resultados = mod.db.prepare(`SELECT status, total FROM auto_resultados ORDER BY id`).all() as { status: string; total: number }[];
+    expect(resultados).toEqual([
+      { status: 'ok', total: 1 },
+      { status: 'ok', total: 1 },
+      { status: 'ok', total: 1 },
+      { status: 'ok', total: 1 },
+    ]);
 
     mod.db.close();
   });

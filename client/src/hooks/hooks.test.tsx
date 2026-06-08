@@ -2,6 +2,7 @@ import { act, cleanup, render, renderHook, screen, waitFor } from '@testing-libr
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ProductCard } from '../components/ProductCard';
+import { SearchForm } from '../components/SearchForm';
 import { StateMessage } from '../components/StateMessage';
 import { StatsDashboardPanel } from '../components/StatsDashboardPanel';
 import { useAutoConfig } from './useAutoConfig';
@@ -237,6 +238,68 @@ describe('useStatsDashboard', () => {
 });
 
 describe('critical UI states', () => {
+  it('renderiza sugestões fixas ao focar no campo de busca', async () => {
+    const user = userEvent.setup();
+    const onSearch = vi.fn();
+
+    render(<SearchForm onSearch={onSearch} loading={false} />);
+    await user.click(screen.getByRole('combobox'));
+
+    expect(screen.queryByRole('option', { name: /rtx 4060/i })).not.toBeNull();
+    expect(screen.queryByRole('option', { name: /ssd nvme 1tb/i })).not.toBeNull();
+  });
+
+  it('filtra sugestões conforme o termo digitado', async () => {
+    const user = userEvent.setup();
+    const onSearch = vi.fn();
+
+    render(<SearchForm onSearch={onSearch} loading={false} />);
+    await user.type(screen.getByRole('combobox'), 'mon');
+
+    expect(screen.queryByRole('option', { name: /monitor 144hz/i })).not.toBeNull();
+    expect(screen.queryByRole('option', { name: /rtx 4060/i })).toBeNull();
+  });
+
+  it('seleciona sugestão com clique e usa o site da sugestão recente', async () => {
+    const user = userEvent.setup();
+    const onSearch = vi.fn();
+
+    render(
+      <SearchForm
+        onSearch={onSearch}
+        loading={false}
+        history={[{ termo: 'SSD 1TB', site: 'pichau', siteNome: 'Pichau' }]}
+      />,
+    );
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: /ssd 1tb/i }));
+
+    expect(onSearch).toHaveBeenCalledWith('SSD 1TB', 'pichau');
+  });
+
+  it('navega por teclado e confirma sugestão com Enter', async () => {
+    const user = userEvent.setup();
+    const onSearch = vi.fn();
+
+    render(<SearchForm onSearch={onSearch} loading={false} />);
+    await user.click(screen.getByRole('combobox'));
+    await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+
+    expect(onSearch).toHaveBeenCalledWith('Ryzen 7 5700X', 'kabum');
+  });
+
+  it('fecha sugestões com Escape', async () => {
+    const user = userEvent.setup();
+    const onSearch = vi.fn();
+
+    render(<SearchForm onSearch={onSearch} loading={false} />);
+    await user.click(screen.getByRole('combobox'));
+
+    expect(screen.queryByRole('listbox')).not.toBeNull();
+    await user.keyboard('{Escape}');
+    expect(screen.queryByRole('listbox')).toBeNull();
+  });
+
   it('renderiza estados principais de busca', () => {
     const { rerender } = render(<StateMessage type="initial" />);
     expect(screen.queryByText('Compare antes de comprar')).not.toBeNull();

@@ -1,5 +1,5 @@
 import * as http from 'http';
-import { AUTO_INTERVAL_HOURS, executarAutoBuscas, getAutoStatus, iniciarScheduler } from './server-core/auto';
+import { AUTO_INTERVAL_HOURS, AUTO_MAX_CONCURRENCY, executarAutoBuscas, getAutoStatus, iniciarScheduler } from './server-core/auto';
 import { createServer } from './server-core/app';
 import { db, initDatabase } from './server-core/db';
 import { PORT, PORT_AUTO_FALLBACK, PORT_MAX_ATTEMPTS, resolveProjectRoot } from './server-core/env';
@@ -46,6 +46,7 @@ function startServer(): http.Server {
 
 export {
   AUTO_INTERVAL_HOURS,
+  AUTO_MAX_CONCURRENCY,
   WATCH_INTERVAL_HOURS,
   brlToCents,
   calcularProximoHorarioIntervalo,

@@ -42,6 +42,7 @@ Variaveis comuns:
 
 ```bash
 AUTO_INTERVAL_HOURS=3
+AUTO_MAX_CONCURRENCY=3
 WATCH_INTERVAL_HOURS=3
 PORT=3000
 API_PORT=3000
@@ -53,6 +54,7 @@ DISCORD_WEBHOOK_AVATAR_URL=https://alguma-url-da-imagem.png
 ## Notes
 
 - Auto Search nao envia Discord em producao.
+- Auto Search usa `AUTO_MAX_CONCURRENCY=3` por padrao para limitar browsers simultaneos.
 - Watch Alerts usa `DISCORD_WEBHOOK_URL` para notificacoes.
 - Auto e Watch tem intervalo minimo de 3h.
 - Horarios devem usar `America/Sao_Paulo`, inclusive em VPS UTC.

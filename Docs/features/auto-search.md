@@ -5,12 +5,13 @@ Auto Search permite configurar ate 10 produtos para busca automatica.
 ## Core Rules
 
 - Intervalo default: 6 horas.
-- Configuravel por `AUTO_INTERVAL_HOURS` no `.env`.
+- Intervalo configuravel por `AUTO_INTERVAL_HOURS` no `.env`.
+- Concorrencia configuravel por `AUTO_MAX_CONCURRENCY` no `.env`; default 3, minimo 1, maximo 10.
 - Minimo obrigatorio: 3 horas.
 - Auto Search salva resultados no SQLite e atualiza historico de precos.
 - Auto Search nao envia Discord, mesmo quando `DISCORD_WEBHOOK_URL` esta configurado.
 - Alertas Discord pertencem exclusivamente ao fluxo Watch.
-- Buscas sao sequenciais, uma por vez, para evitar multiplos browsers simultaneos.
+- Buscas rodam com concorrencia limitada; por padrao ate 3 browsers Playwright simultaneos.
 
 ## Backend
 
@@ -41,6 +42,7 @@ Auto Search permite configurar ate 10 produtos para busca automatica.
 - Inicializado junto com o servidor.
 - Executa em grades baseadas no intervalo configurado.
 - Com `AUTO_INTERVAL_HOURS=3`: 00:00, 03:00, 06:00, 09:00...
+- Com `AUTO_MAX_CONCURRENCY=3`, processa ate 3 configuracoes ao mesmo tempo.
 - Usa fuso fixo `America/Sao_Paulo`.
 - Usa o mesmo fuso para agendamento, persistencia e exibicao no frontend.
 - Na inicializacao, verifica se esta atrasado alem do intervalo configurado e executa imediatamente.

@@ -44,8 +44,9 @@ Ao adicionar um novo site, registrar a cor em:
 - Horarios devem usar `America/Sao_Paulo` no backend e nos formatadores do frontend.
 - Isso evita diferenca de fuso em VPS UTC.
 - Auto Search usa `AUTO_INTERVAL_HOURS`; valores abaixo de 3 sao elevados para 3.
+- Auto Search usa `AUTO_MAX_CONCURRENCY`; default 3, minimo 1 e maximo 10.
 - Watch usa `WATCH_INTERVAL_HOURS`; valores abaixo de 3 sao elevados para 3.
-- Schedulers executam buscas sequenciais, uma por vez.
+- Auto Search executa buscas com concorrencia limitada; Watch executa alertas em sequencia.
 - Schedulers devem recuperar crash quando a ultima execucao ficou com status `executando`.
 
 ## Notifications

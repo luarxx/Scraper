@@ -6,3 +6,4 @@ dist/
 .env.*
 !.env.example
 acessar-vps.bat
+data/session-state/

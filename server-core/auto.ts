@@ -5,17 +5,43 @@ import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, fo
 
 const MIN_AUTO_INTERVAL_HOURS = 3;
 const DEFAULT_AUTO_INTERVAL_HOURS = 6;
+const MIN_AUTO_CONCURRENCY = 1;
+const MAX_AUTO_CONCURRENCY = 10;
+const DEFAULT_AUTO_CONCURRENCY = 3;
 const configuredIntervalHours = Number(process.env.AUTO_INTERVAL_HOURS);
 export const AUTO_INTERVAL_HOURS = Number.isFinite(configuredIntervalHours)
   ? Math.max(MIN_AUTO_INTERVAL_HOURS, Math.floor(configuredIntervalHours))
   : DEFAULT_AUTO_INTERVAL_HOURS;
+const configuredAutoConcurrency = Number(process.env.AUTO_MAX_CONCURRENCY);
+export const AUTO_MAX_CONCURRENCY = Number.isFinite(configuredAutoConcurrency)
+  ? Math.min(MAX_AUTO_CONCURRENCY, Math.max(MIN_AUTO_CONCURRENCY, Math.floor(configuredAutoConcurrency)))
+  : DEFAULT_AUTO_CONCURRENCY;
 const INTERVALO_MS = AUTO_INTERVAL_HOURS * 60 * 60 * 1000;
 let schedulerStatus: 'idle' | 'executando' | 'agendado' = 'idle';
 let proximaExecucao: string | null = null;
 let schedulerTimer: ReturnType<typeof setInterval> | null = null;
 
+type AutoConfig = {
+  id: number;
+  termo: string;
+  site: string;
+};
+
 function calcularProximoHorario(): Date {
   return calcularProximoHorarioIntervalo(AUTO_INTERVAL_HOURS);
+}
+
+async function executarComConcorrencia<T>(items: T[], limit: number, worker: (item: T) => Promise<void>): Promise<void> {
+  let index = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (index < items.length) {
+      const item = items[index];
+      index++;
+      await worker(item);
+    }
+  });
+
+  await Promise.all(workers);
 }
 
 export async function executarAutoBuscas(): Promise<void> {
@@ -25,7 +51,7 @@ export async function executarAutoBuscas(): Promise<void> {
 
   const configs = db.prepare(
     `SELECT id, termo, site FROM auto_config WHERE ativo = 1 ORDER BY ordem`
-  ).all() as { id: number; termo: string; site: string }[];
+  ).all() as AutoConfig[];
 
   if (configs.length === 0) {
     schedulerStatus = 'agendado';
@@ -51,7 +77,7 @@ export async function executarAutoBuscas(): Promise<void> {
   });
   insertMany(configs);
 
-  for (const config of configs) {
+  await executarComConcorrencia(configs, AUTO_MAX_CONCURRENCY, async (config) => {
     try {
       const data = await buscarProduto(config.site, config.termo);
       if ('erro' in data && data.erro) {
@@ -70,7 +96,7 @@ export async function executarAutoBuscas(): Promise<void> {
         `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
       ).run(error.message, execucaoId, config.id);
     }
-  }
+  });
 
   db.prepare(
     `UPDATE auto_execucoes SET finalizada_em = ?, status = 'concluido' WHERE id = ?`

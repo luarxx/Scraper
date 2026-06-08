@@ -141,9 +141,12 @@ Variavel configurada:
 
 ```env
 AUTO_INTERVAL_HOURS=3
+AUTO_MAX_CONCURRENCY=3
 ```
 
-Essa variavel controla o intervalo da busca automatica. O minimo aceito pelo servidor e 3 horas. Se for definido `1` ou `2`, o servidor usa 3 horas. Se a variavel nao existir, o padrao e 6 horas.
+`AUTO_INTERVAL_HOURS` controla o intervalo da busca automatica. O minimo aceito pelo servidor e 3 horas. Se for definido `1` ou `2`, o servidor usa 3 horas. Se a variavel nao existir, o padrao e 6 horas.
+
+`AUTO_MAX_CONCURRENCY` controla quantas buscas automaticas rodam ao mesmo tempo. O padrao recomendado para a VPS atual e 3; valores aceitos vao de 1 a 10.
 
 Depois de alterar o `.env`, reiniciar o app:
 
@@ -413,7 +416,7 @@ Para o site funcionar publicamente:
 ```txt
 [x] client/dist/index.html existe
 [x] dist/server.js existe
-[x] .env existe com AUTO_INTERVAL_HOURS
+[x] .env existe com AUTO_INTERVAL_HOURS e AUTO_MAX_CONCURRENCY
 [x] npm install --omit=dev executado
 [x] Chromium do Playwright instalado
 [x] Node responde em localhost:3000

@@ -1,7 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const ROOT = path.resolve(__dirname, '..');
+export function resolveProjectRoot(runtimeDir: string): string {
+  const parent = path.resolve(runtimeDir, '..');
+  return path.basename(parent) === 'dist' ? path.resolve(parent, '..') : parent;
+}
+
+export const ROOT = resolveProjectRoot(__dirname);
 
 export function loadEnv(): void {
   const envPath = path.join(ROOT, '.env');

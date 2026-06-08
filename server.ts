@@ -2,7 +2,7 @@ import * as http from 'http';
 import { AUTO_INTERVAL_HOURS, executarAutoBuscas, getAutoStatus, iniciarScheduler } from './server-core/auto';
 import { createServer } from './server-core/app';
 import { db, initDatabase } from './server-core/db';
-import { PORT, PORT_AUTO_FALLBACK, PORT_MAX_ATTEMPTS } from './server-core/env';
+import { PORT, PORT_AUTO_FALLBACK, PORT_MAX_ATTEMPTS, resolveProjectRoot } from './server-core/env';
 import { brlToCents, centsToBrl, parseTargetPrice } from './server-core/money';
 import { calcularProximoHorarioIntervalo, formatApiDatetime, formatDbDatetime } from './server-core/time';
 import { WATCH_INTERVAL_HOURS, executarWatchAlerts, getWatchStatus, iniciarWatchScheduler, normalizarWatchAlert } from './server-core/watch';
@@ -61,6 +61,7 @@ export {
   initDatabase,
   normalizarWatchAlert,
   parseTargetPrice,
+  resolveProjectRoot,
   startServer,
 };
 

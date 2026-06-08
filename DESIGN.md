@@ -93,6 +93,7 @@ Todas as animações respeitam `prefers-reduced-motion: reduce`, que reduz trans
 - Seletor de site em **abas** (botões lado a lado com fundo slate-900 e borda slate-800)
 - Aba ativa: cor da loja + fundo translúcido + animação `tabActivate`
 - Botão "Comparar precos agora" com cor sólida `accent`, hover `accent-hover` e foco visível
+- Autocomplete customizado abaixo do input combina histórico local com exemplos fixos, suporta mouse, `ArrowUp`/`ArrowDown`, `Enter` e `Escape`, e mantém badges por loja
 - Modo `compact` (header sticky) vs modo normal (página inicial)
 - A primeira tela do modo Buscar apresenta a promessa "Compare precos de informatica sem abrir varias abas" antes do input.
 - No estado inicial, o SearchForm aparece apenas no hero; o header compacto entra depois que a busca sai do estado inicial.

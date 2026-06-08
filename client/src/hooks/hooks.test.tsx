@@ -3,9 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ProductCard } from '../components/ProductCard';
 import { StateMessage } from '../components/StateMessage';
+import { StatsDashboardPanel } from '../components/StatsDashboardPanel';
 import { useAutoConfig } from './useAutoConfig';
 import { useAutoResults } from './useAutoResults';
 import { useSearch } from './useSearch';
+import { useStatsDashboard } from './useStatsDashboard';
 import { useWatchAlerts } from './useWatchAlerts';
 
 vi.mock('./usePriceHistory', () => ({
@@ -202,6 +204,38 @@ describe('useWatchAlerts', () => {
   });
 });
 
+describe('useStatsDashboard', () => {
+  it('carrega estatísticas do dashboard', async () => {
+    mockFetch({
+      body: {
+        total_buscas: 3,
+        sucessos: 2,
+        erros: 1,
+        taxa_sucesso: 66.67,
+        tempo_medio_resposta_ms: 1200,
+        atualizado_em: '2026-06-05T10:00:00-03:00',
+        sites: [{ site: 'kabum', siteNome: 'KaBuM!', total: 2, sucessos: 2, erros: 0, taxa_sucesso: 100, tempo_medio_resposta_ms: 900 }],
+      },
+    });
+    const { result } = renderHook(() => useStatsDashboard());
+
+    await act(async () => result.current.fetchStats());
+
+    expect(result.current.stats?.total_buscas).toBe(3);
+    expect(result.current.stats?.sites[0].site).toBe('kabum');
+    expect(result.current.error).toBeNull();
+  });
+
+  it('expõe erro ao falhar carregamento de estatísticas', async () => {
+    mockFetch({ ok: false, status: 500, body: { mensagem: 'Falha no dashboard' } });
+    const { result } = renderHook(() => useStatsDashboard());
+
+    await act(async () => result.current.fetchStats());
+
+    expect(result.current.error).toBe('Falha no dashboard');
+  });
+});
+
 describe('critical UI states', () => {
   it('renderiza estados principais de busca', () => {
     const { rerender } = render(<StateMessage type="initial" />);
@@ -234,5 +268,44 @@ describe('critical UI states', () => {
     await user.click(screen.getByRole('button', { name: /avisar quando baixar/i }));
 
     await waitFor(() => expect(onCreateAlert).toHaveBeenCalledWith(produto, 'kabum'));
+  });
+
+  it('renderiza dashboard com KPIs e ranking de sites', async () => {
+    mockFetch({
+      body: {
+        total_buscas: 3,
+        sucessos: 2,
+        erros: 1,
+        taxa_sucesso: 66.67,
+        tempo_medio_resposta_ms: 1200,
+        atualizado_em: '2026-06-05T10:00:00-03:00',
+        sites: [{ site: 'kabum', siteNome: 'KaBuM!', total: 2, sucessos: 2, erros: 0, taxa_sucesso: 100, tempo_medio_resposta_ms: 900 }],
+      },
+    });
+
+    render(<StatsDashboardPanel />);
+
+    await waitFor(() => expect(screen.queryByText('Total de buscas')).not.toBeNull());
+    expect(screen.queryByText('Sites mais acessíveis')).not.toBeNull();
+    expect(screen.queryByText('KaBuM!')).not.toBeNull();
+    expect(screen.queryByText('66,67%')).not.toBeNull();
+  });
+
+  it('renderiza empty state do dashboard sem métricas', async () => {
+    mockFetch({
+      body: {
+        total_buscas: 0,
+        sucessos: 0,
+        erros: 0,
+        taxa_sucesso: 0,
+        tempo_medio_resposta_ms: 0,
+        atualizado_em: null,
+        sites: [],
+      },
+    });
+
+    render(<StatsDashboardPanel />);
+
+    await waitFor(() => expect(screen.queryByText('Nenhuma métrica registrada ainda')).not.toBeNull());
   });
 });

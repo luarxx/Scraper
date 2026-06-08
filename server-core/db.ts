@@ -51,6 +51,22 @@ export function initDatabase(): void {
 
     CREATE INDEX IF NOT EXISTS idx_price_history_url ON price_history(url, site);
 
+    CREATE TABLE IF NOT EXISTS search_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      origem TEXT NOT NULL,
+      site TEXT NOT NULL,
+      termo TEXT,
+      url TEXT,
+      status TEXT NOT NULL,
+      total INTEGER NOT NULL DEFAULT 0,
+      duracao_ms INTEGER NOT NULL,
+      erro TEXT,
+      criado_em TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_search_metrics_site ON search_metrics(site);
+    CREATE INDEX IF NOT EXISTS idx_search_metrics_criado ON search_metrics(criado_em);
+
     CREATE TABLE IF NOT EXISTS watch_alerts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       nome TEXT NOT NULL,

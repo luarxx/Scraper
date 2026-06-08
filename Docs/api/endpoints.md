@@ -32,6 +32,14 @@ Servidor HTTP nativo em Node.js, sem Express/Fastify.
 | `/api/watch/status` | GET | nenhum | Status do scheduler Watch + webhook |
 | `/api/watch/run` | POST | nenhum | Dispara verificacao manual dos alertas |
 
+## Stats Dashboard
+
+| Rota | Metodo | Parametros/body | Descricao |
+|---|---|---|---|
+| `/api/stats/dashboard` | GET | nenhum | Estatisticas all-time de buscas manuais, Auto Search e Watch |
+
+Retorna `total_buscas`, `sucessos`, `erros`, `taxa_sucesso`, `tempo_medio_resposta_ms`, `atualizado_em` e `sites`. O ranking de `sites` ordena por maior taxa de sucesso, depois maior volume e menor tempo medio.
+
 ## Static Serving
 
 - Se `client/dist/index.html` existir, o servidor serve a SPA a partir de `client/dist/`.
@@ -46,4 +54,5 @@ Handlers HTTP ficam em `server-core/routes/`, organizados por contexto:
 - search;
 - auto;
 - watch;
+- stats;
 - history.

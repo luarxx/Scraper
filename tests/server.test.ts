@@ -177,6 +177,29 @@ describe('server API', () => {
     expect(search.res.status).toBe(200);
     expect(search.body.total).toBe(1);
     expect(buscarProdutoMock).toHaveBeenCalledWith('kabum', 'ssd');
+    expect((await jsonRequest(baseUrl, '/api/stats/dashboard')).body).toMatchObject({
+      total_buscas: 1,
+      sucessos: 1,
+      erros: 0,
+      taxa_sucesso: 100,
+      sites: [expect.objectContaining({ site: 'kabum', total: 1, sucessos: 1, erros: 0 })],
+    });
+
+    mod.db.prepare(
+      `INSERT INTO search_metrics (origem, site, termo, status, total, duracao_ms, erro, criado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run('manual', 'pichau', 'gpu', 'erro', 0, 900, 'Falha mockada', '2026-06-05 10:03:00');
+    mod.db.prepare(
+      `INSERT INTO search_metrics (origem, site, termo, status, total, duracao_ms, erro, criado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run('auto', 'terabyteshop', 'ram', 'ok', 0, 200, null, '2026-06-05 10:04:00');
+
+    const dashboard = await jsonRequest(baseUrl, '/api/stats/dashboard');
+    expect(dashboard.res.status).toBe(200);
+    expect(dashboard.body.total_buscas).toBe(3);
+    expect(dashboard.body.taxa_sucesso).toBeCloseTo(66.67, 2);
+    expect(dashboard.body.tempo_medio_resposta_ms).toBeGreaterThan(0);
+    expect(dashboard.body.sites.map((item: { site: string }) => item.site)).toEqual(['kabum', 'terabyteshop', 'pichau']);
 
     const saved = await jsonRequest(baseUrl, '/api/auto/config', {
       method: 'POST',
@@ -300,6 +323,8 @@ describe('watch scheduler rules', () => {
 
     const resultado = mod.db.prepare(`SELECT status, total FROM auto_resultados`).get() as { status: string; total: number };
     expect(resultado).toEqual({ status: 'ok', total: 1 });
+    const metric = mod.db.prepare(`SELECT origem, site, termo, status, total FROM search_metrics`).get() as { origem: string; site: string; termo: string; status: string; total: number };
+    expect(metric).toEqual({ origem: 'auto', site: 'kabum', termo: 'ssd', status: 'ok', total: 1 });
     expect(globalThis.fetch).not.toHaveBeenCalled();
 
     mod.db.close();
@@ -383,8 +408,17 @@ describe('watch scheduler rules', () => {
 
     const alerta = mod.db.prepare(`SELECT status, ativo, erro FROM watch_alerts`).get() as { status: string; ativo: number; erro: string | null };
     const check = mod.db.prepare(`SELECT status, notified FROM watch_checks`).get() as { status: string; notified: number };
+    const metric = mod.db.prepare(`SELECT origem, site, termo, url, status, total FROM search_metrics`).get() as { origem: string; site: string; termo: string; url: string; status: string; total: number };
     expect(alerta).toEqual({ status: 'disparado', ativo: 0, erro: null });
     expect(check).toEqual({ status: 'disparado', notified: 1 });
+    expect(metric).toEqual({
+      origem: 'watch',
+      site: 'kabum',
+      termo: 'SSD NVMe',
+      url: 'https://www.kabum.com.br/produto/1',
+      status: 'ok',
+      total: 1,
+    });
     expect(globalThis.fetch).toHaveBeenCalled();
     const webhookBody = JSON.parse((vi.mocked(globalThis.fetch).mock.calls[0][1] as RequestInit).body as string);
     const description = webhookBody.embeds[0].description.replace(/\u00a0/g, ' ');

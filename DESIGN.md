@@ -183,6 +183,14 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - **Estados**: loading inline, empty state com ícone `Bell`, erro em banner vermelho e badge "Salvo" após criação
 - **Produto específico**: quando aberto pelo ProductCard, preenche nome, URL, site e preço atual como sugestão de alvo
 
+### StatsDashboardPanel
+- **Aba Dashboard**: quarta opção no header, ao lado de Buscar, Buscas salvas e Alertas
+- **Painel de contexto**: apresenta métricas operacionais do scraper sem linguagem promocional
+- **KPI grid**: total de buscas, taxa de sucesso, tempo médio e falhas, usando `tabular-nums`, ícones lucide e `kpiStagger`
+- **Sites mais acessíveis**: ranking por taxa de sucesso, com volume, erros e tempo médio para contexto
+- **Estados**: loading inline, empty state quando ainda não há métricas e erro em banner vermelho
+- **Escopo**: dados all-time de busca manual, Auto Search e Watch, sem filtro de período na primeira versão
+
 ## Responsividade
 
 - Breakpoints Tailwind padrão (sm: 640px, md: 768px, lg: 1024px, xl: 1280px)
@@ -200,6 +208,7 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - Logo à esquerda no desktop e centralizada no mobile, preservando o toggle de modos como controle principal
 - Mode toggle com botões `rounded-xl`, `font-bold`, padding `px-4 py-2`
 - Modos: Buscar, Buscas salvas e Alertas
+- Modo Dashboard exibe estatísticas operacionais all-time
 - Fonte Display para labels dos modos
 - SearchForm em modo compacto dentro do header (modo Buscar após o estado inicial)
 

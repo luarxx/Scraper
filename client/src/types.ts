@@ -138,3 +138,25 @@ export interface WatchProductPreview extends Produto {
   siteNome: string;
   timestamp: string;
 }
+
+// ─── Stats dashboard ─────────────────────────────────────────
+
+export interface SiteStats {
+  site: string;
+  siteNome: string;
+  total: number;
+  sucessos: number;
+  erros: number;
+  taxa_sucesso: number;
+  tempo_medio_resposta_ms: number;
+}
+
+export interface StatsDashboardResponse {
+  total_buscas: number;
+  sucessos: number;
+  erros: number;
+  taxa_sucesso: number;
+  tempo_medio_resposta_ms: number;
+  atualizado_em: string | null;
+  sites: SiteStats[];
+}

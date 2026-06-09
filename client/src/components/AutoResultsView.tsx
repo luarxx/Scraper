@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, memo, useEffect, useRef } from 'react';
 import { AlertTriangle, BadgeDollarSign, BarChart, Search, XCircle, Radio, Timer, CheckCircle, Loader2, Package, ThumbsUp, ChevronsUp, ChevronsDown, ChevronRight } from 'lucide-react';
-import type { AutoExecucao, AutoResultadoItem, Produto } from '../types';
+import type { AutoExecucao, AutoResultadoItem, Produto, WishlistItem } from '../types';
 import { ProductGrid } from './ProductGrid';
 import { Icon } from './Icon';
 import { formatBrazilDateMonth, formatBrazilTime } from '../utils/date';
@@ -18,6 +18,9 @@ interface AutoResultsViewProps {
   running: boolean;
   onRefresh: () => void;
   onCreateAlert?: (produto: Produto, siteKey: string) => void;
+  wishlistMap?: Record<string, WishlistItem>;
+  wishlistBusy?: boolean;
+  onWishlistAction?: (produto: Produto, siteKey: string, wishlistItem?: WishlistItem | null) => void;
 }
 
 function parsePrice(price: string | null): number {
@@ -92,9 +95,21 @@ interface TermoSectionProps {
   onToggle: (id: number) => void;
   updatedAt?: string | null;
   onCreateAlert?: (produto: Produto, siteKey: string) => void;
+  wishlistMap?: Record<string, WishlistItem>;
+  wishlistBusy?: boolean;
+  onWishlistAction?: (produto: Produto, siteKey: string, wishlistItem?: WishlistItem | null) => void;
 }
 
-const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle, updatedAt, onCreateAlert }: TermoSectionProps) {
+const TermoSection = memo(function TermoSection({
+  resultado: r,
+  isOpen,
+  onToggle,
+  updatedAt,
+  onCreateAlert,
+  wishlistMap,
+  wishlistBusy,
+  onWishlistAction,
+}: TermoSectionProps) {
   const siteColor = SITE_COLORS[r.site] || SITE_COLORS.kabum;
   const stats = useMemo(
     () => (r.status === 'ok' ? getTermoStats(r.produtos) : null),
@@ -207,7 +222,15 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
                       </span>
                     </div>
                   )}
-                  <ProductGrid produtos={r.produtos} siteKey={r.site} updatedAt={updatedAt} onCreateAlert={onCreateAlert} />
+                  <ProductGrid
+                    produtos={r.produtos}
+                    siteKey={r.site}
+                    updatedAt={updatedAt}
+                    onCreateAlert={onCreateAlert}
+                    wishlistMap={wishlistMap}
+                    wishlistBusy={wishlistBusy}
+                    onWishlistAction={onWishlistAction}
+                  />
                 </>
               ) : r.status === 'ok' && r.produtos.length === 0 ? (
                 <div className="px-4 py-8 text-center text-sm text-text-muted">
@@ -231,7 +254,17 @@ const TermoSection = memo(function TermoSection({ resultado: r, isOpen, onToggle
 });
 
 /* ─── Main Component ─────────────────────────────────────── */
-export function AutoResultsView({ execucao, resultados, loading, running, onRefresh, onCreateAlert }: AutoResultsViewProps) {
+export function AutoResultsView({
+  execucao,
+  resultados,
+  loading,
+  running,
+  onRefresh,
+  onCreateAlert,
+  wishlistMap,
+  wishlistBusy,
+  onWishlistAction,
+}: AutoResultsViewProps) {
   const [expanded, setExpanded] = useState<Set<number>>(() => new Set());
   const initializedRef = useRef(false);
 
@@ -386,6 +419,9 @@ export function AutoResultsView({ execucao, resultados, loading, running, onRefr
             onToggle={toggleExpand}
             updatedAt={execucao.finalizada_em || execucao.iniciada_em}
             onCreateAlert={onCreateAlert}
+            wishlistMap={wishlistMap}
+            wishlistBusy={wishlistBusy}
+            onWishlistAction={onWishlistAction}
           />
         ))
       )}

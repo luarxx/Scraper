@@ -93,6 +93,7 @@ Todas as animações respeitam `prefers-reduced-motion: reduce`, que reduz trans
 - Seletor de site em **abas** (botões lado a lado com fundo slate-900 e borda slate-800)
 - Aba ativa: cor da loja + fundo translúcido + animação `tabActivate`
 - Botão "Comparar precos agora" com cor sólida `accent`, hover `accent-hover` e foco visível
+- Autocomplete customizado abaixo do input combina histórico local com exemplos fixos, suporta mouse, `ArrowUp`/`ArrowDown`, `Enter` e `Escape`, e mantém badges por loja
 - Modo `compact` (header sticky) vs modo normal (página inicial)
 - A primeira tela do modo Buscar apresenta a promessa "Compare precos de informatica sem abrir varias abas" antes do input.
 - No estado inicial, o SearchForm aparece apenas no hero; o header compacto entra depois que a busca sai do estado inicial.
@@ -139,6 +140,7 @@ Quatro estados visuais centralizados:
 - `loading="lazy"` nas imagens
 - Animação `fadeInUp` com delay progressivo (`index * 0.05s`)
 - Hover: borda clareia de forma sutil, sem salto visual
+- PriceHistoryChart mantém o gráfico montado durante o recolhimento para animar fechamento com altura, opacidade e leve deslocamento antes de desmontar.
 
 ### KpiCard (componente interno)
 Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
@@ -179,9 +181,18 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - **Status bar**: 4 KPI tiles (Status, Próximo check, Alertas e Discord)
 - **Formulário**: campos URL, Nome, Preço-alvo e seletor de site em button-group com cores por loja; Nome fica bloqueado enquanto a URL está sendo identificada
 - **Lista de alertas**: cards compactos com nome, site, status, preço-alvo, último preço, último check, canal/disparo e texto de confiança sobre a próxima verificação
+- **Histórico de preços**: cada card de alerta reutiliza `PriceHistoryChart` com a URL e loja do alerta quando já existem registros salvos em `price_history`
 - **Discord state**: tile mostra "Configurado" ou "Sem webhook" para evitar falha silenciosa
 - **Estados**: loading inline, empty state com ícone `Bell`, erro em banner vermelho e badge "Salvo" após criação
 - **Produto específico**: quando aberto pelo ProductCard, preenche nome, URL, site e preço atual como sugestão de alvo
+
+### StatsDashboardPanel
+- **Aba Dashboard**: quarta opção no header, ao lado de Buscar, Buscas salvas e Alertas
+- **Painel de contexto**: apresenta métricas operacionais do scraper sem linguagem promocional
+- **KPI grid**: total de buscas, taxa de sucesso, tempo médio e falhas, usando `tabular-nums`, ícones lucide e `kpiStagger`
+- **Sites mais acessíveis**: ranking por taxa de sucesso, com volume, erros e tempo médio para contexto
+- **Estados**: loading inline, empty state quando ainda não há métricas e erro em banner vermelho
+- **Escopo**: dados all-time de busca manual, Auto Search e Watch, sem filtro de período na primeira versão
 
 ## Responsividade
 
@@ -200,6 +211,7 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - Logo à esquerda no desktop e centralizada no mobile, preservando o toggle de modos como controle principal
 - Mode toggle com botões `rounded-xl`, `font-bold`, padding `px-4 py-2`
 - Modos: Buscar, Buscas salvas e Alertas
+- Modo Dashboard exibe estatísticas operacionais all-time
 - Fonte Display para labels dos modos
 - SearchForm em modo compacto dentro do header (modo Buscar após o estado inicial)
 

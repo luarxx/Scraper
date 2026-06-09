@@ -1,5 +1,6 @@
 import { buscarProdutoPorUrl, SITES } from '../scraper';
 import { db } from './db';
+import { registrarMetricaBusca } from './metrics';
 import { brlToCents, centsToBrl } from './money';
 import { salvarPrecos } from './priceHistory';
 import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime } from './time';
@@ -127,6 +128,7 @@ export async function executarWatchAlerts(): Promise<void> {
 
   for (const alerta of alertas) {
     const checkedAt = formatDbDatetime();
+    const startedAt = Date.now();
     try {
       const produto = await buscarProdutoPorUrl(alerta.site, alerta.url, alerta.nome);
       console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — preço ${produto.price || 'N/D'}${produto.priceSource ? ` (${produto.priceSource})` : ''}`);
@@ -136,6 +138,16 @@ export async function executarWatchAlerts(): Promise<void> {
       if (precoCents === null) {
         const erro = 'Preço atual não identificado';
         insertCheck.run(alerta.id, checkedAt, 'erro', null, produto.price, erro, 0);
+        registrarMetricaBusca({
+          origem: 'watch',
+          site: alerta.site,
+          termo: alerta.nome,
+          url: alerta.url,
+          status: 'erro',
+          total: 0,
+          duracaoMs: Date.now() - startedAt,
+          erro,
+        });
         erros++;
         db.prepare(
           `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
@@ -149,6 +161,16 @@ export async function executarWatchAlerts(): Promise<void> {
         const notified = await enviarWatchDiscord(alerta, precoCents, produto.price || centsToBrl(precoCents), produto.parcelamento);
         const erro = notified ? null : 'Falha ao enviar notificação Discord';
         insertCheck.run(alerta.id, checkedAt, notified ? 'disparado' : 'erro', precoCents, produto.price, erro, notified ? 1 : 0);
+        registrarMetricaBusca({
+          origem: 'watch',
+          site: alerta.site,
+          termo: alerta.nome,
+          url: alerta.url,
+          status: notified ? 'ok' : 'erro',
+          total: 1,
+          duracaoMs: Date.now() - startedAt,
+          erro,
+        });
         if (notified) {
           disparados++;
         } else {
@@ -172,6 +194,15 @@ export async function executarWatchAlerts(): Promise<void> {
         );
       } else {
         insertCheck.run(alerta.id, checkedAt, 'ok', precoCents, produto.price, null, 0);
+        registrarMetricaBusca({
+          origem: 'watch',
+          site: alerta.site,
+          termo: alerta.nome,
+          url: alerta.url,
+          status: 'ok',
+          total: 1,
+          duracaoMs: Date.now() - startedAt,
+        });
         ok++;
         db.prepare(
           `UPDATE watch_alerts
@@ -182,6 +213,16 @@ export async function executarWatchAlerts(): Promise<void> {
     } catch (err: unknown) {
       const error = err as Error;
       insertCheck.run(alerta.id, checkedAt, 'erro', null, null, error.message, 0);
+      registrarMetricaBusca({
+        origem: 'watch',
+        site: alerta.site,
+        termo: alerta.nome,
+        url: alerta.url,
+        status: 'erro',
+        total: 0,
+        duracaoMs: Date.now() - startedAt,
+        erro: error.message,
+      });
       erros++;
       db.prepare(
         `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`

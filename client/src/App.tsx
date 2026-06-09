@@ -1,16 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
-import { Search, Clock, Bell } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Search, Clock, Bell, BarChart3, Heart } from 'lucide-react';
 import { useSearch } from './hooks/useSearch';
 import { useSearchHistory } from './hooks/useSearchHistory';
+import { useWishlist } from './hooks/useWishlist';
 import { SearchForm } from './components/SearchForm';
 import { SearchHistory } from './components/SearchHistory';
 import { ProductGrid } from './components/ProductGrid';
 import { StateMessage } from './components/StateMessage';
 import { AutoSearchPanel } from './components/AutoSearchPanel';
 import { WatchPanel } from './components/WatchPanel';
+import { StatsDashboardPanel } from './components/StatsDashboardPanel';
+import { WishlistPanel } from './components/WishlistPanel';
 import { Icon } from './components/Icon';
 import { Logo } from './components/Logo';
-import type { Produto, WatchDraft } from './types';
+import type { Produto, WatchDraft, WishlistItem } from './types';
 import { formatBrazilDateTime } from './utils/date';
 
 const SITE_COLORS: Record<string, { text: string }> = {
@@ -26,12 +29,30 @@ function priceToInput(price: string | null): string {
 
 export default function App() {
   const { loading, produtos, termo, siteKey, siteNome, timestamp, erro, search, fetchSites, sites } = useSearch();
-  const [modo, setModo] = useState<'manual' | 'auto' | 'watch'>('manual');
+  const [modo, setModo] = useState<'manual' | 'auto' | 'wishlist' | 'watch' | 'dashboard'>('manual');
   const [watchDraft, setWatchDraft] = useState<WatchDraft | null>(null);
+  const {
+    items: wishlistItems,
+    status: wishlistStatus,
+    loading: wishlistLoading,
+    saving: wishlistSaving,
+    running: wishlistRunning,
+    error: wishlistError,
+    fetchItems: fetchWishlistItems,
+    fetchStatus: fetchWishlistStatus,
+    saveItem: saveWishlistItem,
+    removeItem: removeWishlistItem,
+    triggerRun: triggerWishlistRun,
+  } = useWishlist();
 
   useEffect(() => {
     fetchSites();
   }, [fetchSites]);
+
+  useEffect(() => {
+    fetchWishlistItems();
+    fetchWishlistStatus();
+  }, [fetchWishlistItems, fetchWishlistStatus]);
 
   const { history, addEntry } = useSearchHistory();
   const prevKeyRef = useRef('');
@@ -59,6 +80,28 @@ export default function App() {
     });
     setModo('watch');
   }
+
+  async function handleWishlistAction(produto: Produto, productSiteKey: string, wishlistItem?: WishlistItem | null) {
+    try {
+      if (wishlistItem) {
+        await removeWishlistItem(wishlistItem.id);
+        return;
+      }
+      await saveWishlistItem({
+        title: produto.title,
+        url: produto.url,
+        site: productSiteKey,
+        image: produto.image || null,
+        price: produto.price,
+        parcelamento: produto.parcelamento,
+      });
+    } catch {
+    }
+  }
+
+  const wishlistMap = useMemo(() => {
+    return Object.fromEntries(wishlistItems.map((item) => [`${item.site}|${item.url}`, item]));
+  }, [wishlistItems]);
 
   const state = (() => {
     if (loading) return 'loading';
@@ -102,6 +145,17 @@ export default function App() {
                 <Icon icon={Clock} size={14} /> <span>Buscas salvas</span>
               </button>
               <button
+                onClick={() => setModo('wishlist')}
+                aria-pressed={modo === 'wishlist'}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                  modo === 'wishlist'
+                    ? 'bg-accent text-white'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
+                }`}
+              >
+                <Icon icon={Heart} size={14} /> <span>Desejos</span>
+              </button>
+              <button
                 onClick={() => setModo('watch')}
                 aria-pressed={modo === 'watch'}
                 className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
@@ -112,17 +166,50 @@ export default function App() {
               >
                 <Icon icon={Bell} size={14} /> <span>Alertas</span>
               </button>
+              <button
+                onClick={() => setModo('dashboard')}
+                aria-pressed={modo === 'dashboard'}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-colors ${
+                  modo === 'dashboard'
+                    ? 'bg-accent text-white'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-white/[0.04]'
+                }`}
+              >
+                <Icon icon={BarChart3} size={14} /> <span>Dashboard</span>
+              </button>
             </div>
           </div>
           {modo === 'manual' && state !== 'initial' && (
-            <SearchForm onSearch={search} loading={loading} compact />
+            <SearchForm onSearch={search} loading={loading} history={history} compact />
           )}
         </div>
       </header>
 
       {modo === 'auto' ? (
         <main className="flex-1">
-          <AutoSearchPanel sites={sites} onCreateAlert={handleCreateAlert} />
+          <AutoSearchPanel
+            sites={sites}
+            onCreateAlert={handleCreateAlert}
+            wishlistMap={wishlistMap}
+            wishlistBusy={wishlistSaving}
+            onWishlistAction={handleWishlistAction}
+          />
+        </main>
+      ) : modo === 'wishlist' ? (
+        <main className="flex-1">
+          <WishlistPanel
+            sites={sites}
+            items={wishlistItems}
+            status={wishlistStatus}
+            loading={wishlistLoading}
+            saving={wishlistSaving}
+            running={wishlistRunning}
+            error={wishlistError}
+            fetchItems={fetchWishlistItems}
+            fetchStatus={fetchWishlistStatus}
+            removeItem={removeWishlistItem}
+            triggerRun={triggerWishlistRun}
+          />
         </main>
       ) : modo === 'watch' ? (
         <main className="flex-1">
@@ -131,6 +218,10 @@ export default function App() {
             draft={watchDraft}
             onDraftConsumed={() => setWatchDraft(null)}
           />
+        </main>
+      ) : modo === 'dashboard' ? (
+        <main className="flex-1">
+          <StatsDashboardPanel />
         </main>
       ) : (
         <>
@@ -162,7 +253,15 @@ export default function App() {
                     <SearchHistory history={history} onSelect={handleHistorySelect} compact />
                   </div>
                 </div>
-                <ProductGrid produtos={produtos} siteKey={siteKey} updatedAt={timestamp} onCreateAlert={handleCreateAlert} />
+                <ProductGrid
+                  produtos={produtos}
+                  siteKey={siteKey}
+                  updatedAt={timestamp}
+                  onCreateAlert={handleCreateAlert}
+                  wishlistMap={wishlistMap}
+                  wishlistBusy={wishlistSaving}
+                  onWishlistAction={handleWishlistAction}
+                />
                 <footer className="mt-14 text-center animate-[fadeIn_0.6s_ease-out_0.3s_both]">
                   <div className="w-6 h-px bg-white/[0.06] mx-auto mb-4" />
                   <p className="text-xs text-text-muted">
@@ -190,7 +289,7 @@ export default function App() {
                       Pesquise em lojas como KaBuM!, Pichau e Terabyte, veja preco, parcelamento e crie alertas quando o valor baixar.
                     </p>
                     <div className="mt-6 max-w-xl mx-auto">
-                      <SearchForm onSearch={search} loading={loading} />
+                      <SearchForm onSearch={search} loading={loading} history={history} />
                     </div>
                     <div className="mt-4 max-w-xl mx-auto">
                       <SearchHistory history={history} onSelect={handleHistorySelect} compact align="center" />

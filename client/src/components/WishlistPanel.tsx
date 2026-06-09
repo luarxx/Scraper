@@ -186,7 +186,7 @@ function WishlistItemRow({ item, sites, onRemove }: { item: WishlistItem; sites:
         )}
         {!item.erro && (
           <p className="mt-3 text-xs leading-relaxed text-text-muted">
-            A próxima checagem compara o preço atual com o último valor salvo. Se cair, o Discord recebe aviso e a referência é atualizada.
+            A próxima checagem compara o preço da loja com a referência salva e com o último valor encontrado. Se houver queda em relação ao padrão acompanhado, o Discord recebe aviso e a nova referência é atualizada.
           </p>
         )}
       </div>
@@ -273,7 +273,7 @@ export function WishlistPanel({
             Guarde ofertas que valem acompanhar e receba aviso quando baixarem
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-            Salve um produto a partir de um card de resultado, veja a evolução dos preços e acione a checagem de todos os itens com um clique.
+            Salve um produto a partir de um card de resultado para usar o preço atual como referência. Nas próximas checagens, se a loja oscilar para baixo do preço salvo ou do último valor encontrado, o aviso chega pelo Discord.
           </p>
         </div>
         <button

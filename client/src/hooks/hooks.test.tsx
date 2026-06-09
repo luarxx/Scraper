@@ -5,11 +5,13 @@ import { ProductCard } from '../components/ProductCard';
 import { SearchForm } from '../components/SearchForm';
 import { StateMessage } from '../components/StateMessage';
 import { StatsDashboardPanel } from '../components/StatsDashboardPanel';
+import { WishlistPanel } from '../components/WishlistPanel';
 import { useAutoConfig } from './useAutoConfig';
 import { useAutoResults } from './useAutoResults';
 import { useSearch } from './useSearch';
 import { useStatsDashboard } from './useStatsDashboard';
 import { useWatchAlerts } from './useWatchAlerts';
+import { useWishlist } from './useWishlist';
 
 vi.mock('./usePriceHistory', () => ({
   usePriceHistory: () => ({
@@ -205,6 +207,55 @@ describe('useWatchAlerts', () => {
   });
 });
 
+describe('useWishlist', () => {
+  it('salva, atualiza status e remove item dos desejos', async () => {
+    const item = {
+      id: 1,
+      title: 'SSD NVMe',
+      url: 'https://www.kabum.com.br/produto/1',
+      site: 'kabum',
+      image: '',
+      ultimo_preco_cents: 29990,
+      ultimo_preco_text: 'R$ 299,90',
+      ultimo_parcelamento: null,
+      status: 'ativo',
+      ativo: true,
+      ultimo_check_em: null,
+      ultimo_disparo_em: null,
+      erro: null,
+      criado_em: '2026-06-05T10:00:00-03:00',
+      atualizado_em: '2026-06-05T10:00:00-03:00',
+    };
+    const fetchMock = mockFetch(
+      { body: item },
+      { body: { status: 'agendado', ultima_execucao: null, proxima_execucao: null, total_ativos: 1, total_disparados: 0, webhook_configurado: true } },
+      { body: { ok: true } },
+      { body: { status: 'agendado', ultima_execucao: null, proxima_execucao: null, total_ativos: 0, total_disparados: 0, webhook_configurado: true } },
+    );
+    const { result } = renderHook(() => useWishlist());
+
+    await act(async () => {
+      await result.current.saveItem({
+        title: 'SSD NVMe',
+        url: 'https://www.kabum.com.br/produto/1',
+        site: 'kabum',
+        image: '',
+        price: 'R$ 299,90',
+        parcelamento: null,
+      });
+    });
+    expect(result.current.items).toHaveLength(1);
+    expect(result.current.status?.total_ativos).toBe(1);
+
+    await act(async () => result.current.removeItem(1));
+
+    expect(result.current.items).toEqual([]);
+    expect(result.current.status?.total_ativos).toBe(0);
+    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/wishlist/items', expect.objectContaining({ method: 'POST' }));
+    expect(fetchMock).toHaveBeenNthCalledWith(3, '/api/wishlist/items/1', { method: 'DELETE' });
+  });
+});
+
 describe('useStatsDashboard', () => {
   it('carrega estatísticas do dashboard', async () => {
     mockFetch({
@@ -331,6 +382,84 @@ describe('critical UI states', () => {
     await user.click(screen.getByRole('button', { name: /avisar quando baixar/i }));
 
     await waitFor(() => expect(onCreateAlert).toHaveBeenCalledWith(produto, 'kabum'));
+  });
+
+  it('aciona salvar e remover desejos a partir do ProductCard', async () => {
+    const user = userEvent.setup();
+    const onWishlistAction = vi.fn();
+    const produto = {
+      title: 'SSD NVMe 1TB',
+      price: 'R$ 299,90',
+      parcelamento: '10x de R$ 29,99',
+      image: '',
+      url: 'https://www.kabum.com.br/produto/1',
+      relevancia: 2,
+    };
+    const wishlistItem = {
+      id: 1,
+      title: produto.title,
+      url: produto.url,
+      site: 'kabum',
+      image: '',
+      ultimo_preco_cents: 29990,
+      ultimo_preco_text: 'R$ 299,90',
+      ultimo_parcelamento: '10x de R$ 29,99',
+      status: 'ativo' as const,
+      ativo: true,
+      ultimo_check_em: null,
+      ultimo_disparo_em: null,
+      erro: null,
+      criado_em: '2026-06-05T10:00:00-03:00',
+      atualizado_em: '2026-06-05T10:00:00-03:00',
+    };
+
+    const { rerender } = render(<ProductCard produto={produto} index={0} siteKey="kabum" wishlistItem={null} onWishlistAction={onWishlistAction} />);
+    await user.click(screen.getByRole('button', { name: /salvar nos desejos/i }));
+    expect(onWishlistAction).toHaveBeenCalledWith(produto, 'kabum', null);
+
+    rerender(<ProductCard produto={produto} index={0} siteKey="kabum" wishlistItem={wishlistItem} onWishlistAction={onWishlistAction} />);
+    await user.click(screen.getByRole('button', { name: /remover dos desejos/i }));
+    expect(onWishlistAction).toHaveBeenLastCalledWith(produto, 'kabum', wishlistItem);
+  });
+
+  it('renderiza painel de desejos com item salvo', () => {
+    const item = {
+      id: 1,
+      title: 'SSD NVMe 1TB',
+      url: 'https://www.kabum.com.br/produto/1',
+      site: 'kabum',
+      image: '',
+      ultimo_preco_cents: 29990,
+      ultimo_preco_text: 'R$ 299,90',
+      ultimo_parcelamento: '10x de R$ 29,99',
+      status: 'ativo' as const,
+      ativo: true,
+      ultimo_check_em: null,
+      ultimo_disparo_em: null,
+      erro: null,
+      criado_em: '2026-06-05T10:00:00-03:00',
+      atualizado_em: '2026-06-05T10:00:00-03:00',
+    };
+
+    render(
+      <WishlistPanel
+        sites={[{ key: 'kabum', nome: 'KaBuM!' }]}
+        items={[item]}
+        status={{ status: 'agendado', ultima_execucao: null, proxima_execucao: null, total_ativos: 1, total_disparados: 0, webhook_configurado: true }}
+        loading={false}
+        saving={false}
+        running={false}
+        error={null}
+        fetchItems={vi.fn(async () => undefined)}
+        fetchStatus={vi.fn(async () => undefined)}
+        removeItem={vi.fn(async () => undefined)}
+        triggerRun={vi.fn(async () => undefined)}
+      />,
+    );
+
+    expect(screen.queryByText('Lista de desejos')).not.toBeNull();
+    expect(screen.queryByText('SSD NVMe 1TB')).not.toBeNull();
+    expect(screen.queryByText('R$ 299,90')).not.toBeNull();
   });
 
   it('renderiza dashboard com KPIs e ranking de sites', async () => {

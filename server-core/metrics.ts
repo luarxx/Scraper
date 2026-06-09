@@ -2,7 +2,7 @@ import { SITES } from '../scraper';
 import { db } from './db';
 import { dbDatetimeToApi, formatDbDatetime } from './time';
 
-export type SearchMetricOrigem = 'manual' | 'auto' | 'watch';
+export type SearchMetricOrigem = 'manual' | 'auto' | 'watch' | 'wishlist';
 export type SearchMetricStatus = 'ok' | 'erro';
 
 export type SearchMetricInput = {

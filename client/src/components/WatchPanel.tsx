@@ -3,7 +3,9 @@ import { Bell, CalendarClock, CheckCircle2, Clock, ExternalLink, Play, ShieldChe
 import type { FormEvent } from 'react';
 import type { Site, WatchAlert, WatchDraft } from '../types';
 import { useWatchAlerts } from '../hooks/useWatchAlerts';
+import { usePriceHistory } from '../hooks/usePriceHistory';
 import { Icon } from './Icon';
+import { PriceHistoryChart } from './PriceHistoryChart';
 
 interface WatchPanelProps {
   sites: Site[];
@@ -56,6 +58,17 @@ function WatchAlertRow({ alert, onRemove }: { alert: WatchAlert; onRemove: (id: 
   const siteColor = SITE_COLORS[alert.site] ?? SITE_COLORS.kabum;
   const isDone = alert.status === 'disparado';
   const currentPrice = alert.ultimo_preco_text || centsToBrl(alert.ultimo_preco_cents);
+  const { loading, history, summary, erro, fetchSummary, fetchHistory } = usePriceHistory();
+  const historyKeyRef = useRef('');
+
+  useEffect(() => {
+    if (!alert.url) return;
+    const key = `${alert.site}|${alert.url}`;
+    if (historyKeyRef.current === key) return;
+    historyKeyRef.current = key;
+    fetchSummary(alert.url, alert.site);
+    fetchHistory(alert.url, alert.site);
+  }, [alert.site, alert.url, fetchSummary, fetchHistory]);
 
   return (
     <div className="rounded-xl border border-white/[0.06] bg-surface/60 p-4 animate-[fadeInUp_0.25s_ease-out_forwards]">
@@ -115,6 +128,14 @@ function WatchAlertRow({ alert, onRemove }: { alert: WatchAlert; onRemove: (id: 
           <span className="text-sm font-semibold text-text-primary tabular-nums">{isDone ? formatDate(alert.disparado_em) : 'Discord'}</span>
         </div>
       </div>
+
+      <PriceHistoryChart
+        history={history}
+        siteColor={siteColor.text}
+        loading={loading}
+        erro={erro}
+        summary={summary}
+      />
 
       {alert.erro && (
         <div className="mt-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">

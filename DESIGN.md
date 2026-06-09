@@ -140,6 +140,7 @@ Quatro estados visuais centralizados:
 - `loading="lazy"` nas imagens
 - Animação `fadeInUp` com delay progressivo (`index * 0.05s`)
 - Hover: borda clareia de forma sutil, sem salto visual
+- PriceHistoryChart mantém o gráfico montado durante o recolhimento para animar fechamento com altura, opacidade e leve deslocamento antes de desmontar.
 
 ### KpiCard (componente interno)
 Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
@@ -180,6 +181,7 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - **Status bar**: 4 KPI tiles (Status, Próximo check, Alertas e Discord)
 - **Formulário**: campos URL, Nome, Preço-alvo e seletor de site em button-group com cores por loja; Nome fica bloqueado enquanto a URL está sendo identificada
 - **Lista de alertas**: cards compactos com nome, site, status, preço-alvo, último preço, último check, canal/disparo e texto de confiança sobre a próxima verificação
+- **Histórico de preços**: cada card de alerta reutiliza `PriceHistoryChart` com a URL e loja do alerta quando já existem registros salvos em `price_history`
 - **Discord state**: tile mostra "Configurado" ou "Sem webhook" para evitar falha silenciosa
 - **Estados**: loading inline, empty state com ícone `Bell`, erro em banner vermelho e badge "Salvo" após criação
 - **Produto específico**: quando aberto pelo ProductCard, preenche nome, URL, site e preço atual como sugestão de alvo

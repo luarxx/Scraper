@@ -1,5 +1,5 @@
 import { useMemo, memo } from 'react';
-import type { Produto } from '../types';
+import type { Produto, WishlistItem } from '../types';
 import { ProductCard } from './ProductCard';
 
 interface ProductGridProps {
@@ -7,6 +7,9 @@ interface ProductGridProps {
   siteKey: string;
   updatedAt?: string | null;
   onCreateAlert?: (produto: Produto, siteKey: string) => void;
+  wishlistMap?: Record<string, WishlistItem>;
+  wishlistBusy?: boolean;
+  onWishlistAction?: (produto: Produto, siteKey: string, wishlistItem?: WishlistItem | null) => void;
 }
 
 function parsePrice(price: string | null): number {
@@ -14,7 +17,15 @@ function parsePrice(price: string | null): number {
   return parseFloat(price.replace(/[^\d,]/g, '').replace(',', '.'));
 }
 
-function ProductGridInner({ produtos, siteKey, updatedAt, onCreateAlert }: ProductGridProps) {
+function ProductGridInner({
+  produtos,
+  siteKey,
+  updatedAt,
+  onCreateAlert,
+  wishlistMap = {},
+  wishlistBusy,
+  onWishlistAction,
+}: ProductGridProps) {
   const { maxRelevancia, minPrice } = useMemo(() => {
     if (produtos.length === 0) return { maxRelevancia: 0, minPrice: Infinity };
     let maxRel = produtos[0].relevancia;
@@ -38,6 +49,9 @@ function ProductGridInner({ produtos, siteKey, updatedAt, onCreateAlert }: Produ
           siteKey={siteKey}
           updatedAt={updatedAt}
           onCreateAlert={onCreateAlert}
+          wishlistItem={wishlistMap[`${siteKey}|${p.url}`] ?? null}
+          wishlistBusy={wishlistBusy}
+          onWishlistAction={onWishlistAction}
           isBestOption={
             p.relevancia === maxRelevancia && parsePrice(p.price) === minPrice
           }

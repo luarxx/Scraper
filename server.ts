@@ -6,6 +6,7 @@ import { PORT, PORT_AUTO_FALLBACK, PORT_MAX_ATTEMPTS, resolveProjectRoot } from 
 import { brlToCents, centsToBrl, parseTargetPrice } from './server-core/money';
 import { calcularProximoHorarioIntervalo, formatApiDatetime, formatDbDatetime } from './server-core/time';
 import { WATCH_INTERVAL_HOURS, executarWatchAlerts, getWatchStatus, iniciarWatchScheduler, normalizarWatchAlert } from './server-core/watch';
+import { WISHLIST_INTERVAL_HOURS, executarWishlistChecks, getWishlistStatus, iniciarWishlistScheduler, normalizarWishlistItem } from './server-core/wishlist';
 
 function startServer(): http.Server {
   const server = createServer();
@@ -32,12 +33,14 @@ function startServer(): http.Server {
   server.listen(currentPort, () => {
     iniciarScheduler();
     iniciarWatchScheduler();
+    iniciarWishlistScheduler();
     console.log('');
     console.log('  ┌──────────────────────────────────────┐');
     console.log(`  │  🚀  ${String('http://localhost:' + String(currentPort)).padEnd(26)}│`);
     console.log('  │                                      │');
     console.log(`  │  ⏰  Auto-busca a cada ${String(AUTO_INTERVAL_HOURS + 'h').padEnd(13)}│`);
     console.log(`  │  🔔  Watch a cada ${String(WATCH_INTERVAL_HOURS + 'h').padEnd(18)}│`);
+    console.log(`  │  💾  Desejos a cada ${String(WISHLIST_INTERVAL_HOURS + 'h').padEnd(16)}│`);
     console.log('  └──────────────────────────────────────┘');
     console.log('');
   });
@@ -55,15 +58,19 @@ export {
   db,
   executarAutoBuscas,
   executarWatchAlerts,
+  executarWishlistChecks,
   formatApiDatetime,
   formatDbDatetime,
   getAutoStatus,
   getWatchStatus,
+  getWishlistStatus,
   initDatabase,
   normalizarWatchAlert,
+  normalizarWishlistItem,
   parseTargetPrice,
   resolveProjectRoot,
   startServer,
+  WISHLIST_INTERVAL_HOURS,
 };
 
 if (require.main === module) {

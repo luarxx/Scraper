@@ -26,6 +26,7 @@ Mapa completo dos principais arquivos e diretorios do projeto.
 |   |-- priceHistory.ts     # Persistencia de historico de precos
 |   |-- auto.ts             # Scheduler e execucao de busca automatica
 |   |-- watch.ts            # Scheduler Watch, alertas e Discord
+|   |-- wishlist.ts         # Scheduler Desejos, checagem de favoritos e Discord
 |   `-- routes/             # Handlers HTTP por contexto
 |-- AGENTS.md               # Instrucoes curtas e roteamento para agentes
 |-- Docs/                   # Documentacao detalhada por tema
@@ -54,7 +55,7 @@ Mapa completo dos principais arquivos e diretorios do projeto.
 |   |-- tsconfig.json       # Project references
 |   |-- src/
 |   |   |-- main.tsx
-|   |   |-- App.tsx         # Layout + state machine + toggle Manual/Auto/Watch
+|   |   |-- App.tsx         # Layout + state machine + toggle Manual/Auto/Desejos/Watch/Dashboard
 |   |   |-- index.css       # Tailwind + custom CSS
 |   |   |-- types.ts        # Shared types
 |   |   |-- hooks/
@@ -62,7 +63,8 @@ Mapa completo dos principais arquivos e diretorios do projeto.
 |   |   |   |-- useSearchHistory.ts
 |   |   |   |-- useAutoConfig.ts
 |   |   |   |-- useAutoResults.ts
-|   |   |   `-- useWatchAlerts.ts
+|   |   |   |-- useWatchAlerts.ts
+|   |   |   `-- useWishlist.ts
 |   |   `-- components/
 |   |       |-- SearchForm.tsx
 |   |       |-- Logo.tsx
@@ -74,7 +76,8 @@ Mapa completo dos principais arquivos e diretorios do projeto.
 |   |       |-- AutoSearchPanel.tsx
 |   |       |-- AutoConfigList.tsx
 |   |       |-- AutoResultsView.tsx
-|   |       `-- WatchPanel.tsx
+|   |       |-- WatchPanel.tsx
+|   |       `-- WishlistPanel.tsx
 |   `-- dist/               # Build output servido em producao
 |-- data/
 |   |-- scraper.db          # SQLite: auto_config, auto_execucoes, auto_resultados
@@ -98,6 +101,7 @@ App
 |-- AutoSearchPanel
 |   |-- AutoConfigList  # Ate 10 produtos configurados, add/remove/reorder
 |   `-- AutoResultsView # Ultima execucao por termo com ProductGrid
+|-- WishlistPanel       # Lista de desejos, update em lote e historico por item
 `-- WatchPanel          # Status + formulario + lista de alertas
 ```
 
@@ -108,3 +112,4 @@ App
 - `useAutoConfig`: CRUD da configuracao automatica, `fetchConfig()`, `saveConfig(entries)`, `removeConfig(id)`, `fetchStatus()`.
 - `useAutoResults`: resultados automaticos, `fetchResults()` e `triggerRun()`.
 - `useWatchAlerts`: alertas Watch, `fetchAlerts()`, `fetchStatus()`, `createAlert(input)`, `removeAlert(id)`, `triggerRun()`.
+- `useWishlist`: desejos, `fetchItems()`, `saveItem(input)`, `removeItem(id)`, `fetchStatus()` e `triggerRun()`.

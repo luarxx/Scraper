@@ -1,4 +1,3 @@
-data/cache/
 node_modules/
 teste.ts
 dist/
@@ -6,4 +5,4 @@ dist/
 .env.*
 !.env.example
 acessar-vps.bat
-data/session-state/
+data/

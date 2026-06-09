@@ -32,6 +32,17 @@ Servidor HTTP nativo em Node.js, sem Express/Fastify.
 | `/api/watch/status` | GET | nenhum | Status do scheduler Watch + webhook |
 | `/api/watch/run` | POST | nenhum | Dispara verificacao manual dos alertas |
 
+## Wishlist / Desejos
+
+| Rota | Metodo | Parametros/body | Descricao |
+|---|---|---|---|
+| `/api/wishlist/items` | GET | nenhum | Lista produtos ativos da lista de desejos |
+| `/api/wishlist/items` | POST | Body: `{ title, url, site, image?, price?, parcelamento? }` | Salva item; se `site + url` ja existir, atualiza o snapshot e reativa |
+| `/api/wishlist/items/:id` | PATCH | Body parcial: `{ title?, image?, price?, parcelamento?, status? }` | Atualiza snapshot/status do item |
+| `/api/wishlist/items/:id` | DELETE | nenhum | Remove item por soft delete/pausa |
+| `/api/wishlist/status` | GET | nenhum | Status do scheduler Desejos + webhook |
+| `/api/wishlist/run` | POST | nenhum | Dispara verificacao manual de todos os desejos ativos |
+
 ## Stats Dashboard
 
 | Rota | Metodo | Parametros/body | Descricao |
@@ -54,5 +65,6 @@ Handlers HTTP ficam em `server-core/routes/`, organizados por contexto:
 - search;
 - auto;
 - watch;
+- wishlist;
 - stats;
 - history.

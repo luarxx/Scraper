@@ -7,14 +7,17 @@ import { AutoConfigList } from './AutoConfigList';
 import { AutoResultsView } from './AutoResultsView';
 import { Icon } from './Icon';
 import { formatBrazilDateMonthTime } from '../utils/date';
-import type { Produto } from '../types';
+import type { Produto, WishlistItem } from '../types';
 
 interface AutoSearchPanelProps {
   sites: Site[];
   onCreateAlert?: (produto: Produto, siteKey: string) => void;
+  wishlistMap?: Record<string, WishlistItem>;
+  wishlistBusy?: boolean;
+  onWishlistAction?: (produto: Produto, siteKey: string, wishlistItem?: WishlistItem | null) => void;
 }
 
-export function AutoSearchPanel({ sites, onCreateAlert }: AutoSearchPanelProps) {
+export function AutoSearchPanel({ sites, onCreateAlert, wishlistMap, wishlistBusy, onWishlistAction }: AutoSearchPanelProps) {
   const [tab, setTab] = useState<'config' | 'results'>('config');
   const [nowMs, setNowMs] = useState(() => Date.now());
   const { configs, status, loading: configLoading, saving, error: configError, fetchConfig, fetchStatus, saveConfig, removeConfig } = useAutoConfig();
@@ -259,6 +262,9 @@ export function AutoSearchPanel({ sites, onCreateAlert }: AutoSearchPanelProps) 
           running={running || status?.status === 'executando'}
           onRefresh={fetchResults}
           onCreateAlert={onCreateAlert}
+          wishlistMap={wishlistMap}
+          wishlistBusy={wishlistBusy}
+          onWishlistAction={onWishlistAction}
         />
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useId, useState, useMemo, memo } from 'react';
+import { useEffect, useId, useState, useMemo, memo } from 'react';
 import { AlertTriangle, ChevronDown } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -254,9 +254,16 @@ const ChartBody = memo(function ChartBody({ history, siteColor, gradientId, summ
 export function PriceHistoryChart({ history, siteColor, loading, erro, summary }: PriceHistoryChartProps) {
   const gradientId = useId().replace(/:/g, '');
   const [expanded, setExpanded] = useState(false);
+  const [renderChart, setRenderChart] = useState(false);
 
   const trend = useMemo(() => trendOf(summary), [summary]);
   const hasData = !!summary && summary.records > 0;
+
+  useEffect(() => {
+    if (expanded || !renderChart) return undefined;
+    const timeout = window.setTimeout(() => setRenderChart(false), 320);
+    return () => window.clearTimeout(timeout);
+  }, [expanded, renderChart]);
 
   if (!loading && !hasData && history.length === 0) return null;
 
@@ -273,7 +280,13 @@ export function PriceHistoryChart({ history, siteColor, loading, erro, summary }
 
       <button
         type="button"
-        onClick={() => setExpanded((v) => !v)}
+        onClick={() => {
+          setExpanded((v) => {
+            const next = !v;
+            if (next) setRenderChart(true);
+            return next;
+          });
+        }}
         aria-expanded={expanded}
         className="relative w-full px-4 pt-3 pb-2 flex items-center justify-between gap-2 text-left hover:bg-white/[0.03] active:bg-white/[0.05] transition-colors"
       >
@@ -334,12 +347,22 @@ export function PriceHistoryChart({ history, siteColor, loading, erro, summary }
       )}
 
       <div
-        className="grid transition-[grid-template-rows] duration-300 ease-out"
+        className="grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
         style={{ gridTemplateRows: expanded ? '1fr' : '0fr' }}
+        onTransitionEnd={(event) => {
+          if (event.propertyName === 'grid-template-rows' && !expanded) {
+            setRenderChart(false);
+          }
+        }}
       >
         <div className="overflow-hidden">
-          {expanded && (
-            <div className="relative px-2 pb-3 animate-[fadeIn_0.2s_ease-out]">
+          {renderChart && (
+            <div
+              className={[
+                'relative px-2 pb-3 transition-[opacity,transform,filter] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none',
+                expanded ? 'opacity-100 translate-y-0 blur-0' : 'pointer-events-none opacity-0 -translate-y-1 blur-[1px]',
+              ].join(' ')}
+            >
               <ChartBody history={history} siteColor={siteColor} gradientId={gradientId} summary={summary} />
             </div>
           )}

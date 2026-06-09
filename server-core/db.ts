@@ -100,6 +100,41 @@ export function initDatabase(): void {
 
     CREATE INDEX IF NOT EXISTS idx_watch_alerts_active ON watch_alerts(ativo, status);
     CREATE INDEX IF NOT EXISTS idx_watch_checks_alert ON watch_checks(alert_id, checked_at);
+
+    CREATE TABLE IF NOT EXISTS wishlist_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      url TEXT NOT NULL,
+      site TEXT NOT NULL,
+      image TEXT,
+      ultimo_preco_cents INTEGER,
+      ultimo_preco_text TEXT,
+      ultimo_parcelamento TEXT,
+      status TEXT NOT NULL DEFAULT 'ativo',
+      ativo INTEGER NOT NULL DEFAULT 1,
+      ultimo_check_em TEXT,
+      ultimo_disparo_em TEXT,
+      erro TEXT,
+      criado_em TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours')),
+      atualizado_em TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours'))
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_wishlist_items_url_site ON wishlist_items(url, site);
+    CREATE INDEX IF NOT EXISTS idx_wishlist_items_active ON wishlist_items(ativo, status);
+
+    CREATE TABLE IF NOT EXISTS wishlist_checks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      item_id INTEGER NOT NULL,
+      checked_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', '-3 hours')),
+      status TEXT NOT NULL,
+      preco_cents INTEGER,
+      preco_text TEXT,
+      erro TEXT,
+      notified INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY (item_id) REFERENCES wishlist_items(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_wishlist_checks_item ON wishlist_checks(item_id, checked_at);
   `);
 }
 

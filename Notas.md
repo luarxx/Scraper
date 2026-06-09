@@ -57,8 +57,12 @@ A ideia é manter o browser Playwright **aberto e parado na página do produto**
 
 **Valor:** Alto (essencial para promoções sazonais) | **Complexidade:** Alta
 
-### 2.2 Lista de favoritos / "Desejos" ⬜
-Usuário salva produtos favoritos (localStorage ou DB) com atalho para ver preços atualizados de todos de uma vez.
+### 2.2 Lista de favoritos / "Desejos" ✅
+Implementado. Usuário salva produtos favoritos no SQLite a partir dos cards, consulta a aba Desejos, atualiza todos de uma vez e recebe Discord quando o preço atual fica menor que o último preço salvo.
+
+- **Backend:** Tabelas `wishlist_items` e `wishlist_checks`, rotas `/api/wishlist/*`, scheduler `WISHLIST_INTERVAL_HOURS` com mínimo de 3h.
+- **Frontend:** Aba "Desejos", botão "Salvar nos desejos" nos cards, remoção por soft delete e histórico de preço via `PriceHistoryChart`.
+- **Regra:** Deduplica por `site + url`; cada checagem salva `price_history` e atualiza a referência de preço após comparar.
 **Valor:** Médio | **Complexidade:** Baixa-Média
 
 ### 2.3 "Watch" de preços (alertas de queda) ✅

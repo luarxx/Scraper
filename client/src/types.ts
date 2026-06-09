@@ -138,3 +138,65 @@ export interface WatchProductPreview extends Produto {
   siteNome: string;
   timestamp: string;
 }
+
+// ─── Wishlist ───────────────────────────────────────────────
+
+export type WishlistStatusValue = 'ativo' | 'pausado';
+
+export interface WishlistItem {
+  id: number;
+  title: string;
+  url: string;
+  site: string;
+  image: string | null;
+  ultimo_preco_cents: number | null;
+  ultimo_preco_text: string | null;
+  ultimo_parcelamento: string | null;
+  status: WishlistStatusValue;
+  ativo: boolean;
+  ultimo_check_em: string | null;
+  ultimo_disparo_em: string | null;
+  erro: string | null;
+  criado_em: string;
+  atualizado_em: string;
+}
+
+export interface WishlistStatus {
+  status: 'idle' | 'executando' | 'agendado';
+  ultima_execucao: string | null;
+  proxima_execucao: string | null;
+  total_ativos: number;
+  total_disparados: number;
+  webhook_configurado: boolean;
+}
+
+export interface WishlistItemInput {
+  title: string;
+  url: string;
+  site: string;
+  image?: string | null;
+  price?: string | null;
+  parcelamento?: string | null;
+}
+
+// ─── Stats dashboard ─────────────────────────────────────────
+
+export interface SiteStats {
+  site: string;
+  siteNome: string;
+  total: number;
+  sucessos: number;
+  erros: number;
+  taxa_sucesso: number;
+  tempo_medio_resposta_ms: number;
+}
+
+export interface StatsDashboardResponse {
+  total_buscas: number;
+  sucessos: number;
+  erros: number;
+  taxa_sucesso: number;
+  tempo_medio_resposta_ms: number;
+  atualizado_em: string | null;
+  sites: SiteStats[];
+}

@@ -9,7 +9,7 @@ const buscarProdutoPorUrlMock = vi.fn();
 
 type ServerModule = typeof import('../server');
 
-async function importServer(options: { auto?: string; autoConcurrency?: string; watch?: string; webhook?: string } = {}): Promise<ServerModule> {
+async function importServer(options: { auto?: string; autoConcurrency?: string; watch?: string; wishlist?: string; webhook?: string } = {}): Promise<ServerModule> {
   vi.resetModules();
   buscarProdutoMock.mockReset();
   buscarProdutoPorUrlMock.mockReset();
@@ -18,6 +18,7 @@ async function importServer(options: { auto?: string; autoConcurrency?: string; 
   process.env.AUTO_INTERVAL_HOURS = options.auto;
   process.env.AUTO_MAX_CONCURRENCY = options.autoConcurrency;
   process.env.WATCH_INTERVAL_HOURS = options.watch;
+  process.env.WISHLIST_INTERVAL_HOURS = options.wishlist;
   process.env.DISCORD_WEBHOOK_URL = options.webhook || '';
   process.env.DISCORD_WEBHOOK_AVATAR_URL = '';
 
@@ -69,17 +70,19 @@ afterEach(() => {
   delete process.env.AUTO_INTERVAL_HOURS;
   delete process.env.AUTO_MAX_CONCURRENCY;
   delete process.env.WATCH_INTERVAL_HOURS;
+  delete process.env.WISHLIST_INTERVAL_HOURS;
   delete process.env.DISCORD_WEBHOOK_URL;
   vi.doUnmock('../scraper');
 });
 
 describe('server helpers', () => {
   it('aplica intervalo mínimo de 3 horas', async () => {
-    const mod = await importServer({ auto: '1', watch: '2' });
+    const mod = await importServer({ auto: '1', watch: '2', wishlist: '1' });
 
     expect(mod.AUTO_INTERVAL_HOURS).toBe(3);
     expect(mod.AUTO_MAX_CONCURRENCY).toBe(3);
     expect(mod.WATCH_INTERVAL_HOURS).toBe(3);
+    expect(mod.WISHLIST_INTERVAL_HOURS).toBe(3);
 
     mod.db.close();
   });
@@ -177,6 +180,29 @@ describe('server API', () => {
     expect(search.res.status).toBe(200);
     expect(search.body.total).toBe(1);
     expect(buscarProdutoMock).toHaveBeenCalledWith('kabum', 'ssd');
+    expect((await jsonRequest(baseUrl, '/api/stats/dashboard')).body).toMatchObject({
+      total_buscas: 1,
+      sucessos: 1,
+      erros: 0,
+      taxa_sucesso: 100,
+      sites: [expect.objectContaining({ site: 'kabum', total: 1, sucessos: 1, erros: 0 })],
+    });
+
+    mod.db.prepare(
+      `INSERT INTO search_metrics (origem, site, termo, status, total, duracao_ms, erro, criado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run('manual', 'pichau', 'gpu', 'erro', 0, 900, 'Falha mockada', '2026-06-05 10:03:00');
+    mod.db.prepare(
+      `INSERT INTO search_metrics (origem, site, termo, status, total, duracao_ms, erro, criado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run('auto', 'terabyteshop', 'ram', 'ok', 0, 200, null, '2026-06-05 10:04:00');
+
+    const dashboard = await jsonRequest(baseUrl, '/api/stats/dashboard');
+    expect(dashboard.res.status).toBe(200);
+    expect(dashboard.body.total_buscas).toBe(3);
+    expect(dashboard.body.taxa_sucesso).toBeCloseTo(66.67, 2);
+    expect(dashboard.body.tempo_medio_resposta_ms).toBeGreaterThan(0);
+    expect(dashboard.body.sites.map((item: { site: string }) => item.site)).toEqual(['kabum', 'terabyteshop', 'pichau']);
 
     const saved = await jsonRequest(baseUrl, '/api/auto/config', {
       method: 'POST',
@@ -246,6 +272,56 @@ describe('server API', () => {
     mod.db.close();
   });
 
+  it('salva, deduplica e remove itens da lista de desejos', async () => {
+    const mod = await importServer();
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const created = await jsonRequest(baseUrl, '/api/wishlist/items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: 'SSD NVMe',
+        url: 'https://www.kabum.com.br/produto/1',
+        site: 'kabum',
+        image: 'https://img.test/ssd.png',
+        price: 'R$ 329,90',
+        parcelamento: '10x de R$ 32,99',
+      }),
+    });
+    expect(created.res.status).toBe(201);
+    expect(created.body.ultimo_preco_cents).toBe(32990);
+    expect(created.body.ativo).toBe(true);
+
+    const updated = await jsonRequest(baseUrl, '/api/wishlist/items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: 'SSD NVMe atualizado',
+        url: 'https://www.kabum.com.br/produto/1',
+        site: 'kabum',
+        image: 'https://img.test/ssd-new.png',
+        price: 'R$ 299,90',
+        parcelamento: 'No PIX',
+      }),
+    });
+    expect(updated.res.status).toBe(201);
+    expect(updated.body.id).toBe(created.body.id);
+    expect(updated.body.title).toBe('SSD NVMe atualizado');
+    expect(updated.body.ultimo_preco_cents).toBe(29990);
+
+    const list = await jsonRequest(baseUrl, '/api/wishlist/items');
+    expect(list.body).toHaveLength(1);
+    expect((await jsonRequest(baseUrl, '/api/wishlist/status')).body.total_ativos).toBe(1);
+
+    const removed = await jsonRequest(baseUrl, `/api/wishlist/items/${created.body.id}`, { method: 'DELETE' });
+    expect(removed.body).toEqual({ ok: true });
+    expect((await jsonRequest(baseUrl, '/api/wishlist/items')).body).toHaveLength(0);
+    expect((await jsonRequest(baseUrl, '/api/wishlist/status')).body.total_ativos).toBe(0);
+
+    mod.db.close();
+  });
+
   it('pré-visualiza produto Watch pela URL', async () => {
     const mod = await importServer();
     server = mod.createServer();
@@ -300,6 +376,8 @@ describe('watch scheduler rules', () => {
 
     const resultado = mod.db.prepare(`SELECT status, total FROM auto_resultados`).get() as { status: string; total: number };
     expect(resultado).toEqual({ status: 'ok', total: 1 });
+    const metric = mod.db.prepare(`SELECT origem, site, termo, status, total FROM search_metrics`).get() as { origem: string; site: string; termo: string; status: string; total: number };
+    expect(metric).toEqual({ origem: 'auto', site: 'kabum', termo: 'ssd', status: 'ok', total: 1 });
     expect(globalThis.fetch).not.toHaveBeenCalled();
 
     mod.db.close();
@@ -383,8 +461,17 @@ describe('watch scheduler rules', () => {
 
     const alerta = mod.db.prepare(`SELECT status, ativo, erro FROM watch_alerts`).get() as { status: string; ativo: number; erro: string | null };
     const check = mod.db.prepare(`SELECT status, notified FROM watch_checks`).get() as { status: string; notified: number };
+    const metric = mod.db.prepare(`SELECT origem, site, termo, url, status, total FROM search_metrics`).get() as { origem: string; site: string; termo: string; url: string; status: string; total: number };
     expect(alerta).toEqual({ status: 'disparado', ativo: 0, erro: null });
     expect(check).toEqual({ status: 'disparado', notified: 1 });
+    expect(metric).toEqual({
+      origem: 'watch',
+      site: 'kabum',
+      termo: 'SSD NVMe',
+      url: 'https://www.kabum.com.br/produto/1',
+      status: 'ok',
+      total: 1,
+    });
     expect(globalThis.fetch).toHaveBeenCalled();
     const webhookBody = JSON.parse((vi.mocked(globalThis.fetch).mock.calls[0][1] as RequestInit).body as string);
     const description = webhookBody.embeds[0].description.replace(/\u00a0/g, ' ');
@@ -419,6 +506,98 @@ describe('watch scheduler rules', () => {
     const check = mod.db.prepare(`SELECT status, notified, erro FROM watch_checks`).get() as { status: string; notified: number; erro: string };
     expect(alerta).toEqual({ status: 'ativo', ativo: 1, erro: 'Falha ao enviar notificação Discord' });
     expect(check).toEqual({ status: 'erro', notified: 0, erro: 'Falha ao enviar notificação Discord' });
+
+    mod.db.close();
+  });
+
+  it('não notifica desejos quando preço não caiu', async () => {
+    const mod = await importServer({ webhook: 'https://discord.test/webhook' });
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, text: async () => '' })));
+    buscarProdutoPorUrlMock.mockResolvedValue({
+      title: 'SSD NVMe',
+      price: 'R$ 349,90',
+      parcelamento: null,
+      image: '',
+      url: 'https://www.kabum.com.br/produto/1',
+      relevancia: 0,
+      site: 'kabum',
+      siteNome: 'KaBuM!',
+      timestamp: new Date().toISOString(),
+    });
+
+    mod.db.prepare(
+      `INSERT INTO wishlist_items (title, url, site, ultimo_preco_cents, ultimo_preco_text, criado_em, atualizado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).run('SSD NVMe', 'https://www.kabum.com.br/produto/1', 'kabum', 32990, 'R$ 329,90', '2026-06-05 10:00:00', '2026-06-05 10:00:00');
+
+    await mod.executarWishlistChecks();
+
+    const item = mod.db.prepare(`SELECT ultimo_preco_cents, erro, ativo, status FROM wishlist_items`).get() as { ultimo_preco_cents: number; erro: string | null; ativo: number; status: string };
+    const check = mod.db.prepare(`SELECT status, notified FROM wishlist_checks`).get() as { status: string; notified: number };
+    expect(item).toEqual({ ultimo_preco_cents: 34990, erro: null, ativo: 1, status: 'ativo' });
+    expect(check).toEqual({ status: 'ok', notified: 0 });
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+
+    mod.db.close();
+  });
+
+  it('notifica desejos quando preço cai e mantém item ativo', async () => {
+    const mod = await importServer({ webhook: 'https://discord.test/webhook' });
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, text: async () => '' })));
+    buscarProdutoPorUrlMock.mockResolvedValue({
+      title: 'SSD NVMe',
+      price: 'R$ 199,90',
+      parcelamento: '10x de R$ 19,99',
+      image: 'https://img.test/ssd.png',
+      url: 'https://www.kabum.com.br/produto/1',
+      relevancia: 0,
+      site: 'kabum',
+      siteNome: 'KaBuM!',
+      timestamp: new Date().toISOString(),
+    });
+
+    mod.db.prepare(
+      `INSERT INTO wishlist_items (title, url, site, image, ultimo_preco_cents, ultimo_preco_text, criado_em, atualizado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run('SSD NVMe', 'https://www.kabum.com.br/produto/1', 'kabum', '', 29990, 'R$ 299,90', '2026-06-05 10:00:00', '2026-06-05 10:00:00');
+
+    await mod.executarWishlistChecks();
+
+    const item = mod.db.prepare(`SELECT ultimo_preco_cents, ultimo_preco_text, ultimo_parcelamento, ultimo_disparo_em, erro, ativo, status FROM wishlist_items`).get() as {
+      ultimo_preco_cents: number;
+      ultimo_preco_text: string;
+      ultimo_parcelamento: string;
+      ultimo_disparo_em: string | null;
+      erro: string | null;
+      ativo: number;
+      status: string;
+    };
+    const check = mod.db.prepare(`SELECT status, notified FROM wishlist_checks`).get() as { status: string; notified: number };
+    const metric = mod.db.prepare(`SELECT origem, site, termo, url, status, total FROM search_metrics`).get() as { origem: string; site: string; termo: string; url: string; status: string; total: number };
+    expect(item).toMatchObject({
+      ultimo_preco_cents: 19990,
+      ultimo_preco_text: 'R$ 199,90',
+      ultimo_parcelamento: '10x de R$ 19,99',
+      erro: null,
+      ativo: 1,
+      status: 'ativo',
+    });
+    expect(item.ultimo_disparo_em).not.toBeNull();
+    expect(check).toEqual({ status: 'disparado', notified: 1 });
+    expect(metric).toEqual({
+      origem: 'wishlist',
+      site: 'kabum',
+      termo: 'SSD NVMe',
+      url: 'https://www.kabum.com.br/produto/1',
+      status: 'ok',
+      total: 1,
+    });
+    expect(globalThis.fetch).toHaveBeenCalled();
+    const webhookBody = JSON.parse((vi.mocked(globalThis.fetch).mock.calls[0][1] as RequestInit).body as string);
+    const description = webhookBody.embeds[0].description.replace(/\u00a0/g, ' ');
+    expect(description).toContain('Preço anterior: **R$ 299,90**');
+    expect(description).toContain('Preço atual: **R$ 199,90**');
+    expect(description).toContain('Parcelamento: 10x de R$ 19,99');
 
     mod.db.close();
   });

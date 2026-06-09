@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, memo } from 'react';
-import { TrendingUp, TrendingDown, ImageOff, BellPlus } from 'lucide-react';
-import type { Produto } from '../types';
+import { TrendingUp, TrendingDown, ImageOff, BellPlus, Heart, Trash2 } from 'lucide-react';
+import type { Produto, WishlistItem } from '../types';
 import { usePriceHistory } from '../hooks/usePriceHistory';
 import { PriceHistoryChart } from './PriceHistoryChart';
 import { Icon } from './Icon';
@@ -13,6 +13,9 @@ interface ProductCardProps {
   updatedAt?: string | null;
   isBestOption?: boolean;
   onCreateAlert?: (produto: Produto, siteKey: string) => void;
+  wishlistItem?: WishlistItem | null;
+  wishlistBusy?: boolean;
+  onWishlistAction?: (produto: Produto, siteKey: string, wishlistItem?: WishlistItem | null) => void;
 }
 
 const SITE_COLORS: Record<string, { text: string; bg: string; btnBg: string }> = {
@@ -27,7 +30,17 @@ const SITE_NAMES: Record<string, string> = {
   pichau: 'Pichau',
 };
 
-export const ProductCard = memo(function ProductCard({ produto, index, siteKey, updatedAt, isBestOption, onCreateAlert }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({
+  produto,
+  index,
+  siteKey,
+  updatedAt,
+  isBestOption,
+  onCreateAlert,
+  wishlistItem,
+  wishlistBusy,
+  onWishlistAction,
+}: ProductCardProps) {
   const [imgError, setImgError] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const siteStyle = SITE_COLORS[siteKey] ?? SITE_COLORS.kabum;
@@ -101,6 +114,11 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
             Melhor Opção
           </span>
         )}
+        {wishlistItem && (
+          <span className="absolute top-2 right-2 z-10 inline-flex items-center gap-1 rounded-full bg-rose-500 px-2.5 py-1 text-[11px] font-semibold text-white">
+            <Icon icon={Heart} size={12} /> Nos desejos
+          </span>
+        )}
       </div>
 
       <div className="p-4 sm:p-5 flex flex-col flex-1">
@@ -157,6 +175,22 @@ export const ProductCard = memo(function ProductCard({ produto, index, siteKey, 
         />
 
         <div className="mt-3 grid grid-cols-1 gap-2">
+          {onWishlistAction && (
+            <button
+              type="button"
+              onClick={() => onWishlistAction(produto, siteKey, wishlistItem)}
+              disabled={wishlistBusy}
+              aria-pressed={Boolean(wishlistItem)}
+              className={`w-full font-semibold text-sm px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors active:scale-[0.99] border focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300 disabled:cursor-not-allowed disabled:opacity-50 ${
+                wishlistItem
+                  ? 'border-rose-500/30 bg-rose-500/10 text-rose-200 hover:bg-rose-500/15'
+                  : 'border-slate-700/70 bg-slate-800/70 text-slate-100 hover:bg-slate-800'
+              }`}
+            >
+              <Icon icon={wishlistItem ? Trash2 : Heart} size={16} />
+              {wishlistItem ? 'Remover dos desejos' : 'Salvar nos desejos'}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => onCreateAlert?.(produto, siteKey)}

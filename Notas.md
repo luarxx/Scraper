@@ -161,7 +161,7 @@ Impedir que N requisições abram N instâncias do Chromium e esgotem a memória
 Prevenir abuso (ex.: 100 requisições/min). Protege o servidor e evita bloqueio pelos sites alvo.
 **Valor:** Médio | **Complexidade:** Baixa
 
-### 4.4 Endpoint de sugestão / autocomplete ⬜
+### 4.4 Endpoint de sugestão / autocomplete ✅
 Sugerir termos de busca populares enquanto o usuário digita (baseado em histórico).
 **Valor:** Médio | **Complexidade:** Baixa
 

@@ -19,6 +19,8 @@ npm run build:prod    # Build completo para VPS/FileZilla: client/dist + dist/
 npm run start         # Node production, dist/server.js
 ```
 
+O build do client copia os arquivos PWA estaticos de `client/public/` para `client/dist/`, incluindo `manifest.webmanifest`, `sw.js` e icones de instalacao.
+
 ## Tests
 
 ```bash

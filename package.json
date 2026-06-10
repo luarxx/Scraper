@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "node scripts/dev-local.mjs",
-    "dev:fixed": "concurrently --kill-others \"cd client && vite\" \"tsx watch server.ts\"",
+    "dev:fixed": "node scripts/dev-fixed.mjs",
     "dev:local": "node scripts/dev-local.mjs",
     "dev:server": "tsx watch server.ts",
     "dev:client": "cd client && vite",

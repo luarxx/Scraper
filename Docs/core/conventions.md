@@ -35,6 +35,7 @@ Ao adicionar um novo site, registrar a cor em:
 
 - Server-side SQLite usa `better-sqlite3`.
 - Usar `db.prepare()` e transacoes com `db.transaction()`.
+- Novas colunas em tabelas existentes devem ter migracao em `server-core/db.ts`.
 - Auto Search usa soft delete em configs: `ativo = 0`, nao DELETE fisico.
 - Watch usa soft delete/status para alertas, nao remocao fisica.
 - Resultados automaticos ficam como JSON text na coluna `produtos`.

@@ -5,7 +5,7 @@
 ```bash
 npm run dev           # Dev local com descoberta automatica de portas livres
 npm run dev:local     # Alias do dev local automatico
-npm run dev:fixed     # Dev completo fixo: client 5173 + servidor 3000
+npm run dev:fixed     # Dev completo fixo: client 5173 + servidor 3000, sem fallback silencioso
 npm run dev:server    # Apenas servidor, tsx watch server.ts
 npm run dev:client    # Apenas client, Vite dev server
 ```

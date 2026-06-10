@@ -38,6 +38,29 @@ function findAvailablePort(startPort) {
   });
 }
 
+function waitForPort(port, host = '127.0.0.1', timeout = 30000) {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    function poll() {
+      const sock = new net.Socket();
+      sock.once('connect', () => {
+        sock.destroy();
+        resolve();
+      });
+      sock.once('error', () => {
+        sock.destroy();
+        if (Date.now() - start > timeout) {
+          reject(new Error(`Timeout waiting for ${host}:${port}`));
+        } else {
+          setTimeout(poll, 200);
+        }
+      });
+      sock.connect(port, host);
+    }
+    poll();
+  });
+}
+
 const apiPort = await findAvailablePort(Number(process.env.PORT || 3000));
 const clientPort = await findAvailablePort(Number(process.env.CLIENT_PORT || 5173));
 const serverArgs = ['run', 'dev:server'];
@@ -48,13 +71,17 @@ const children = [
     env: { ...process.env, PORT: String(apiPort) },
     stdio: 'inherit',
   }),
-  spawnCommand(clientArgs, {
-    env: { ...process.env, API_PORT: String(apiPort) },
-    stdio: 'inherit',
-  }),
 ];
 
 console.log(`[Dev Local] API: http://localhost:${apiPort}`);
+console.log('[Dev Local] Aguardando servidor ficar pronto...');
+await waitForPort(apiPort);
+
+children.push(spawnCommand(clientArgs, {
+  env: { ...process.env, API_PORT: String(apiPort) },
+  stdio: 'inherit',
+}));
+
 console.log(`[Dev Local] Client: http://localhost:${clientPort}`);
 
 let shuttingDown = false;

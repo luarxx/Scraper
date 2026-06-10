@@ -6,6 +6,7 @@ import { SearchForm } from '../components/SearchForm';
 import { StateMessage } from '../components/StateMessage';
 import { StatsDashboardPanel } from '../components/StatsDashboardPanel';
 import { WishlistPanel } from '../components/WishlistPanel';
+import { matchesPriceRange, parseBrlPrice } from '../utils/price';
 import { useAutoConfig } from './useAutoConfig';
 import { useAutoResults } from './useAutoResults';
 import { useSearch } from './useSearch';
@@ -289,6 +290,13 @@ describe('useStatsDashboard', () => {
 });
 
 describe('critical UI states', () => {
+  it('interpreta e filtra valores de preço em BRL', () => {
+    expect(parseBrlPrice('R$ 1.299,90')).toBe(1299.9);
+    expect(parseBrlPrice('1.000')).toBe(1000);
+    expect(matchesPriceRange('R$ 1.299,90', '1000', '1500')).toBe(true);
+    expect(matchesPriceRange('R$ 1.299,90', '1300', '1500')).toBe(false);
+  });
+
   it('renderiza sugestões fixas ao focar no campo de busca', async () => {
     const user = userEvent.setup();
     const onSearch = vi.fn();

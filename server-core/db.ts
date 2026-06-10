@@ -9,6 +9,18 @@ export const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
+function ensureColumn(table: string, columnDef: string): void {
+  const columnName = columnDef.split(/\s+/)[0];
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[];
+  if (columns.some((column) => column.name === columnName)) return;
+  db.prepare(`ALTER TABLE ${table} ADD COLUMN ${columnDef}`).run();
+}
+
+function migrateAutoConfig(): void {
+  ensureColumn('auto_config', 'ordem INTEGER NOT NULL DEFAULT 0');
+  ensureColumn('auto_config', 'ativo INTEGER NOT NULL DEFAULT 1');
+}
+
 export function initDatabase(): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS auto_config (
@@ -136,6 +148,8 @@ export function initDatabase(): void {
 
     CREATE INDEX IF NOT EXISTS idx_wishlist_checks_item ON wishlist_checks(item_id, checked_at);
   `);
+
+  migrateAutoConfig();
 }
 
 initDatabase();

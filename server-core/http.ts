@@ -19,11 +19,30 @@ export function jsonHeaders(): Record<string, string> {
   return {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
+    'X-Content-Type-Options': 'nosniff',
   };
 }
 
 function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/`/g, '&#x60;');
+}
+
+export function securityHeaders(contentType: 'json' | 'html' | 'static'): Record<string, string> {
+  const h: Record<string, string> = {
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'no-referrer-when-downgrade',
+  };
+  if (contentType === 'html') {
+    h['Content-Security-Policy'] = "default-src 'self'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' https: data:; script-src 'self'";
+  }
+  return h;
 }
 
 export function sendJson(res: http.ServerResponse, status: number, data: unknown): void {
@@ -37,7 +56,7 @@ export function sendStatic(res: http.ServerResponse, filePath: string, fallback?
     if (err) {
       if (err.code === 'ENOENT' && fallback) return fallback();
       if (err.code === 'ENOENT') {
-        res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8', ...securityHeaders('html') });
         res.end(`<h1>404</h1><p>${escapeHtml(path.basename(filePath))} não encontrado</p>`);
         return;
       }
@@ -45,14 +64,16 @@ export function sendStatic(res: http.ServerResponse, filePath: string, fallback?
       res.end('500 Internal Server Error');
       return;
     }
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+    const mime = MIME[ext] || 'application/octet-stream';
+    const extra = ext === '.html' ? securityHeaders('html') : securityHeaders('static');
+    res.writeHead(200, { 'Content-Type': mime, ...extra });
     res.end(data);
   });
 }
 
 export function sendSpa(res: http.ServerResponse): void {
   if (!hasReactBuild) {
-    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8', ...securityHeaders('html') });
     res.end('<h1>404</h1>');
     return;
   }
@@ -67,7 +88,7 @@ export function serveStatic(pathname: string, res: http.ServerResponse): void {
       if (!path.extname(pathname)) {
         return sendSpa(res);
       }
-      res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8', ...securityHeaders('html') });
       res.end(`<h1>404</h1><p>${escapeHtml(pathname)} não encontrado</p>`);
     });
     return;

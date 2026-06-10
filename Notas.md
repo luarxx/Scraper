@@ -309,8 +309,14 @@ Monitorar quais sites estão com desafio/bloqueio e quais erros são mais comuns
 Garantir que `../etc/passwd` não funcione no servir de arquivos estáticos.
 **Valor:** Alto | **Complexidade:** Baixa
 
-### 10.2 Sanitização de inputs (XSS) 🟡
-O servidor já usa `escapeHtml()` em respostas HTML de erro para arquivos estáticos, e a UI React escapa texto por padrão. Ainda vale revisar todos os caminhos de erro e qualquer HTML legado.
+### 10.2 Sanitização de inputs (XSS) ✅
+O servidor já usa `escapeHtml()` em respostas HTML de erro para arquivos estáticos, e a UI React escapa texto por padrão. Revisão completa feita em jun/2026:
+- `escapeHtml()` agora escapa `&`, `<`, `>`, `"`, `'` e backtick — cobertura total para contextos text e atributo.
+- Nenhum HTML legado encontrado: apenas `client/index.html` (template estático React).
+- Nenhuma rota da API retorna HTML — todas usam `sendJson()`.
+- Nenhum `dangerouslySetInnerHTML` no frontend.
+- Links externos usam `rel="noopener noreferrer"`.
+- Todos os `writeHead` de HTML incluem `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` e CSP com `default-src 'self'`.
 **Valor:** Alto | **Complexidade:** Baixa
 
 ### 10.3 Timeout global e cancelamento de requests 🟡

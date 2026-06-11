@@ -4,6 +4,15 @@ import { jsonHeaders } from '../http';
 import { registrarMetricaBusca } from '../metrics';
 import { salvarPrecos } from '../priceHistory';
 
+function executarComLog(contexto: string, action: () => void): void {
+  try {
+    action();
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.warn(`[Busca Manual] ${contexto}: ${error.message}`);
+  }
+}
+
 export function handleSearchRoute(pathname: string, req: IncomingMessage, res: ServerResponse, parsedUrl: URL): boolean {
   if (pathname === '/api/search' && req.method === 'GET') {
     const q = parsedUrl.searchParams.get('q');
@@ -27,25 +36,29 @@ export function handleSearchRoute(pathname: string, req: IncomingMessage, res: S
     buscarProduto(site, q.trim())
       .then((data) => {
         if (!('erro' in data) || !data.erro) {
-          salvarPrecos(data.produtos, site);
-          registrarMetricaBusca({
-            origem: 'manual',
-            site,
-            termo: q.trim(),
-            status: 'ok',
-            total: data.total,
-            duracaoMs: Date.now() - startedAt,
+          executarComLog('falha ao salvar histórico de preços', () => salvarPrecos(data.produtos, site));
+          executarComLog('falha ao registrar métrica de sucesso', () => {
+            registrarMetricaBusca({
+              origem: 'manual',
+              site,
+              termo: q.trim(),
+              status: 'ok',
+              total: data.total,
+              duracaoMs: Date.now() - startedAt,
+            });
           });
           console.log(`[Busca Manual] "${q.trim()}" em ${SITES[site].nome} — ${data.total} produto(s) encontrado(s)`);
         } else {
-          registrarMetricaBusca({
-            origem: 'manual',
-            site,
-            termo: q.trim(),
-            status: 'erro',
-            total: 0,
-            duracaoMs: Date.now() - startedAt,
-            erro: data.mensagem,
+          executarComLog('falha ao registrar métrica de erro', () => {
+            registrarMetricaBusca({
+              origem: 'manual',
+              site,
+              termo: q.trim(),
+              status: 'erro',
+              total: 0,
+              duracaoMs: Date.now() - startedAt,
+              erro: data.mensagem,
+            });
           });
           console.log(`[Busca Manual] "${q.trim()}" em ${SITES[site].nome} — erro: ${data.mensagem}`);
         }
@@ -53,14 +66,16 @@ export function handleSearchRoute(pathname: string, req: IncomingMessage, res: S
       })
       .catch((err: unknown) => {
         const error = err as Error;
-        registrarMetricaBusca({
-          origem: 'manual',
-          site,
-          termo: q.trim(),
-          status: 'erro',
-          total: 0,
-          duracaoMs: Date.now() - startedAt,
-          erro: error.message,
+        executarComLog('falha ao registrar métrica de exceção', () => {
+          registrarMetricaBusca({
+            origem: 'manual',
+            site,
+            termo: q.trim(),
+            status: 'erro',
+            total: 0,
+            duracaoMs: Date.now() - startedAt,
+            erro: error.message,
+          });
         });
         console.log(`[Busca Manual] "${q.trim()}" em ${SITES[site].nome} — erro: ${error.message}`);
         res.end(JSON.stringify({ erro: true, mensagem: error.message }));

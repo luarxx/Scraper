@@ -6,11 +6,20 @@ export class ScraperParseError extends Error {
   override name = 'ScraperParseError';
 }
 
+export class ScraperRateLimitError extends Error {
+  override name = 'ScraperRateLimitError';
+
+  constructor(message: string, readonly retryAfterMs?: number) {
+    super(message);
+  }
+}
+
 export type RetryKind = 'transient' | 'challenge' | 'fatal';
 
 export interface RetryClassification {
   kind: RetryKind;
   error: Error;
+  retryAfterMs?: number;
 }
 
 export interface RetryOptions {
@@ -30,6 +39,11 @@ function normalizarMensagem(value: string): string {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
+function getRetryAfterMs(err: Error): number | undefined {
+  const value = (err as Error & { retryAfterMs?: unknown }).retryAfterMs;
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
 export function classificarErroScraper(err: unknown): RetryClassification {
   if (err instanceof ScraperChallengeError) {
     return { kind: 'challenge', error: err };
@@ -41,6 +55,7 @@ export function classificarErroScraper(err: unknown): RetryClassification {
 
   const error = err instanceof Error ? err : new Error(String(err));
   const message = normalizarMensagem(error.message);
+  const retryAfterMs = getRetryAfterMs(error);
 
   if (
     message.includes('captcha')
@@ -58,14 +73,17 @@ export function classificarErroScraper(err: unknown): RetryClassification {
     message.includes('timeout')
     || message.includes('timed out')
     || message.includes('navigation failed')
+    || message.includes('too many requests')
+    || message.includes('rate limit')
+    || message.includes('http 429')
     || message.includes('net::err')
     || message.includes('econnreset')
     || message.includes('fetch failed')
   ) {
-    return { kind: 'transient', error };
+    return { kind: 'transient', error, retryAfterMs };
   }
 
-  return { kind: 'transient', error };
+  return { kind: 'transient', error, retryAfterMs };
 }
 
 export function calcularBackoffMs(
@@ -111,7 +129,8 @@ export async function executarComRetry<T>(
         throw classification.error;
       }
 
-      const delayMs = calcularBackoffMs(attempt, baseDelayMs, jitterRatio, random);
+      const backoffMs = calcularBackoffMs(attempt, baseDelayMs, jitterRatio, random);
+      const delayMs = classification.retryAfterMs ? Math.max(backoffMs, classification.retryAfterMs) : backoffMs;
       options.onRetry?.({
         attempt,
         kind: classification.kind,

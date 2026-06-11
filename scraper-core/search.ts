@@ -131,6 +131,27 @@ async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: s
   const urlBusca = site.searchUrl(termoBusca);
   console.log(`  → URL de busca: ${urlBusca}`);
 
+  try {
+    await page.setExtraHTTPHeaders({
+      'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7',
+      'Sec-Fetch-Dest': 'document',
+      'Sec-Fetch-Mode': 'navigate',
+      'Sec-Fetch-Site': 'none',
+      'Sec-Fetch-User': '?1',
+      'Upgrade-Insecure-Requests': '1',
+    });
+    await page.route('**/*', (route) => {
+      const type = route.request().resourceType();
+      if (['image', 'font', 'media', 'stylesheet', 'other'].includes(type)) {
+        route.abort().catch(() => undefined);
+      } else {
+        route.continue().catch(() => undefined);
+      }
+    });
+  } catch {
+    /* best-effort */
+  }
+
   const navStart = Date.now();
   let navError: string | null = null;
   try {
@@ -151,6 +172,14 @@ async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: s
   if (navError) {
     await capturarSnapshot(page, siteKey, 'nav_error');
     throw new ScraperParseError(`Falha ao navegar para ${urlBusca}: ${navError}`);
+  }
+
+  if (/azion|blocked|forbidden|erro 403|access denied/i.test(titulo) || bodyLen < 1000) {
+    await capturarSnapshot(page, siteKey, 'bloqueado');
+    throw new ScraperParseError(
+      `${site.nome} retornou pagina de bloqueio (titulo: "${titulo}", body: ${bodyLen} chars). ` +
+      `O IP do servidor/VPS pode estar bloqueado.`
+    );
   }
 
   await randomWait(2000, 4000);

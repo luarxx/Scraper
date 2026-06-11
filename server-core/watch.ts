@@ -1,4 +1,4 @@
-import { buscarProdutoPorUrl, SITES } from '../scraper';
+import { buscarProdutoPorUrl, SITES, Produto } from '../scraper';
 import { db } from './db';
 import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
@@ -37,6 +37,42 @@ export type WatchAlertRow = {
   criado_em: string;
   atualizado_em: string;
 };
+
+export function normalizarUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    const path = parsed.pathname.replace(/\/+$/, '');
+    return `${parsed.hostname}${path}`.toLowerCase();
+  } catch {
+    return url.toLowerCase().trim();
+  }
+}
+
+export function carregarCacheAutoResultados(): Map<string, Produto> {
+  const map = new Map<string, Produto>();
+
+  const ultimaExec = db.prepare(
+    `SELECT id FROM auto_execucoes WHERE status = 'concluido' ORDER BY id DESC LIMIT 1`
+  ).get() as { id: number } | undefined;
+
+  if (!ultimaExec) return map;
+
+  const resultados = db.prepare(
+    `SELECT site, produtos FROM auto_resultados WHERE execucao_id = ? AND status = 'ok' AND produtos IS NOT NULL`
+  ).all(ultimaExec.id) as { site: string; produtos: string }[];
+
+  for (const r of resultados) {
+    const produtos: Produto[] = JSON.parse(r.produtos);
+    for (const p of produtos) {
+      const key = normalizarUrl(p.url);
+      if (!map.has(key)) {
+        map.set(key, p);
+      }
+    }
+  }
+
+  return map;
+}
 
 function truncateDiscord(value: string, max: number): string {
   return value.length > max ? `${value.slice(0, max - 1)}…` : value;
@@ -128,10 +164,102 @@ export async function executarWatchAlerts(): Promise<void> {
   let erros = 0;
   let disparados = 0;
   let precosVerificados = 0;
+  let resolvidosPorAuto = 0;
+
+  const cacheAuto = carregarCacheAutoResultados();
 
   for (const alerta of alertasFiltrados) {
     const checkedAt = formatDbDatetime();
     const startedAt = Date.now();
+
+    const urlNormalizada = normalizarUrl(alerta.url);
+    const produtoCached = cacheAuto.get(urlNormalizada);
+
+    if (produtoCached) {
+      resolvidosPorAuto++;
+      const produto = { ...produtoCached, site: alerta.site, siteNome: siteNome(alerta.site), timestamp: new Date().toISOString() };
+      console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — resolvido via Busca Automática, preço ${produto.price || 'N/D'}`);
+      const precoCents = brlToCents(produto.price);
+      salvarPrecos([produto], alerta.site);
+
+      if (precoCents === null) {
+        const erro = 'Preço atual não identificado';
+        insertCheck.run(alerta.id, checkedAt, 'erro', null, produto.price, erro, 0);
+        registrarMetricaBusca({
+          origem: 'watch',
+          site: alerta.site,
+          termo: alerta.nome,
+          url: alerta.url,
+          status: 'erro',
+          total: 0,
+          duracaoMs: Date.now() - startedAt,
+          erro,
+        });
+        erros++;
+        db.prepare(
+          `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
+        ).run(checkedAt, erro, checkedAt, alerta.id);
+        continue;
+      }
+
+      precosVerificados++;
+
+      if (precoCents <= alerta.preco_alvo_cents) {
+        const notified = await enviarWatchDiscord(alerta, precoCents, produto.price || centsToBrl(precoCents), produto.parcelamento);
+        const erro = notified ? null : 'Falha ao enviar notificação Discord';
+        insertCheck.run(alerta.id, checkedAt, notified ? 'disparado' : 'erro', precoCents, produto.price, erro, notified ? 1 : 0);
+        registrarMetricaBusca({
+          origem: 'watch',
+          site: alerta.site,
+          termo: alerta.nome,
+          url: alerta.url,
+          status: notified ? 'ok' : 'erro',
+          total: 1,
+          duracaoMs: Date.now() - startedAt,
+          erro,
+        });
+        if (notified) {
+          disparados++;
+        } else {
+          erros++;
+        }
+        db.prepare(
+          `UPDATE watch_alerts
+           SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, status = ?, ativo = ?, disparado_em = ?, erro = ?, atualizado_em = ?
+           WHERE id = ?`
+        ).run(
+          precoCents,
+          produto.price,
+          produto.parcelamento,
+          checkedAt,
+          notified ? 'disparado' : 'ativo',
+          notified ? 0 : 1,
+          notified ? checkedAt : null,
+          erro,
+          checkedAt,
+          alerta.id,
+        );
+      } else {
+        insertCheck.run(alerta.id, checkedAt, 'ok', precoCents, produto.price, null, 0);
+        registrarMetricaBusca({
+          origem: 'watch',
+          site: alerta.site,
+          termo: alerta.nome,
+          url: alerta.url,
+          status: 'ok',
+          total: 1,
+          duracaoMs: Date.now() - startedAt,
+        });
+        ok++;
+        db.prepare(
+          `UPDATE watch_alerts
+           SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, erro = NULL, atualizado_em = ?
+           WHERE id = ?`
+        ).run(precoCents, produto.price, produto.parcelamento, checkedAt, checkedAt, alerta.id);
+      }
+      continue;
+    }
+
     try {
       const produto = await buscarProdutoPorUrl(alerta.site, alerta.url, alerta.nome);
       console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — preço ${produto.price || 'N/D'}${produto.priceSource ? ` (${produto.priceSource})` : ''}`);
@@ -233,7 +361,7 @@ export async function executarWatchAlerts(): Promise<void> {
     }
   }
 
-  console.log(`[Watch] Verificação concluída — ${alertasFiltrados.length} alerta(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)`);
+  console.log(`[Watch] Verificação concluída — ${alertasFiltrados.length} alerta(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)${resolvidosPorAuto > 0 ? `, ${resolvidosPorAuto} resolvido(s) via Busca Automática` : ''}`);
   watchStatus = 'agendado';
   proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
 }

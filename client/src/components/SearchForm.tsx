@@ -2,19 +2,21 @@ import { useId, useMemo, useState, type FormEvent, type KeyboardEvent } from 're
 import { Search } from 'lucide-react';
 import { Icon } from './Icon';
 import type { SearchHistoryEntry } from '../hooks/useSearchHistory';
+import type { Site } from '../types';
 
 interface SearchFormProps {
   onSearch: (q: string, site: string) => void;
   loading: boolean;
   compact?: boolean;
   history?: SearchHistoryEntry[];
+  sites?: Site[];
 }
 
-const SITES = [
-  { key: 'kabum', nome: 'KaBuM!', color: 'text-orange-400', activeBg: 'bg-orange-600/20', activeBorder: 'border-orange-500/30' },
-  { key: 'terabyteshop', nome: 'Terabyte', color: 'text-emerald-400', activeBg: 'bg-emerald-600/20', activeBorder: 'border-emerald-500/30' },
-  { key: 'pichau', nome: 'Pichau', color: 'text-red-400', activeBg: 'bg-red-600/20', activeBorder: 'border-red-500/30' },
-];
+const SITE_STYLE: Record<string, { color: string; text: string; bg: string; border: string; activeBg: string; activeBorder: string }> = {
+  kabum: { color: 'text-orange-400', text: '#f97316', bg: 'rgba(249, 115, 22, 0.1)', border: 'border-orange-500/30', activeBg: 'bg-orange-600/20', activeBorder: 'border-orange-500/30' },
+  pichau: { color: 'text-red-400', text: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', border: 'border-red-500/30', activeBg: 'bg-red-600/20', activeBorder: 'border-red-500/30' },
+  terabyteshop: { color: 'text-emerald-400', text: '#34d399', bg: 'rgba(52, 211, 153, 0.1)', border: 'border-emerald-500/30', activeBg: 'bg-emerald-600/20', activeBorder: 'border-emerald-500/30' },
+};
 
 const SITE_BADGES: Record<string, string> = {
   kabum: 'KaBuM!',
@@ -50,11 +52,15 @@ function normalizeTerm(value: string) {
   return value.trim().toLocaleLowerCase('pt-BR');
 }
 
-export function SearchForm({ onSearch, loading, compact, history = [] }: SearchFormProps) {
+export function SearchForm({ onSearch, loading, compact, history = [], sites }: SearchFormProps) {
   const inputId = useId();
   const listboxId = `${inputId}-suggestions`;
+  const activeSites = useMemo(() => {
+    if (sites && sites.length > 0) return sites.map(s => ({ ...s, ...SITE_STYLE[s.key] || SITE_STYLE.kabum }));
+    return Object.entries(SITE_STYLE).map(([key, style]) => ({ key, nome: SITE_BADGES[key] || key, ...style }));
+  }, [sites]);
   const [q, setQ] = useState('');
-  const [site, setSite] = useState('kabum');
+  const [site, setSite] = useState(activeSites[0]?.key || 'kabum');
   const [focused, setFocused] = useState(false);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -232,7 +238,7 @@ export function SearchForm({ onSearch, loading, compact, history = [] }: SearchF
 
       <div className="flex items-center justify-center mt-2.5">
         <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
-          {SITES.map(s => (
+          {activeSites.map(s => (
             <button
               key={s.key}
               type="button"

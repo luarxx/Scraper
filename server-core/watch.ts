@@ -1,5 +1,6 @@
 import { buscarProdutoPorUrl, SITES } from '../scraper';
 import { db } from './db';
+import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
 import { brlToCents, centsToBrl } from './money';
 import { salvarPrecos } from './priceHistory';
@@ -110,7 +111,9 @@ export async function executarWatchAlerts(): Promise<void> {
     `SELECT * FROM watch_alerts WHERE ativo = 1 AND status = 'ativo' ORDER BY id`
   ).all() as WatchAlertRow[];
 
-  if (alertas.length === 0) {
+  const alertasFiltrados = alertas.filter(a => isSiteEnabled(a.site));
+
+  if (alertasFiltrados.length === 0) {
     watchStatus = 'agendado';
     proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
     return;
@@ -126,7 +129,7 @@ export async function executarWatchAlerts(): Promise<void> {
   let disparados = 0;
   let precosVerificados = 0;
 
-  for (const alerta of alertas) {
+  for (const alerta of alertasFiltrados) {
     const checkedAt = formatDbDatetime();
     const startedAt = Date.now();
     try {
@@ -230,7 +233,7 @@ export async function executarWatchAlerts(): Promise<void> {
     }
   }
 
-  console.log(`[Watch] Verificação concluída — ${alertas.length} alerta(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)`);
+  console.log(`[Watch] Verificação concluída — ${alertasFiltrados.length} alerta(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)`);
   watchStatus = 'agendado';
   proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
 }

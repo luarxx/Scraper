@@ -35,3 +35,8 @@ export const PORT_AUTO_FALLBACK = !process.env.PORT && process.env.PORT_STRICT !
 export const PORT_MAX_ATTEMPTS = Number(process.env.PORT_MAX_ATTEMPTS || 10);
 export const CLIENT_DIST = path.join(ROOT, 'client', 'dist');
 export const hasReactBuild = fs.existsSync(path.join(CLIENT_DIST, 'index.html'));
+
+export const DISABLED_SITES: string[] = (process.env.DISABLED_SITES || '')
+  .split(',')
+  .map(s => s.trim().toLowerCase())
+  .filter(Boolean);

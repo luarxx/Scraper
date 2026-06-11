@@ -16,6 +16,7 @@ type ImportServerOptions = {
   wishlist?: string;
   webhook?: string;
   legacyAutoConfig?: boolean;
+  disabledSites?: string;
 };
 
 async function importServer(options: ImportServerOptions = {}): Promise<ServerModule> {
@@ -30,6 +31,7 @@ async function importServer(options: ImportServerOptions = {}): Promise<ServerMo
   process.env.WISHLIST_INTERVAL_HOURS = options.wishlist;
   process.env.DISCORD_WEBHOOK_URL = options.webhook || '';
   process.env.DISCORD_WEBHOOK_AVATAR_URL = '';
+  if (options.disabledSites !== undefined) process.env.DISABLED_SITES = options.disabledSites;
 
   if (options.legacyAutoConfig) {
     const legacyDb = new Database(process.env.SCRAPER_DB_PATH);
@@ -94,6 +96,7 @@ afterEach(() => {
   delete process.env.WATCH_INTERVAL_HOURS;
   delete process.env.WISHLIST_INTERVAL_HOURS;
   delete process.env.DISCORD_WEBHOOK_URL;
+  delete process.env.DISABLED_SITES;
   vi.doUnmock('../scraper');
 });
 
@@ -419,6 +422,173 @@ describe('server API', () => {
     expect(preview.res.status).toBe(200);
     expect(preview.body.title).toBe('SSD NVMe');
     expect(buscarProdutoPorUrlMock).toHaveBeenCalledWith('kabum', 'https://www.kabum.com.br/produto/1');
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, /api/sites omite KaBuM!', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const { body } = await jsonRequest(baseUrl, '/api/sites');
+    expect(body).toEqual([
+      { key: 'pichau', nome: 'Pichau' },
+      { key: 'terabyteshop', nome: 'TerabyteShop' },
+    ]);
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, /api/search rejeita busca em kabum', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const { res, body } = await jsonRequest(baseUrl, '/api/search?q=ssd&site=kabum');
+    expect(res.status).toBe(400);
+    expect(body.erro).toBe(true);
+    expect(body.mensagem).toContain('desabilitado');
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, /api/auto/config rejeita entrada da kabum', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const saved = await jsonRequest(baseUrl, '/api/auto/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([{ termo: 'ssd', site: 'kabum' }, { termo: 'gpu', site: 'pichau' }]),
+    });
+    expect(saved.res.status).toBe(200);
+    expect(saved.body).toHaveLength(1);
+    expect(saved.body[0].site).toBe('pichau');
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, /api/watch/alerts rejeita site kabum', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const created = await jsonRequest(baseUrl, '/api/watch/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: 'SSD NVMe',
+        url: 'https://www.kabum.com.br/produto/1',
+        site: 'kabum',
+        canal: 'discord',
+        preco_alvo: 'R$ 299,90',
+      }),
+    });
+    expect(created.res.status).toBe(400);
+    expect(created.body.erro).toBe(true);
+    expect(created.body.mensagem).toContain('desabilitado');
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, /api/watch/preview rejeita site kabum', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const { res, body } = await jsonRequest(baseUrl, '/api/watch/preview?site=kabum&url=https%3A%2F%2Fwww.kabum.com.br%2Fproduto%2F1');
+    expect(res.status).toBe(400);
+    expect(body.erro).toBe(true);
+    expect(body.mensagem).toContain('desabilitado');
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, /api/wishlist/items rejeita site kabum', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const created = await jsonRequest(baseUrl, '/api/wishlist/items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: 'SSD NVMe',
+        url: 'https://www.kabum.com.br/produto/1',
+        site: 'kabum',
+        price: 'R$ 299,90',
+      }),
+    });
+    expect(created.res.status).toBe(400);
+    expect(created.body.erro).toBe(true);
+    expect(created.body.mensagem).toContain('desabilitado');
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, auto scheduler pula configs da kabum', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+
+    buscarProdutoMock.mockResolvedValue({
+      termo: 'gpu',
+      site: 'pichau',
+      siteNome: 'Pichau',
+      timestamp: new Date().toISOString(),
+      total: 1,
+      produtos: [{
+        title: 'GPU',
+        price: 'R$ 1.999,90',
+        parcelamento: null,
+        image: '',
+        url: 'https://loja.test/gpu',
+        relevancia: 1,
+      }],
+    });
+
+    mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+      .run('ssd', 'kabum', 1, '2026-06-05 10:00:00');
+    mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+      .run('gpu', 'pichau', 2, '2026-06-05 10:00:00');
+
+    await mod.executarAutoBuscas();
+
+    const resultados = mod.db.prepare(`SELECT termo, site, status, total FROM auto_resultados`).all() as { termo: string; site: string; status: string; total: number }[];
+    expect(resultados).toHaveLength(1);
+    expect(resultados[0]).toEqual({ termo: 'gpu', site: 'pichau', status: 'ok', total: 1 });
+    expect(buscarProdutoMock).toHaveBeenCalledWith('pichau', 'gpu');
+    expect(buscarProdutoMock).not.toHaveBeenCalledWith('kabum', 'ssd');
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=kabum, watch scheduler pula alertas da kabum', async () => {
+    const mod = await importServer({ disabledSites: 'kabum' });
+    server = mod.createServer();
+
+    mod.db.prepare(`INSERT INTO watch_alerts (nome, url, site, canal, preco_alvo_cents, criado_em, atualizado_em) VALUES (?, ?, ?, ?, ?, ?, ?)`)
+      .run('SSD Kabum', 'https://www.kabum.com.br/produto/1', 'kabum', 'discord', 29990, '2026-06-05 10:00:00', '2026-06-05 10:00:00');
+
+    await mod.executarWatchAlerts();
+
+    expect(buscarProdutoPorUrlMock).not.toHaveBeenCalled();
+
+    mod.db.close();
+  });
+
+  it('com DISABLED_SITES=vazio, mantém todos os sites (regressão)', async () => {
+    const mod = await importServer({ disabledSites: '' });
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    const { body } = await jsonRequest(baseUrl, '/api/sites');
+    expect(body).toEqual([
+      { key: 'kabum', nome: 'KaBuM!' },
+      { key: 'pichau', nome: 'Pichau' },
+      { key: 'terabyteshop', nome: 'TerabyteShop' },
+    ]);
 
     mod.db.close();
   });

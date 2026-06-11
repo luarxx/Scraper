@@ -32,6 +32,7 @@ Leia `DESIGN.md` apenas para tarefas de UI/UX, layout, copy visual, cores, anima
 - `scraper-core/`: logica do scraper, sites, busca, cache, fingerprint, parsing e comportamento de browser.
 - `server.ts`: fachada publica do servidor e start.
 - `server-core/`: servidor HTTP, env, SQLite, rotas, schedulers Auto/Watch e utilitarios.
+- `server-core/enabledSites.ts`: filtro de sites habilitados com base em `DISABLED_SITES`.
 - `server-core/routes/`: handlers HTTP por dominio.
 - `client/src/`: frontend React.
 - `client/src/hooks/`: hooks de busca, historico, Auto e Watch.
@@ -130,6 +131,9 @@ Para novos sites:
 - Resultados automaticos ficam como JSON text no SQLite, coluna `produtos`.
 - Auto Search executa buscas com concorrencia limitada e recupera crash quando ultima execucao ficou `executando`.
 - Logs operacionais devem usar prefixo curto, por exemplo `[Busca Manual]`, `[Busca Automatica]`, `[Watch]`.
+- `DISABLED_SITES` na env desativa sites nas rotas e schedulers sem afetar o scraper core. `server-core/enabledSites.ts` exporta `isSiteEnabled()`, `getEnabledSites()` e `getEnabledSiteKeys()`.
+- O frontend usa a lista de sites vinda de `/api/sites`; se KaBuM! estiver desabilitado, ela simplesmente nao aparece como opcao.
+- Historico e dados antigos de sites desabilitados permanecem no banco, mas novas execucoes e acoes ficam bloqueadas.
 - Server-side SQLite usa `better-sqlite3`, `db.prepare()` e transacoes com `db.transaction()`.
 - Documentacao viva: atualize `AGENTS.md` e/ou `Docs/` quando mudar funcionalidades, sites, comandos, arquitetura ou convencoes.
 

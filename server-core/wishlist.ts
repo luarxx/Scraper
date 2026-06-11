@@ -1,10 +1,11 @@
-import { buscarProdutoPorUrl, SITES } from '../scraper';
+import { buscarProdutoPorUrl, SITES, Produto } from '../scraper';
 import { db } from './db';
 import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
 import { brlToCents, centsToBrl } from './money';
 import { salvarPrecos } from './priceHistory';
 import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime } from './time';
+import { normalizarUrl, carregarCacheAutoResultados } from './watch';
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 const DISCORD_WEBHOOK_AVATAR_URL = process.env.DISCORD_WEBHOOK_AVATAR_URL || '';
@@ -169,10 +170,90 @@ export async function executarWishlistChecks(): Promise<void> {
   let erros = 0;
   let disparados = 0;
   let precosVerificados = 0;
+  let resolvidosPorAuto = 0;
+
+  const cacheAuto = carregarCacheAutoResultados();
 
   for (const item of itensFiltrados) {
     const checkedAt = formatDbDatetime();
     const startedAt = Date.now();
+
+    const urlNormalizada = normalizarUrl(item.url);
+    const produtoCached = cacheAuto.get(urlNormalizada);
+
+    if (produtoCached) {
+      resolvidosPorAuto++;
+      const produto = { ...produtoCached, site: item.site, siteNome: siteNome(item.site), timestamp: new Date().toISOString() };
+      console.log(`[Desejos] Item "${item.title}" em ${siteNome(item.site)} — resolvido via Busca Automática, preço ${produto.price || 'N/D'}`);
+      const precoCents = brlToCents(produto.price);
+      salvarPrecos([produto], item.site);
+
+      if (precoCents === null) {
+        const erro = 'Preço atual não identificado';
+        insertCheck.run(item.id, checkedAt, 'erro', null, produto.price, erro, 0);
+        registrarMetricaBusca({
+          origem: 'wishlist',
+          site: item.site,
+          termo: item.title,
+          url: item.url,
+          status: 'erro',
+          total: 0,
+          duracaoMs: Date.now() - startedAt,
+          erro,
+        });
+        erros++;
+        db.prepare(
+          `UPDATE wishlist_items SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
+        ).run(checkedAt, erro, checkedAt, item.id);
+        continue;
+      }
+
+      precosVerificados++;
+      const previousPriceCents = item.ultimo_preco_cents;
+      const shouldNotify = previousPriceCents !== null && precoCents < previousPriceCents;
+      const priceText = produto.price || centsToBrl(precoCents);
+      const discordSent = shouldNotify
+        ? await enviarWishlistDiscord(item, previousPriceCents, precoCents, priceText, produto.parcelamento)
+        : true;
+      const erro = shouldNotify && !discordSent ? 'Falha ao enviar notificação Discord' : null;
+
+      insertCheck.run(item.id, checkedAt, shouldNotify ? (discordSent ? 'disparado' : 'erro') : 'ok', precoCents, produto.price, erro, shouldNotify && discordSent ? 1 : 0);
+      registrarMetricaBusca({
+        origem: 'wishlist',
+        site: item.site,
+        termo: item.title,
+        url: item.url,
+        status: erro ? 'erro' : 'ok',
+        total: 1,
+        duracaoMs: Date.now() - startedAt,
+        erro,
+      });
+
+      if (shouldNotify && discordSent) disparados++;
+      else if (erro) erros++;
+      else ok++;
+
+      db.prepare(
+        `UPDATE wishlist_items
+         SET title = ?, image = ?, ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, ultimo_disparo_em = ?, erro = ?, ativo = ?, status = ?, atualizado_em = ?
+         WHERE id = ?`
+      ).run(
+        produto.title || item.title,
+        produto.image || item.image,
+        precoCents,
+        produto.price,
+        produto.parcelamento,
+        checkedAt,
+        shouldNotify && discordSent ? checkedAt : item.ultimo_disparo_em,
+        erro,
+        1,
+        'ativo',
+        checkedAt,
+        item.id,
+      );
+      continue;
+    }
+
     try {
       const produto = await buscarProdutoPorUrl(item.site, item.url, item.title);
       console.log(`[Desejos] Item "${item.title}" em ${siteNome(item.site)} — preço ${produto.price || 'N/D'}${produto.priceSource ? ` (${produto.priceSource})` : ''}`);
@@ -262,7 +343,7 @@ export async function executarWishlistChecks(): Promise<void> {
     }
   }
 
-  console.log(`[Desejos] Verificação concluída — ${itensFiltrados.length} item(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)`);
+  console.log(`[Desejos] Verificação concluída — ${itensFiltrados.length} item(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)${resolvidosPorAuto > 0 ? `, ${resolvidosPorAuto} resolvido(s) via Busca Automática` : ''}`);
   wishlistStatus = 'agendado';
   proximaWishlistExecucao = formatApiDatetime(calcularProximoWishlistHorario());
 }

@@ -8,6 +8,33 @@ import { calcularProximoHorarioIntervalo, formatApiDatetime, formatDbDatetime } 
 import { WATCH_INTERVAL_HOURS, executarWatchAlerts, getWatchStatus, iniciarWatchScheduler, normalizarWatchAlert } from './server-core/watch';
 import { WISHLIST_INTERVAL_HOURS, executarWishlistChecks, getWishlistStatus, iniciarWishlistScheduler, normalizarWishlistItem } from './server-core/wishlist';
 
+const STARTUP_BOX_WIDTH = 46;
+
+function startupLine(content = ''): string {
+  return `  │ ${content.padEnd(STARTUP_BOX_WIDTH)} │`;
+}
+
+function startupRule(left: string, fill: string, right: string): string {
+  return `  ${left}${fill.repeat(STARTUP_BOX_WIDTH + 2)}${right}`;
+}
+
+function startupRow(icon: string, label: string, value: string): string {
+  return startupLine(`${icon}  ${label.padEnd(12)} ${value}`);
+}
+
+function logStartup(currentPort: number): void {
+  console.log('');
+  console.log(startupRule('┌', '─', '┐'));
+  console.log(startupLine('◆  Scraper pronto'));
+  console.log(startupRule('├', '─', '┤'));
+  console.log(startupRow('●', 'Servidor', `http://localhost:${currentPort}`));
+  console.log(startupRow('◷', 'Auto-busca', `a cada ${AUTO_INTERVAL_HOURS}h`));
+  console.log(startupRow('◉', 'Watch', `a cada ${WATCH_INTERVAL_HOURS}h`));
+  console.log(startupRow('▣', 'Desejos', `a cada ${WISHLIST_INTERVAL_HOURS}h`));
+  console.log(startupRule('└', '─', '┘'));
+  console.log('');
+}
+
 function startServer(): http.Server {
   const server = createServer();
   let currentPort = PORT;
@@ -34,15 +61,7 @@ function startServer(): http.Server {
     iniciarScheduler();
     iniciarWatchScheduler();
     iniciarWishlistScheduler();
-    console.log('');
-    console.log('  ┌──────────────────────────────────────┐');
-    console.log(`  │  🚀  ${String('http://localhost:' + String(currentPort)).padEnd(26)}│`);
-    console.log('  │                                      │');
-    console.log(`  │  ⏰  Auto-busca a cada ${String(AUTO_INTERVAL_HOURS + 'h').padEnd(13)}│`);
-    console.log(`  │  🔔  Watch a cada ${String(WATCH_INTERVAL_HOURS + 'h').padEnd(18)}│`);
-    console.log(`  │  💾  Desejos a cada ${String(WISHLIST_INTERVAL_HOURS + 'h').padEnd(16)}│`);
-    console.log('  └──────────────────────────────────────┘');
-    console.log('');
+    logStartup(currentPort);
   });
   return server;
 }

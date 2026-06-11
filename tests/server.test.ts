@@ -2,14 +2,23 @@ import * as fs from 'fs';
 import * as http from 'http';
 import * as os from 'os';
 import * as path from 'path';
+import Database from 'better-sqlite3';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const buscarProdutoMock = vi.fn();
 const buscarProdutoPorUrlMock = vi.fn();
 
 type ServerModule = typeof import('../server');
+type ImportServerOptions = {
+  auto?: string;
+  autoConcurrency?: string;
+  watch?: string;
+  wishlist?: string;
+  webhook?: string;
+  legacyAutoConfig?: boolean;
+};
 
-async function importServer(options: { auto?: string; autoConcurrency?: string; watch?: string; wishlist?: string; webhook?: string } = {}): Promise<ServerModule> {
+async function importServer(options: ImportServerOptions = {}): Promise<ServerModule> {
   vi.resetModules();
   buscarProdutoMock.mockReset();
   buscarProdutoPorUrlMock.mockReset();
@@ -21,6 +30,19 @@ async function importServer(options: { auto?: string; autoConcurrency?: string; 
   process.env.WISHLIST_INTERVAL_HOURS = options.wishlist;
   process.env.DISCORD_WEBHOOK_URL = options.webhook || '';
   process.env.DISCORD_WEBHOOK_AVATAR_URL = '';
+
+  if (options.legacyAutoConfig) {
+    const legacyDb = new Database(process.env.SCRAPER_DB_PATH);
+    legacyDb.exec(`
+      CREATE TABLE auto_config (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        termo TEXT NOT NULL,
+        site TEXT NOT NULL
+      );
+      INSERT INTO auto_config (termo, site) VALUES ('ssd', 'kabum');
+    `);
+    legacyDb.close();
+  }
 
   vi.doMock('../scraper', () => ({
     SITES: {
@@ -139,6 +161,27 @@ describe('server helpers', () => {
 
     mod.db.close();
   });
+
+  it('migra configuração automática legada sem coluna ativo', async () => {
+    const mod = await importServer({ legacyAutoConfig: true });
+    const server = mod.createServer();
+    const baseUrl = await listen(server);
+    const row = mod.db.prepare(`SELECT termo, site, ordem, ativo FROM auto_config`).get() as {
+      termo: string;
+      site: string;
+      ordem: number;
+      ativo: number;
+    };
+
+    expect(row).toEqual({ termo: 'ssd', site: 'kabum', ordem: 0, ativo: 1 });
+    expect(mod.getAutoStatus().total_configurados).toBe(1);
+    expect((await jsonRequest(baseUrl, '/api/auto/config')).body).toEqual([
+      { id: 1, termo: 'ssd', site: 'kabum', ordem: 0 },
+    ]);
+
+    await closeServer(server);
+    mod.db.close();
+  });
 });
 
 describe('server API', () => {
@@ -226,6 +269,38 @@ describe('server API', () => {
     const results = await jsonRequest(baseUrl, '/api/auto/results');
     expect(results.body.execucao.status).toBe('concluido');
     expect(results.body.resultados[0].produtos[0].title).toBe('GPU');
+
+    mod.db.close();
+  });
+
+  it('mantém a resposta da busca manual quando a métrica falha', async () => {
+    const mod = await importServer();
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    buscarProdutoMock.mockResolvedValue({
+      termo: 'ssd',
+      site: 'kabum',
+      siteNome: 'KaBuM!',
+      timestamp: '2026-06-05T10:00:00.000Z',
+      total: 1,
+      produtos: [{
+        title: 'SSD NVMe',
+        price: 'R$ 299,90',
+        parcelamento: null,
+        image: '',
+        url: 'https://loja.test/ssd',
+        relevancia: 1,
+      }],
+    });
+    mod.db.prepare('DROP TABLE search_metrics').run();
+
+    const search = await jsonRequest(baseUrl, '/api/search?q=ssd&site=kabum');
+
+    expect(search.res.status).toBe(200);
+    expect(search.body).toMatchObject({ total: 1 });
+    expect(search.body.erro).toBeUndefined();
+    expect(buscarProdutoMock).toHaveBeenCalledWith('kabum', 'ssd');
 
     mod.db.close();
   });

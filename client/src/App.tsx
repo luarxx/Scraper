@@ -4,6 +4,7 @@ import { useSearch } from './hooks/useSearch';
 import { useSearchHistory } from './hooks/useSearchHistory';
 import { useWishlist } from './hooks/useWishlist';
 import { SearchForm } from './components/SearchForm';
+import { SortControl, type SortOption } from './components/SortControl';
 import { SearchHistory } from './components/SearchHistory';
 import { ProductGrid } from './components/ProductGrid';
 import { StateMessage } from './components/StateMessage';
@@ -15,6 +16,7 @@ import { Icon } from './components/Icon';
 import { Logo } from './components/Logo';
 import type { Produto, WatchDraft, WishlistItem } from './types';
 import { formatBrazilDateTime } from './utils/date';
+import { parseBrlPrice } from './utils/price';
 
 const SITE_COLORS: Record<string, { text: string }> = {
   kabum: { text: '#f97316' },
@@ -27,10 +29,22 @@ function priceToInput(price: string | null): string {
   return price.replace(/R\$\s*/i, '').trim();
 }
 
+function comparePrice(a: Produto, b: Produto, direction: 'asc' | 'desc'): number {
+  const priceA = parseBrlPrice(a.price);
+  const priceB = parseBrlPrice(b.price);
+
+  if (priceA === null && priceB === null) return 0;
+  if (priceA === null) return 1;
+  if (priceB === null) return -1;
+
+  return direction === 'asc' ? priceA - priceB : priceB - priceA;
+}
+
 export default function App() {
   const { loading, produtos, termo, siteKey, siteNome, timestamp, erro, search, fetchSites, sites } = useSearch();
   const [modo, setModo] = useState<'manual' | 'auto' | 'wishlist' | 'watch' | 'dashboard'>('manual');
   const [watchDraft, setWatchDraft] = useState<WatchDraft | null>(null);
+  const [sortOption, setSortOption] = useState<SortOption>('relevance');
   const {
     items: wishlistItems,
     status: wishlistStatus,
@@ -102,6 +116,17 @@ export default function App() {
   const wishlistMap = useMemo(() => {
     return Object.fromEntries(wishlistItems.map((item) => [`${item.site}|${item.url}`, item]));
   }, [wishlistItems]);
+
+  const sortedProdutos = useMemo(() => {
+    const nextProdutos = [...produtos];
+    if (sortOption === 'price-asc') {
+      return nextProdutos.sort((a, b) => comparePrice(a, b, 'asc'));
+    }
+    if (sortOption === 'price-desc') {
+      return nextProdutos.sort((a, b) => comparePrice(a, b, 'desc'));
+    }
+    return nextProdutos;
+  }, [produtos, sortOption]);
 
   const state = (() => {
     if (loading) return 'loading';
@@ -252,9 +277,16 @@ export default function App() {
                   <div className="mt-4">
                     <SearchHistory history={history} onSelect={handleHistorySelect} compact />
                   </div>
+                  <div className="mt-4 max-w-3xl">
+                    <SortControl
+                      value={sortOption}
+                      onChange={setSortOption}
+                      totalCount={produtos.length}
+                    />
+                  </div>
                 </div>
                 <ProductGrid
-                  produtos={produtos}
+                  produtos={sortedProdutos}
                   siteKey={siteKey}
                   updatedAt={timestamp}
                   onCreateAlert={handleCreateAlert}

@@ -20,6 +20,9 @@ interface SetupOptions {
   html?: string;
   visibleText?: string;
   apiProducts?: Array<Record<string, unknown>>;
+  apiStatus?: number;
+  apiBody?: Record<string, unknown>;
+  evaluateProducts?: Resultado['produtos'];
 }
 
 function createTempRoot(): { root: string; sessionDir: string } {
@@ -38,12 +41,13 @@ function createPageMock(options: SetupOptions): Record<string, unknown> {
     goto: vi.fn(async () => undefined),
     waitForFunction: vi.fn(async () => undefined),
     waitForSelector: vi.fn(async () => undefined),
-    evaluate: vi.fn(async () => []),
+    evaluate: vi.fn(async () => options.evaluateProducts ?? []),
     request: {
       get: vi.fn(async () => ({
-        ok: () => true,
-        status: () => 200,
+        ok: () => (options.apiStatus ?? 200) >= 200 && (options.apiStatus ?? 200) < 300,
+        status: () => options.apiStatus ?? 200,
         json: async () => ({
+          ...(options.apiBody ?? {}),
           products: options.apiProducts ?? [{
             nome: 'SSD NVMe 1TB',
             preco: 399.9,
@@ -189,6 +193,37 @@ describe('search runtime', () => {
     expect(first.total).toBe(1);
     expect(second).toBe(first);
     expect(launchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('usa fallback DOM na TerabyteShop quando a API retorna 429', async () => {
+    const fallbackProducts = [{
+      title: 'Placa de Video RTX 4060',
+      price: 'R$ 2.199,90',
+      parcelamento: null,
+      image: '',
+      url: 'https://www.terabyteshop.com.br/produto/1/rtx-4060',
+      relevancia: 2,
+    }];
+    const { mod, runtimes } = await setupSearchModule({
+      apiStatus: 429,
+      apiBody: { error: 'Too many requests' },
+      evaluateProducts: fallbackProducts,
+    });
+
+    const result = await mod.buscarProduto('terabyteshop', 'rtx 4060');
+
+    expect(result).toMatchObject({
+      total: 1,
+      produtos: fallbackProducts,
+    });
+    expect(runtimes[0].page.goto).toHaveBeenCalledWith(
+      'https://www.terabyteshop.com.br',
+      expect.objectContaining({ waitUntil: 'domcontentloaded' }),
+    );
+    expect(runtimes[0].page.goto).toHaveBeenCalledWith(
+      'https://www.terabyteshop.com.br/busca?str=rtx%204060',
+      expect.objectContaining({ waitUntil: 'domcontentloaded' }),
+    );
   });
 
   it('salva storageState apenas quando a página de produto é extraída com sucesso', async () => {

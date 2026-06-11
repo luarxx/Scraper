@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { extrairProdutoPorUrlHtml, gerarCacheKey, normalizarTermo, ordenarPorRelevancia, SITES } from '../scraper';
+import { ScraperRateLimitError } from '../scraper-core/retry';
 import type { Produto } from '../scraper';
 
 const { JSDOM } = require('jsdom') as { JSDOM: new (html: string, options?: { url?: string }) => { window: { document: Document; close: () => void } } };
@@ -291,6 +292,69 @@ describe('site extractors', () => {
     }]);
   });
 
+  it('extrai produtos KaBuM! do JSON-LD atual da busca', () => {
+    const produtos = withDocument(`
+      <script type="application/ld+json">
+        [
+          {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "PC Gamer Ryzen 5 5500, RTX 4060, 16gb Ddr4",
+            "image": "https://images.kabum.com.br/produtos/fotos/697208/pc.webp",
+            "offers": {
+              "@type": "Offer",
+              "url": "https://www.kabum.com.br/produto/697208/pc-gamer-rtx-4060",
+              "priceCurrency": "BRL",
+              "price": 4918.7
+            }
+          }
+        ]
+      </script>
+    `, () => SITES.kabum.extrairProdutos!('rtx 4060'));
+
+    expect(produtos).toEqual([{
+      title: 'PC Gamer Ryzen 5 5500, RTX 4060, 16gb Ddr4',
+      price: 'R$ 4.918,70',
+      parcelamento: null,
+      image: 'https://images.kabum.com.br/produtos/fotos/697208/pc.webp',
+      url: 'https://www.kabum.com.br/produto/697208/pc-gamer-rtx-4060',
+      relevancia: 2,
+    }]);
+  });
+
+  it('prioriza preço do card KaBuM! quando JSON-LD traz valor divergente', () => {
+    const produtos = withDocument(`
+      <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "Placa de Vídeo RTX 4060",
+          "image": "https://img.test/rtx.jpg",
+          "offers": {
+            "@type": "Offer",
+            "url": "https://www.kabum.com.br/produto/1/placa-video",
+            "priceCurrency": "BRL",
+            "price": 9999.99
+          }
+        }
+      </script>
+      <a href="/produto/1/placa-video">
+        <span class="text-sm text-left text-gray-800 text-ellipsis">Placa de Vídeo RTX 4060</span>
+        <div class="flex flex-col">
+          <div class="flex gap-4 items-center">R$ 1.899,90</div>
+          <span class="text-xs text-gray-400 h-16">10x de R$ 189,99</span>
+        </div>
+        <img src="https://img.test/rtx.jpg">
+      </a>
+    `, () => SITES.kabum.extrairProdutos!('rtx 4060'));
+
+    expect(produtos[0].price).toBe('R$ 1.899,90');
+  });
+
+  it('mantém extractor KaBuM! seguro para page.evaluate no runtime tsx', () => {
+    expect(String(SITES.kabum.extrairProdutos)).not.toContain('__name');
+  });
+
   it('extrai produtos Pichau de fixture HTML', () => {
     const produtos = withDocument(`
       <a data-cy="list-product" href="/produto/ssd-nvme">
@@ -423,12 +487,100 @@ describe('site extractors', () => {
 
     expect(produtos[0]).toEqual({
       title: 'Processador Ryzen 5 5600',
-      price: 'R$ 799,9',
+      price: 'R$ 799,90',
       parcelamento: '10x de R$ 79,99',
       image: 'https://img.test/ryzen.jpg',
       url: 'https://www.terabyteshop.com.br/produto/123/processador-ryzen-5-5600',
       relevancia: 2,
     });
+  });
+
+  it('monta URL da TerabyteShop com id alternativo quando externalId vem ausente', async () => {
+    const page = {
+      request: {
+        get: async () => ({
+          ok: () => true,
+          status: () => 200,
+          json: async () => ({
+            products: [{
+              nome: 'Combo Gamer Ninja Legacy',
+              preco: 149.9,
+              id: 98765,
+              slug: 'combo-gamer-ninja-legacy-3-em-1-teclado-mouse-e-mousepad-usb-rgb-gn-cg-lgtmpb',
+            }],
+          }),
+        }),
+      },
+    };
+
+    const produtos = await SITES.terabyteshop.extrairProdutosViaApi!(page as never, 'combo gamer');
+
+    expect(produtos[0].url).toBe('https://www.terabyteshop.com.br/produto/98765/combo-gamer-ninja-legacy-3-em-1-teclado-mouse-e-mousepad-usb-rgb-gn-cg-lgtmpb');
+    expect(produtos[0].url).not.toContain('undefined');
+  });
+
+  it('descarta produto TerabyteShop sem URL segura em vez de gerar /undefined/', async () => {
+    const page = {
+      request: {
+        get: async () => ({
+          ok: () => true,
+          status: () => 200,
+          json: async () => ({
+            products: [{
+              nome: 'Combo Gamer Ninja Legacy',
+              preco: 149.9,
+              slug: 'combo-gamer-ninja-legacy-3-em-1-teclado-mouse-e-mousepad-usb-rgb-gn-cg-lgtmpb',
+            }],
+          }),
+        }),
+      },
+    };
+
+    const produtos = await SITES.terabyteshop.extrairProdutosViaApi!(page as never, 'combo gamer');
+
+    expect(produtos).toEqual([]);
+  });
+
+  it('extrai produtos TerabyteShop de fixture HTML como fallback DOM', () => {
+    const produtos = withDocument(`
+      <a href="/produto/35802/placa-de-video-gigabyte-nvidia-geforce-rtx-4060">
+        <h2>Placa de Video Gigabyte NVIDIA GeForce RTX 4060</h2>
+        <span>R$ 2.199,90</span>
+        <span>10x de R$ 219,99</span>
+        <img src="https://img.test/rtx4060.jpg">
+      </a>
+    `, () => SITES.terabyteshop.extrairProdutos!('rtx 4060'));
+
+    expect(produtos).toEqual([{
+      title: 'Placa de Video Gigabyte NVIDIA GeForce RTX 4060',
+      price: 'R$ 2.199,90',
+      parcelamento: '10x de R$ 219,99',
+      image: 'https://img.test/rtx4060.jpg',
+      url: 'https://www.terabyteshop.com.br/produto/35802/placa-de-video-gigabyte-nvidia-geforce-rtx-4060',
+      relevancia: 2,
+    }]);
+  });
+
+  it('expõe retryAfterMs quando a API da TerabyteShop retorna rate limit', async () => {
+    const page = {
+      request: {
+        get: async () => ({
+          ok: () => false,
+          status: () => 429,
+          json: async () => ({
+            error: 'Too many requests',
+            retryAfterMs: 38511,
+          }),
+        }),
+      },
+    };
+
+    await expect(SITES.terabyteshop.extrairProdutosViaApi!(page as never, 'rtx 4060'))
+      .rejects.toMatchObject({
+        name: 'ScraperRateLimitError',
+        message: 'TerabyteShop API retornou HTTP 429: Too many requests',
+        retryAfterMs: 38511,
+      } satisfies Partial<ScraperRateLimitError>);
   });
 
   it('prioriza preço à vista por URL da TerabyteShop', () => {

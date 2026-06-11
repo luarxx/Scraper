@@ -119,6 +119,7 @@ Quatro estados visuais centralizados:
 - Grid responsivo: 1 coluna mobile, 2 tablet, 3 desktop, 4 widescreen
 - Destaque "Melhor Opção" no primeiro card
 - Usa `gap-4` a `gap-6`
+- Resultados manuais podem ser ordenados por relevância, menor preço ou maior preço em um controle segmentado acima do grid, exibido apenas depois que a busca termina com ofertas.
 
 ### ProductCard
 
@@ -165,6 +166,7 @@ Usado em `AutoResultsView` e `AutoSearchPanel` para métricas visuais:
 - **Execution summary**: grid de 4 KPI cards (⏱ Início, ✅ Fim, 📦 Produtos, 👍 Sucesso/⚠️ Erros)
 - **Termo sections**: gradient wash na cor da loja (`rgba(cor,0.08)`), barra esquerda sutil, border highlight quando aberto
 - **Per-termo KPI**: menor preço e média exibidos acima do ProductGrid
+- **Ordenação por termo**: seções abertas exibem uma versão compacta do controle segmentado, com relevância, menor preço e maior preço aplicados apenas aos produtos daquele termo.
 - **Default expandido**: todos os termos abertos na montagem
 - **Toggle "Expandir/Recolher todos"**: botão no canto superior direito
 - **Animações**: `panelSlideIn` no conteúdo, `kpiStagger` nos KPIs

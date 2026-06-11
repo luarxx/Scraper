@@ -17,7 +17,7 @@ npm run build      # tsc -b && vite build → client/dist/
 npm run lint       # ESLint
 ```
 
-O `vite.config.ts` faz proxy de `/api` → `localhost:3000` (servidor Node).
+O `vite.config.ts` faz proxy de `/api` para `API_PORT`/`PORT` ou `localhost:3000`. No uso normal, rode o projeto pela raiz com `npm run dev` ou `npm run dev:fixed` para o servidor Node e o Vite usarem a mesma porta de API.
 
 ## Componentes
 

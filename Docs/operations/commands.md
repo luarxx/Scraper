@@ -5,7 +5,7 @@
 ```bash
 npm run dev           # Dev local com descoberta automatica de portas livres
 npm run dev:local     # Alias do dev local automatico
-npm run dev:fixed     # Dev completo fixo: client 5173 + servidor 3000
+npm run dev:fixed     # Dev completo fixo: client 5173 + servidor 3000, sem fallback silencioso
 npm run dev:server    # Apenas servidor, tsx watch server.ts
 npm run dev:client    # Apenas client, Vite dev server
 ```
@@ -18,6 +18,8 @@ npm run build:client  # Build do frontend React -> client/dist/
 npm run build:prod    # Build completo para VPS/FileZilla: client/dist + dist/
 npm run start         # Node production, dist/server.js
 ```
+
+O build do client copia os arquivos PWA estaticos de `client/public/` para `client/dist/`, incluindo `manifest.webmanifest`, `sw.js` e icones de instalacao.
 
 ## Tests
 

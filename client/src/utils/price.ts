@@ -23,16 +23,3 @@ export function parseBrlPrice(price: string | null | undefined): number | null {
   const value = Number(normalized);
   return Number.isFinite(value) ? value : null;
 }
-
-export function matchesPriceRange(price: string | null, minText: string, maxText: string): boolean {
-  const value = parseBrlPrice(price);
-  if (value === null) return false;
-
-  const min = parseBrlPrice(minText);
-  if (min !== null && value < min) return false;
-
-  const max = parseBrlPrice(maxText);
-  if (max !== null && value > max) return false;
-
-  return true;
-}

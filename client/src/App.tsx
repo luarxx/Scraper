@@ -4,7 +4,7 @@ import { useSearch } from './hooks/useSearch';
 import { useSearchHistory } from './hooks/useSearchHistory';
 import { useWishlist } from './hooks/useWishlist';
 import { SearchForm } from './components/SearchForm';
-import { PriceFilters } from './components/PriceFilters';
+import { SortControl, type SortOption } from './components/SortControl';
 import { SearchHistory } from './components/SearchHistory';
 import { ProductGrid } from './components/ProductGrid';
 import { StateMessage } from './components/StateMessage';
@@ -16,7 +16,7 @@ import { Icon } from './components/Icon';
 import { Logo } from './components/Logo';
 import type { Produto, WatchDraft, WishlistItem } from './types';
 import { formatBrazilDateTime } from './utils/date';
-import { matchesPriceRange } from './utils/price';
+import { parseBrlPrice } from './utils/price';
 
 const SITE_COLORS: Record<string, { text: string }> = {
   kabum: { text: '#f97316' },
@@ -29,12 +29,22 @@ function priceToInput(price: string | null): string {
   return price.replace(/R\$\s*/i, '').trim();
 }
 
+function comparePrice(a: Produto, b: Produto, direction: 'asc' | 'desc'): number {
+  const priceA = parseBrlPrice(a.price);
+  const priceB = parseBrlPrice(b.price);
+
+  if (priceA === null && priceB === null) return 0;
+  if (priceA === null) return 1;
+  if (priceB === null) return -1;
+
+  return direction === 'asc' ? priceA - priceB : priceB - priceA;
+}
+
 export default function App() {
   const { loading, produtos, termo, siteKey, siteNome, timestamp, erro, search, fetchSites, sites } = useSearch();
   const [modo, setModo] = useState<'manual' | 'auto' | 'wishlist' | 'watch' | 'dashboard'>('manual');
   const [watchDraft, setWatchDraft] = useState<WatchDraft | null>(null);
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [sortOption, setSortOption] = useState<SortOption>('relevance');
   const {
     items: wishlistItems,
     status: wishlistStatus,
@@ -107,12 +117,16 @@ export default function App() {
     return Object.fromEntries(wishlistItems.map((item) => [`${item.site}|${item.url}`, item]));
   }, [wishlistItems]);
 
-  const filteredProdutos = useMemo(() => {
-    if (!minPrice.trim() && !maxPrice.trim()) return produtos;
-    return produtos.filter((produto) => matchesPriceRange(produto.price, minPrice, maxPrice));
-  }, [maxPrice, minPrice, produtos]);
-
-  const priceFiltersActive = minPrice.trim().length > 0 || maxPrice.trim().length > 0;
+  const sortedProdutos = useMemo(() => {
+    const nextProdutos = [...produtos];
+    if (sortOption === 'price-asc') {
+      return nextProdutos.sort((a, b) => comparePrice(a, b, 'asc'));
+    }
+    if (sortOption === 'price-desc') {
+      return nextProdutos.sort((a, b) => comparePrice(a, b, 'desc'));
+    }
+    return nextProdutos;
+  }, [produtos, sortOption]);
 
   const state = (() => {
     if (loading) return 'loading';
@@ -264,48 +278,22 @@ export default function App() {
                     <SearchHistory history={history} onSelect={handleHistorySelect} compact />
                   </div>
                   <div className="mt-4 max-w-3xl">
-                    <PriceFilters
-                      minPrice={minPrice}
-                      maxPrice={maxPrice}
-                      onMinPriceChange={setMinPrice}
-                      onMaxPriceChange={setMaxPrice}
-                      onClear={() => {
-                        setMinPrice('');
-                        setMaxPrice('');
-                      }}
+                    <SortControl
+                      value={sortOption}
+                      onChange={setSortOption}
                       totalCount={produtos.length}
-                      filteredCount={filteredProdutos.length}
                     />
                   </div>
                 </div>
-                {priceFiltersActive && filteredProdutos.length === 0 ? (
-                  <div className="mt-6 rounded-xl border border-white/[0.06] bg-surface/60 px-4 py-6 text-center">
-                    <p className="text-sm font-semibold text-text-primary">Nenhuma oferta ficou dentro deste filtro</p>
-                    <p className="mt-1.5 text-xs text-text-secondary">
-                      Ajuste os valores ou limpe os campos para ver todas as ofertas encontradas.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setMinPrice('');
-                        setMaxPrice('');
-                      }}
-                      className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-accent-hover"
-                    >
-                      Limpar filtro
-                    </button>
-                  </div>
-                ) : (
-                  <ProductGrid
-                    produtos={filteredProdutos}
-                    siteKey={siteKey}
-                    updatedAt={timestamp}
-                    onCreateAlert={handleCreateAlert}
-                    wishlistMap={wishlistMap}
-                    wishlistBusy={wishlistSaving}
-                    onWishlistAction={handleWishlistAction}
-                  />
-                )}
+                <ProductGrid
+                  produtos={sortedProdutos}
+                  siteKey={siteKey}
+                  updatedAt={timestamp}
+                  onCreateAlert={handleCreateAlert}
+                  wishlistMap={wishlistMap}
+                  wishlistBusy={wishlistSaving}
+                  onWishlistAction={handleWishlistAction}
+                />
                 <footer className="mt-14 text-center animate-[fadeIn_0.6s_ease-out_0.3s_both]">
                   <div className="w-6 h-px bg-white/[0.06] mx-auto mb-4" />
                   <p className="text-xs text-text-muted">
@@ -337,20 +325,6 @@ export default function App() {
                     </div>
                     <div className="mt-4 max-w-xl mx-auto">
                       <SearchHistory history={history} onSelect={handleHistorySelect} compact align="center" />
-                    </div>
-                    <div className="mt-4 max-w-2xl mx-auto">
-                      <PriceFilters
-                        minPrice={minPrice}
-                        maxPrice={maxPrice}
-                        onMinPriceChange={setMinPrice}
-                        onMaxPriceChange={setMaxPrice}
-                        onClear={() => {
-                          setMinPrice('');
-                          setMaxPrice('');
-                        }}
-                        totalCount={produtos.length}
-                        filteredCount={filteredProdutos.length}
-                      />
                     </div>
                     <p className="mt-3 text-xs text-text-muted">
                       Precos e disponibilidade podem mudar. Sempre confirme o valor final na loja.

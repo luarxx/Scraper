@@ -10,7 +10,7 @@ import { lerCache, salvarCache, normalizarTermo } from './cache';
 import { extrairProdutoPorUrlHtml } from './productPageParser';
 import { ordenarPorRelevancia } from './ranking';
 import { criarPaginaComSessao, salvarSessaoDoContexto } from './browserSession';
-import { executarComRetry, ScraperChallengeError, ScraperParseError } from './retry';
+import { executarComRetry, ScraperChallengeError, ScraperParseError, ScraperRateLimitError } from './retry';
 import { SITES } from './sites';
 import type { Produto, Resultado, ResultadoProdutoUrl, SiteConfig } from './types';
 
@@ -106,6 +106,27 @@ async function salvarSessaoComSucesso(siteKey: string, site: SiteConfig, context
   await salvarSessaoDoContexto(context, siteKey, devePersistirSessao(site));
 }
 
+async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: string, viewport: { width: number; height: number }): Promise<Produto[]> {
+  if (!site.searchUrl || !site.waitStrategy || !site.selectors || !site.extrairProdutos) {
+    throw new ScraperParseError('Site sem configuração DOM para busca.');
+  }
+
+  const urlBusca = site.searchUrl(termoBusca);
+  await page.goto(urlBusca, { waitUntil: site.waitStrategy, timeout: TIMEOUT });
+  await randomWait(2000, 4000);
+  await comportamentoHumano(page, viewport);
+  await verificarChallenge(page, 'busca');
+
+  const cardSelector = site.selectors.productCard;
+  try {
+    await page.waitForSelector(cardSelector, { timeout: 10000 });
+  } catch { /* empty */ }
+  await randomWait(300, 800);
+
+  const produtos = await page.evaluate(site.extrairProdutos, termoBusca);
+  return ordenarPorRelevancia(produtos, termoBusca);
+}
+
 function salvarResultadoBusca(resultado: Resultado): void {
   const dataDir = path.join(ROOT, 'data');
   if (!fs.existsSync(dataDir)) {
@@ -136,23 +157,19 @@ async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise
       if (site.precisaHomePrimeiro) {
         await verificarChallenge(page, 'busca');
       }
-      const data = await site.extrairProdutosViaApi!(page, termoBusca);
-      produtos = ordenarPorRelevancia(data, termoBusca);
-    } else {
-      const urlBusca = site.searchUrl!(termoBusca);
-      await page.goto(urlBusca, { waitUntil: site.waitStrategy!, timeout: TIMEOUT });
-      await randomWait(2000, 4000);
-      await comportamentoHumano(page, fingerprint.viewport);
-      await verificarChallenge(page, 'busca');
-
-      const cardSelector = site.selectors!.productCard;
       try {
-        await page.waitForSelector(cardSelector, { timeout: 10000 });
-      } catch { /* empty */ }
-      await randomWait(300, 800);
+        const data = await site.extrairProdutosViaApi!(page, termoBusca);
+        produtos = ordenarPorRelevancia(data, termoBusca);
+      } catch (err) {
+        if (!(err instanceof ScraperRateLimitError) || !site.extrairProdutos) {
+          throw err;
+        }
 
-      produtos = await page.evaluate(site.extrairProdutos!, termoBusca);
-      produtos = ordenarPorRelevancia(produtos, termoBusca);
+        console.log(`[Busca Manual] API de ${site.nome} em rate limit; tentando fallback DOM.`);
+        produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport);
+      }
+    } else {
+      produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport);
     }
 
     const output: Resultado = {

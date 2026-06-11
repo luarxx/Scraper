@@ -273,6 +273,38 @@ describe('server API', () => {
     mod.db.close();
   });
 
+  it('mantém a resposta da busca manual quando a métrica falha', async () => {
+    const mod = await importServer();
+    server = mod.createServer();
+    const baseUrl = await listen(server);
+
+    buscarProdutoMock.mockResolvedValue({
+      termo: 'ssd',
+      site: 'kabum',
+      siteNome: 'KaBuM!',
+      timestamp: '2026-06-05T10:00:00.000Z',
+      total: 1,
+      produtos: [{
+        title: 'SSD NVMe',
+        price: 'R$ 299,90',
+        parcelamento: null,
+        image: '',
+        url: 'https://loja.test/ssd',
+        relevancia: 1,
+      }],
+    });
+    mod.db.prepare('DROP TABLE search_metrics').run();
+
+    const search = await jsonRequest(baseUrl, '/api/search?q=ssd&site=kabum');
+
+    expect(search.res.status).toBe(200);
+    expect(search.body).toMatchObject({ total: 1 });
+    expect(search.body.erro).toBeUndefined();
+    expect(buscarProdutoMock).toHaveBeenCalledWith('kabum', 'ssd');
+
+    mod.db.close();
+  });
+
   it('cria, atualiza, lista e pausa alertas Watch', async () => {
     const mod = await importServer();
     server = mod.createServer();

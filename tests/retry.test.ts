@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   ScraperChallengeError,
   ScraperParseError,
+  ScraperRateLimitError,
   executarComRetry,
 } from '../scraper-core/retry';
 
@@ -46,5 +47,22 @@ describe('retry helper', () => {
     })).rejects.toThrow('preço ausente');
 
     expect(action).toHaveBeenCalledTimes(1);
+  });
+
+  it('respeita retryAfterMs em rate limit', async () => {
+    const delays: number[] = [];
+    const action = vi.fn()
+      .mockRejectedValueOnce(new ScraperRateLimitError('HTTP 429: Too many requests', 1500))
+      .mockResolvedValue('ok');
+
+    const result = await executarComRetry(action, {
+      baseDelayMs: 100,
+      jitterRatio: 0,
+      sleep: async (ms) => { delays.push(ms); },
+    });
+
+    expect(result).toBe('ok');
+    expect(action).toHaveBeenCalledTimes(2);
+    expect(delays).toEqual([1500]);
   });
 });

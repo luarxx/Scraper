@@ -6,24 +6,6 @@ Ideias de funcionalidades organizadas por categoria, com valor estimado, complex
 
 ---
 
-## Já foi feito
-
-- ✅ Interface React com busca manual por loja, histórico local das últimas buscas, cards de produto, destaque de melhor opção e estados de carregamento/erro/vazio.
-- ✅ Scraper multi-loja com KaBuM!, Pichau e TerabyteShop, usando DOM scraping para KaBuM!/Pichau e API scraping para TerabyteShop.
-- ✅ Ordenação por relevância e preço, extração de título, preço, parcelamento, imagem e URL.
-- ✅ Cache local de resultados em `data/cache/` com chave SHA256 e TTL de 10 minutos.
-- ✅ SQLite com `better-sqlite3` em `data/scraper.db`, incluindo tabelas de auto-busca e histórico de preços.
-- ✅ Aba "Automática" no frontend para configurar até 10 produtos, acompanhar status, disparar execução manual e ver resultados da última execução.
-- ✅ Scheduler server-side a cada 6 horas, com execução sequencial, recuperação de execução interrompida e persistência dos resultados.
-- ✅ Histórico de preços por produto salvo no SQLite e exibido no card por meio de gráfico e KPIs de mínimo, máximo, média, preço atual e tendência.
-- ✅ Endpoints `/api/auto/*` e `/api/history*` implementados no servidor HTTP puro.
-- ✅ Anti-detecção reforçada com `playwright-extra`, plugin stealth, fingerprint realístico por contexto, spoof avançado de navegador e comportamento humano simulado.
-- ✅ Watch de preços com alertas: CRUD de alertas, scheduler periódico, notificações via Discord/SSE/Console.
-- ✅ Retry com backoff exponencial com jitter para erros transientes e de challenge.
-- ✅ Suite de testes com Vitest: parsing do scraper, retry, helpers do servidor, search runtime com mocks e hooks React.
-
----
-
 ## 1. Persistência de Dados / Banco de Dados
 
 ### 1.1 Banco de dados local (SQLite) ✅
@@ -33,6 +15,14 @@ Implementado com `better-sqlite3` em `data/scraper.db`. Hoje armazena configura�
 ### 1.2 Exportação de resultados (CSV, JSON) ⬜
 Usuário baixa o resultado da busca como CSV ou JSON para análise offline.
 **Valor:** Médio | **Complexidade:** Baixa
+
+### 1.3 Sistema de migrações SQLite ⬜
+Hoje usa `CREATE TABLE IF NOT EXISTS` + `ensureColumn()` para evoluir o schema. Com o projeto crescendo, migrações formais com script sequencial (ex: `migrations/001-initial.sql`, `002-add-column.sql`) evitam quebras silenciosas entre versões e facilitam deploy.
+**Valor:** Alto | **Complexidade:** Baixa-Média
+
+### 1.4 Limpeza de arquivos legacy ⬜
+`data/resultado.json` e `data/resultado.js` são escritos em toda busca manual mas nunca lidos pelo frontend (legado da era pré-SPA). Remover para evitar confusão e reclaim de espaço.
+**Valor:** Baixo | **Complexidade:** Baixa
 
 ---
 
@@ -83,6 +73,10 @@ Implementado. O servidor salva cada preço encontrado em `price_history`, expõe
 ### 2.5 Scraping periódico automático (cron) ✅
 Implementado no `server.ts` com scheduler a cada 6h, até 10 produtos configuráveis, execução sequencial, botão "Executar agora", status e persistência em SQLite.
 **Valor:** Alto | **Complexidade:** Média
+
+### 2.6 Preço parcelado como gatilho no Watch ⬜
+Watch hoje compara `preco_alvo_cents` com `preco_cents` (preço à vista). Adicionar opção de alertar com base no **preço parcelado** (`preco_parcelado_cents`) ou em qualquer forma de pagamento disponível. Ex: usuário quer ser notificado se o produto parcelado em 12x ficar abaixo de R$ 200/mês.
+**Valor:** Médio | **Complexidade:** Baixa
 
 ---
 
@@ -144,6 +138,10 @@ Extrair dados mais ricos: com/sem juros, valor total a prazo, taxa de juros efet
 Implementado em `scraper-core/retry.ts`: `executarComRetry()` com classificação de erro (transient, challenge, fatal), backoff exponencial com jitter de ±35% e limite de tentativas por categoria.
 **Valor:** Alto | **Complexidade:** Baixa
 
+### 3.7 Auto-fix de selector quebrado ⬜
+Quando uma loja muda o DOM e o scraping falha repetidamente, o sistema tenta detectar automaticamente o novo seletor analisando o HTML e comparando com padrões de produto conhecidos (título em `<h1>`/`<h2>`, preço com padrão `R$` + número, imagem em `<img>`). Fallback: salvar diff do HTML e sugerir seletor para revisão manual.
+**Valor:** Alto | **Complexidade:** Alta
+
 ---
 
 ## 4. APIs e Infraestrutura do Servidor
@@ -153,8 +151,8 @@ Implementado em `scraper-core/retry.ts`: `executarComRetry()` com classificaçã
 Criar categorias por exemplo: Busque em sites de informática(seria kabum, terabyte e Pichau por exemplo), Busque em marketplaces(seria mercado livre e shopee)
 **Valor:** Alto | **Complexidade:** Média
 
-### 4.2 Pool de browsers (limite de concorrência) ⬜
-Impedir que N requisições abram N instâncias do Chromium e esgotem a memória.
+### 4.2 Pool de browsers reutilizáveis (limite de concorrência) ⬜
+Hoje cada execução concorrente abre seu próprio Chromium. Um pool com 1-2 browsers reciclados entre execuções reduz uso de RAM em VPS e elimina overhead de launch (~2-5s). Implementar com fila de tarefas e timeout de idle.
 **Valor:** Alto | **Complexidade:** Média-Alta
 
 ### 4.3 Rate limiting no servidor ⬜
@@ -184,6 +182,10 @@ Substituir `console.log` por logger com níveis, timestamps e rotação de arqui
 ### 5.1 Filtros no frontend (preço, parcelamento, ordenação, produtos que tiveram alteração) ⬜
 Filtrar/ordenar resultados sem refazer requisição: menor preço, maior relevância, faixa de valor.
 **Valor:** Alto | **Complexidade:** Média
+
+### 5.1b Centralizar configuração visual dos sites ⬜
+`SITE_COLORS`, `SITE_NAMES` e badges de loja estão duplicados em ~5 componentes (`App.tsx`, `ProductCard.tsx`, `SearchForm.tsx`, `WatchPanel.tsx`, `WishlistPanel.tsx`). Criar um `sites.config.ts` no frontend (ou consumir via `/api/sites`) para evitar inconsistência ao adicionar nova loja.
+**Valor:** Médio | **Complexidade:** Baixa
 
 ### 5.2 Comparação lado a lado de produtos ⬜
 Selecionar 2-3 produtos e ver tabela comparativa com preços e lojas.
@@ -257,6 +259,14 @@ Incluir no embed da mensagem do Discord um link direto para o Scraper (URL do se
 Menu interativo com `readline` ou `inquirer` para escolher site e termo.
 **Valor:** Baixo | **Complexidade:** Baixa
 
+### 7.5 Notificação push via Web Push API ⬜
+Hoje as notificações dependem de Discord (webhook externo) ou SSE (frontend aberto). Adicionar Web Push API (Service Worker + PushManager) para notificar o usuário mesmo com o browser fechado. Útil para alertas de Watch e Wishlist. Requer registro de SW e chave VAPID.
+**Valor:** Alto | **Complexidade:** Média
+
+### 7.6 Feed RSS / JSON de ofertas ⬜
+Gerar feed público (RSS ou JSON Feed) com os melhores descontos detectados em todas as lojas. Usuário pode assinar no leitor de RSS ou conectar em automações como IFTTT/Zapier sem depender do frontend.
+**Valor:** Médio | **Complexidade:** Baixa
+
 ---
 
 ## 8. DevOps, Testes e Qualidade
@@ -289,8 +299,8 @@ Implementado em `tests/server.test.ts`: testa helpers do servidor, rotas `/api/s
 
 ## 9. Analytics e Dados
 
-### 9.1 Dashboard de estatísticas ⬜
-Página mostrando: total de buscas, taxa de sucesso, sites mais acessíveis, tempo médio de resposta.
+### 9.1 Dashboard de estatísticas ✅
+Implementado: KPIs (total de buscas, taxa de sucesso, tempo médio, sites mais acessíveis) via tabela `search_metrics`, com ranking de performance por site e ordenação configurável.
 **Valor:** Médio | **Complexidade:** Média
 
 ### 9.2 Termos de busca populares (anonymized) ⬜
@@ -325,20 +335,115 @@ Há timeouts por operação do Playwright (`TIMEOUT = 30000` e esperas específi
 
 ---
 
-## Roadmap Sugerido
+## 11. Inovação e Features Disruptivas
 
-| # | Feature | Esforço | Impacto |
-|---|---|---|---|
-| 1 | Busca multi-site simultânea | Médio | Alto |
-| 2 | Pool de browsers / limite de concorrência | Médio-Alto | Alto |
-| 3 | Browser persistente — modo Live Price | Alta | Alto |
-| 4 | Filtros no frontend (preço, ordenação) | Médio | Alto |
-| 5 | Watch de preços com alertas | Alto | Alto | ✅
-| 6 | Retry com backoff + timeout global | Baixo | Alto | ✅
-| 7 | Testes unitários e integração (Vitest) | Baixo-Médio | Alto | ✅
-| 8 | CI/CD básico (typecheck + test) | Baixo | Médio |
-| 9 | Export CSV | Baixo | Médio |
-| 10 | Mais sites (Magalu, Amazon) | Médio-Alto | Médio |
-| 11 | Rate limiting | Baixo | Médio |
-| 12 | Stale-while-revalidate no cache | Médio | Médio |
-| 13 | PWA (instalável) | Médio | Médio |
+### 11.1 Predição de preço com ML leve ⬜
+Usar o histórico acumulado em `price_history` para treinar um modelo simples de regressão (polinomial ou Prophet) no próprio servidor Node.js. Exibir no gráfico do card: "preço estimado em 7/14/30 dias" com linha pontilhada e intervalo de confiança. Stack: `tensorflow.js` ou regressão polinomial pura sem dependências externas.
+
+**Diferencial:** Nenhum outro scraper brasileiro oferece predição de preço.
+**Valor:** Alto | **Complexidade:** Alta
+
+### 11.2 Alerta inteligente "Esperar ou Comprar?" ⬜
+Com base no histórico, sazonalidade (Black Friday, Dia do Consumidor) e tendência atual, o sistema recomenda textualmente: *"Compre agora — preço 15% abaixo da média de 30 dias"* ou *"Espere — tendência é cair 8% nos próximos 15 dias"*. Exibido no card do produto e no embed do Discord.
+
+**Diferencial:** Transforma dado bruto em decisão de compra. Mata a indecisão do usuário.
+**Valor:** Alto | **Complexidade:** Média-Alta
+
+### 11.3 Modo "Garimpo" — descoberta de ofertas ⬜
+Scraper varre categorias inteiras (ex: "hardware", "monitor", "mouse", "fonte") sem um termo de busca específico e retorna produtos com maior desconto percentual vs. média histórica. O usuário não precisa saber o que quer — o sistema encontra as melhores oportunidades.
+
+**Fluxo:** Botão "Garimpar" → scraper navega por departamentos → cruza preço atual com histórico → exibe "Ofertas quentes" ranqueadas por desconto.
+**Diferencial:** Útil para o usuário que "só quer saber se tem algo bom".
+**Valor:** Alto | **Complexidade:** Média-Alta
+
+### 11.4 Lista de compras (carrinho multi-produto) ⬜
+Usuário monta uma cesta com N produtos de lojas diferentes e o sistema calcula o preço total, melhor combinação de fretes (por CEP) e exibe o custo total mais barato. Ideal para montar um PC completo e saber onde comprar cada peça.
+
+**Fluxo:** Adicionar produtos de diferentes buscas a uma "cesta" → informar CEP → sistema tenta extrair frete de cada loja → exibe total + sugestão de otimização.
+**Valor:** Médio | **Complexidade:** Alta
+
+### 11.5 Extensão de browser (Chrome/Firefox) ⬜
+Extensão que, ao navegar por um produto em loja suportada, automaticamente sobrepõe um popup com: histórico de preço do produto, comparação com outras lojas, alerta "está caro/barato vs. média" e link para abrir no Scraper. Comunicação com o servidor local via REST ou WebSocket.
+
+**Diferencial:** Leva o scraper para onde o usuário já está navegando. Zero atrito.
+**Valor:** Alto | **Complexidade:** Alta
+
+### 11.6 Múltiplos usuários (auth básica) ⬜
+Cada usuário com seus próprios alerts, watch e wishlist. Login via token simples ou senha única (sem OAuth complexo). Útil para rodar o scraper em família, grupo de amigos ou república. Dados isolados por `user_id` no SQLite.
+
+**Valor:** Médio | **Complexidade:** Média
+
+### 11.7 Modo "Drift" — monitoramento intensivo ⬜
+Refinamento do Watch atual: em vez de polling a cada 3h, o usuário ativa o modo "Drift" para um alerta específico. O scheduler então faz verificações a cada 1-2 minutos por até 30 minutos, usando um browser persistente (sem launch por ciclo). Ideal para promoções-relâmpago e lançamentos de GPU onde o preço muda em minutos. Desliga automaticamente quando o preço estabiliza ou o tempo expira.
+
+**Diferença do 2.1:** O item 2.1 propõe browser persistente como conceito geral; este item propõe um **modo de curta duração com auto-desligamento** e UX específica no frontend (timer, status "Drift ativo").
+**Valor:** Alto | **Complexidade:** Alta
+
+---
+
+## 🗺️ Roadmap Sugerido
+
+**Legenda:** ✅ Concluído · 🟡 Parcial · ⬜ Pendente
+
+---
+
+### 🔥 Foco Imediato (Alto Impacto)
+
+| # | Feature | Esforço | Impacto | Status |
+|:---:|---|:---:|:---:|:---:|
+| 1 | Busca multi-site simultânea | Médio | 🔥 Alto | ⬜ |
+| 2 | Pool de browsers reutilizáveis | Médio–Alto | 🔥 Alto | ⬜ |
+| 3 | Browser persistente — Live Price / Drift | Alta | 🔥 Alto | ⬜ |
+| 4 | Filtros no frontend (preço, ordenação) | Médio | 🔥 Alto | ⬜ |
+| 8 | Predição de preço com ML | Alta | 🔥 Alto | ⬜ |
+| 9 | Alerta inteligente "Esperar ou Comprar?" | Médio–Alta | 🔥 Alto | ⬜ |
+| 10 | Modo "Garimpo" (ofertas sem termo) | Médio–Alta | 🔥 Alto | ⬜ |
+| 11 | Extensão de browser | Alta | 🔥 Alto | ⬜ |
+| 12 | Notificação push (Web Push API) | Médio | 🔥 Alto | ⬜ |
+| 16 | Migrações SQLite formais | Baixo–Média | 🔥 Alto | ⬜ |
+| 21 | Auto-fix de selector quebrado | Alta | 🔥 Alto | ⬜ |
+
+### ⚡ Médio Impacto
+
+| # | Feature | Esforço | Impacto | Status |
+|:---:|---|:---:|:---:|:---:|
+| 13 | CI/CD básico (typecheck + test) | Baixo | ⚡ Médio | ⬜ |
+| 14 | Export CSV/JSON | Baixo | ⚡ Médio | ⬜ |
+| 15 | Mais sites (Magalu, Amazon, ML) | Médio–Alto | ⚡ Médio | ⬜ |
+| 17 | Rate limiting | Baixo | ⚡ Médio | ⬜ |
+| 18 | Stale-while-revalidate no cache | Médio | ⚡ Médio | ⬜ |
+| 19 | PWA (instalável) | Médio | ⚡ Médio | ⬜ |
+| 20 | Centralizar config visual dos sites | Baixo | ⚡ Médio | ⬜ |
+| 22 | Múltiplos usuários | Médio | ⚡ Médio | ⬜ |
+| 23 | Lista de compras / carrinho multi-produto | Alta | ⚡ Médio | ⬜ |
+| 24 | Feed RSS / JSON de ofertas | Baixa | ⚡ Médio | ⬜ |
+
+### ✅ Já Concluído
+
+| # | Feature | Esforço | Impacto | Status |
+|:---:|---|:---:|:---:|:---:|
+| 5 | Watch de preços com alertas | Alto | 🔥 Alto | ✅ |
+| 6 | Retry com backoff + timeout global | Baixo | 🔥 Alto | 🟡 |
+| 7 | Testes unitários e integração (Vitest) | Baixo–Médio | 🔥 Alto | ✅ |
+
+---
+
+### 📋 Checklist Detalhado — Concluído
+
+- ✅ **Interface React** — busca manual por loja, histórico local, cards de produto, destaque de melhor opção, estados de carregamento/erro/vazio.
+- ✅ **Scraper multi-loja** — KaBuM!, Pichau e TerabyteShop com DOM scraping (KaBuM!/Pichau) e API scraping (TerabyteShop).
+- ✅ **Ordenação** — por relevância e preço com extração de título, preço, parcelamento, imagem e URL.
+- ✅ **Cache local** — `data/cache/` com chave SHA256 e TTL de 10 minutos.
+- ✅ **SQLite** — `better-sqlite3` em `data/scraper.db` com tabelas de auto-busca e histórico de preços.
+- ✅ **Aba "Automática"** — configurar até 10 produtos, status, execução manual e resultados.
+- ✅ **Scheduler server-side** — a cada 6h, execução sequencial, recuperação de crash, persistência.
+- ✅ **Histórico de preços** — gráfico + KPIs (mínimo, máximo, média, tendência) no card.
+- ✅ **Endpoints** — `/api/auto/*` e `/api/history*` no servidor HTTP puro.
+- ✅ **Anti-detecção** — `playwright-extra`, stealth, fingerprint realístico, spoof e comportamento humano.
+- ✅ **Watch de preços** — CRUD, scheduler, notificações Discord/SSE/Console.
+- ✅ **Retry** — backoff exponencial com jitter para erros transientes e challenge.
+- ✅ **Testes (Vitest)** — parsing, retry, helpers, search runtime com mocks, hooks React.
+- ✅ **Wishlist** — CRUD, scheduler, notificação Discord, soft delete, gráfico de histórico.
+- ✅ **Dashboard** — KPIs de busca, breakdown por site, ordenação por performance.
+- ✅ **Autocomplete** — `/api/search/suggest` com base no histórico de buscas.
+- ✅ **Sanitização XSS** — `escapeHtml()` total, CSP headers, sem `dangerouslySetInnerHTML`.

@@ -27,7 +27,9 @@ interface SiteConfig {
 | Modo | Como funciona | Sites |
 |---|---|---|
 | DOM | Navega ate `searchUrl()`, espera `waitStrategy`, faz `page.evaluate(extrairProdutos)`. O callback roda no contexto do navegador e extrai do DOM. | KaBuM!, Pichau |
-| API | Consulta o endpoint via `page.request.get()` com o contexto Playwright, sem abrir a home quando `precisaHomePrimeiro` e `false`. | TerabyteShop |
+| API | Consulta o endpoint via `page.request.get()` com o contexto Playwright. Pode abrir a home antes quando `precisaHomePrimeiro` e `true` para reaproveitar cookies/sessao. | TerabyteShop |
+
+TerabyteShop usa API como caminho principal e DOM scraping como fallback quando a API responde rate limit (`HTTP 429`).
 
 ## Public API
 

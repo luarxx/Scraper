@@ -3,10 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ProductCard } from '../components/ProductCard';
 import { SearchForm } from '../components/SearchForm';
+import { SortControl } from '../components/SortControl';
 import { StateMessage } from '../components/StateMessage';
 import { StatsDashboardPanel } from '../components/StatsDashboardPanel';
 import { WishlistPanel } from '../components/WishlistPanel';
-import { matchesPriceRange, parseBrlPrice } from '../utils/price';
+import { parseBrlPrice } from '../utils/price';
 import { useAutoConfig } from './useAutoConfig';
 import { useAutoResults } from './useAutoResults';
 import { useSearch } from './useSearch';
@@ -290,11 +291,22 @@ describe('useStatsDashboard', () => {
 });
 
 describe('critical UI states', () => {
-  it('interpreta e filtra valores de preço em BRL', () => {
+  it('interpreta valores de preço em BRL', () => {
     expect(parseBrlPrice('R$ 1.299,90')).toBe(1299.9);
     expect(parseBrlPrice('1.000')).toBe(1000);
-    expect(matchesPriceRange('R$ 1.299,90', '1000', '1500')).toBe(true);
-    expect(matchesPriceRange('R$ 1.299,90', '1300', '1500')).toBe(false);
+  });
+
+  it('renderiza opções de ordenação e alterna seleção', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+
+    render(<SortControl value="relevance" onChange={onChange} totalCount={3} />);
+    expect(screen.queryByText('3 ofertas')).not.toBeNull();
+    expect(screen.getByRole('button', { name: /relevância/i }).getAttribute('aria-pressed')).toBe('true');
+
+    await user.click(screen.getByRole('button', { name: /menor preço/i }));
+
+    expect(onChange).toHaveBeenCalledWith('price-asc');
   });
 
   it('renderiza sugestões fixas ao focar no campo de busca', async () => {

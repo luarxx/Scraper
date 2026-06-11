@@ -3,7 +3,9 @@ import { AlertTriangle, BadgeDollarSign, BarChart, Search, XCircle, Radio, Timer
 import type { AutoExecucao, AutoResultadoItem, Produto, WishlistItem } from '../types';
 import { ProductGrid } from './ProductGrid';
 import { Icon } from './Icon';
+import { SortControl, type SortOption } from './SortControl';
 import { formatBrazilDateMonth, formatBrazilTime } from '../utils/date';
+import { parseBrlPrice } from '../utils/price';
 
 const SITE_COLORS: Record<string, { text: string; light: string; glow: string }> = {
   kabum: { text: '#f97316', light: 'rgba(249,115,22,0.08)', glow: 'rgba(249,115,22,0.15)' },
@@ -24,8 +26,18 @@ interface AutoResultsViewProps {
 }
 
 function parsePrice(price: string | null): number {
-  if (!price) return Infinity;
-  return parseFloat(price.replace(/[^\d,]/g, '').replace(',', '.'));
+  return parseBrlPrice(price) ?? Infinity;
+}
+
+function comparePrice(a: Produto, b: Produto, direction: 'asc' | 'desc'): number {
+  const priceA = parseBrlPrice(a.price);
+  const priceB = parseBrlPrice(b.price);
+
+  if (priceA === null && priceB === null) return 0;
+  if (priceA === null) return 1;
+  if (priceB === null) return -1;
+
+  return direction === 'asc' ? priceA - priceB : priceB - priceA;
 }
 
 function formatBRL(reaisOrString: number | string | null): string {
@@ -111,10 +123,21 @@ const TermoSection = memo(function TermoSection({
   onWishlistAction,
 }: TermoSectionProps) {
   const siteColor = SITE_COLORS[r.site] || SITE_COLORS.kabum;
+  const [sortOption, setSortOption] = useState<SortOption>('relevance');
   const stats = useMemo(
     () => (r.status === 'ok' ? getTermoStats(r.produtos) : null),
     [r.status, r.produtos]
   );
+  const sortedProdutos = useMemo(() => {
+    const nextProdutos = [...r.produtos];
+    if (sortOption === 'price-asc') {
+      return nextProdutos.sort((a, b) => comparePrice(a, b, 'asc'));
+    }
+    if (sortOption === 'price-desc') {
+      return nextProdutos.sort((a, b) => comparePrice(a, b, 'desc'));
+    }
+    return nextProdutos;
+  }, [r.produtos, sortOption]);
 
   return (
     <section
@@ -222,8 +245,16 @@ const TermoSection = memo(function TermoSection({
                       </span>
                     </div>
                   )}
+                  <div className="mb-4 flex justify-end px-2">
+                    <SortControl
+                      value={sortOption}
+                      onChange={setSortOption}
+                      totalCount={r.produtos.length}
+                      compact
+                    />
+                  </div>
                   <ProductGrid
-                    produtos={r.produtos}
+                    produtos={sortedProdutos}
                     siteKey={r.site}
                     updatedAt={updatedAt}
                     onCreateAlert={onCreateAlert}

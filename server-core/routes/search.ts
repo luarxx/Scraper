@@ -3,6 +3,7 @@ import { buscarProduto, SITES } from '../../scraper';
 import { jsonHeaders } from '../http';
 import { registrarMetricaBusca } from '../metrics';
 import { salvarPrecos } from '../priceHistory';
+import { getEnabledSiteKeys, getEnabledSites, isSiteEnabled } from '../enabledSites';
 
 function executarComLog(contexto: string, action: () => void): void {
   try {
@@ -16,7 +17,8 @@ function executarComLog(contexto: string, action: () => void): void {
 export function handleSearchRoute(pathname: string, req: IncomingMessage, res: ServerResponse, parsedUrl: URL): boolean {
   if (pathname === '/api/search' && req.method === 'GET') {
     const q = parsedUrl.searchParams.get('q');
-    const site = parsedUrl.searchParams.get('site') || 'kabum';
+    const enabledKeys = getEnabledSiteKeys();
+    const site = parsedUrl.searchParams.get('site') || enabledKeys[0] || '';
 
     if (!q || !q.trim()) {
       res.writeHead(400, jsonHeaders());
@@ -26,7 +28,12 @@ export function handleSearchRoute(pathname: string, req: IncomingMessage, res: S
 
     if (!SITES[site]) {
       res.writeHead(400, jsonHeaders());
-      res.end(JSON.stringify({ erro: true, mensagem: `Site "${site}" não encontrado. Opções: ${Object.keys(SITES).join(', ')}` }));
+      res.end(JSON.stringify({ erro: true, mensagem: `Site "${site}" não encontrado. Opções: ${enabledKeys.join(', ')}` }));
+      return true;
+    }
+    if (!isSiteEnabled(site)) {
+      res.writeHead(400, jsonHeaders());
+      res.end(JSON.stringify({ erro: true, mensagem: `Site "${site}" está desabilitado no momento` }));
       return true;
     }
 
@@ -86,7 +93,7 @@ export function handleSearchRoute(pathname: string, req: IncomingMessage, res: S
 
   if (pathname === '/api/sites' && req.method === 'GET') {
     res.writeHead(200, jsonHeaders());
-    const sites = Object.entries(SITES).map(([key, val]) => ({ key, nome: val.nome }));
+    const sites = Object.entries(getEnabledSites()).map(([key, val]) => ({ key, nome: val.nome }));
     res.end(JSON.stringify(sites));
     return true;
   }

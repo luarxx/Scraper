@@ -1,5 +1,6 @@
 import { buscarProdutoPorUrl, SITES } from '../scraper';
 import { db } from './db';
+import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
 import { brlToCents, centsToBrl } from './money';
 import { salvarPrecos } from './priceHistory';
@@ -151,7 +152,9 @@ export async function executarWishlistChecks(): Promise<void> {
     `SELECT * FROM wishlist_items WHERE ativo = 1 AND status = 'ativo' ORDER BY id`
   ).all() as WishlistItemRow[];
 
-  if (itens.length === 0) {
+  const itensFiltrados = itens.filter(item => isSiteEnabled(item.site));
+
+  if (itensFiltrados.length === 0) {
     wishlistStatus = 'agendado';
     proximaWishlistExecucao = formatApiDatetime(calcularProximoWishlistHorario());
     return;
@@ -167,7 +170,7 @@ export async function executarWishlistChecks(): Promise<void> {
   let disparados = 0;
   let precosVerificados = 0;
 
-  for (const item of itens) {
+  for (const item of itensFiltrados) {
     const checkedAt = formatDbDatetime();
     const startedAt = Date.now();
     try {
@@ -259,7 +262,7 @@ export async function executarWishlistChecks(): Promise<void> {
     }
   }
 
-  console.log(`[Desejos] Verificação concluída — ${itens.length} item(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)`);
+  console.log(`[Desejos] Verificação concluída — ${itensFiltrados.length} item(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)`);
   wishlistStatus = 'agendado';
   proximaWishlistExecucao = formatApiDatetime(calcularProximoWishlistHorario());
 }
@@ -380,6 +383,9 @@ export function parseWishlistCreateBody(body: string): {
     }
     if (!SITES[item.site]) {
       return { ok: false, error: `Site "${item.site}" não encontrado` };
+    }
+    if (!isSiteEnabled(item.site)) {
+      return { ok: false, error: `Site "${item.site}" está desabilitado no momento` };
     }
     try {
       const parsed = new URL(item.url);

@@ -51,6 +51,17 @@ DISCORD_WEBHOOK_URL=
 DISCORD_WEBHOOK_AVATAR_URL=https://alguma-url-da-imagem.png
 ```
 
+Para desabilitar sites especificos em producao (ex: KaBuM!), adicione:
+
+```bash
+DISABLED_SITES=kabum
+```
+
+- `DISABLED_SITES` aceita uma lista separada por virgula (ex: `kabum,pichau`).
+- As lojas desabilitadas somem das rotas da API e sao ignoradas pelos schedulers.
+- Historico e dados antigos permanecem no banco, mas novas execucoes e acoes ficam bloqueadas.
+- Com `DISABLED_SITES` vazio ou omitido, todas as lojas configuradas funcionam normalmente.
+
 ## Notes
 
 - Auto Search nao envia Discord em producao.

@@ -1,5 +1,6 @@
 import { buscarProduto } from '../scraper';
 import { db } from './db';
+import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
 import { salvarPrecos } from './priceHistory';
 import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime, parseLocalDatetime } from './time';
@@ -54,7 +55,9 @@ export async function executarAutoBuscas(): Promise<void> {
     `SELECT id, termo, site FROM auto_config WHERE ativo = 1 ORDER BY ordem`
   ).all() as AutoConfig[];
 
-  if (configs.length === 0) {
+  const configsFiltrados = configs.filter(c => isSiteEnabled(c.site));
+
+  if (configsFiltrados.length === 0) {
     schedulerStatus = 'agendado';
     proximaExecucao = formatApiDatetime(calcularProximoHorario());
     return;
@@ -76,9 +79,9 @@ export async function executarAutoBuscas(): Promise<void> {
       insertResultado.run(execucaoId, config.id, config.termo, config.site, 'pendente', 0, null, null);
     }
   });
-  insertMany(configs);
+  insertMany(configsFiltrados);
 
-  await executarComConcorrencia(configs, AUTO_MAX_CONCURRENCY, async (config) => {
+  await executarComConcorrencia(configsFiltrados, AUTO_MAX_CONCURRENCY, async (config) => {
     const startedAt = Date.now();
     try {
       const data = await buscarProduto(config.site, config.termo);

@@ -4,6 +4,7 @@ import { executarAutoBuscas, getAutoStatus, isAutoRunning } from '../auto';
 import { db } from '../db';
 import { sendJson } from '../http';
 import { dbDatetimeToApi } from '../time';
+import { getEnabledSiteKeys, isSiteEnabled } from '../enabledSites';
 
 export function handleAutoRoutes(pathname: string, req: IncomingMessage, res: ServerResponse): boolean {
   if (pathname === '/api/auto/config' && req.method === 'GET') {
@@ -22,7 +23,7 @@ export function handleAutoRoutes(pathname: string, req: IncomingMessage, res: Se
           sendJson(res, 400, { erro: true, mensagem: 'Body deve ser um array de { termo, site }' });
           return;
         }
-        entries = entries.filter(e => e.termo && e.termo.trim() && e.site && SITES[e.site]);
+        entries = entries.filter(e => e.termo && e.termo.trim() && e.site && SITES[e.site] && isSiteEnabled(e.site));
         if (entries.length > 10) {
           sendJson(res, 400, { erro: true, mensagem: 'Máximo de 10 produtos permitidos' });
           return;

@@ -6,6 +6,7 @@ import { parseTargetPrice } from '../money';
 import { formatDbDatetime } from '../time';
 import { executarWatchAlerts, getWatchStatus, isWatchRunning, normalizarWatchAlert } from '../watch';
 import type { WatchAlertRow } from '../watch';
+import { isSiteEnabled } from '../enabledSites';
 
 export function handleWatchRoutes(pathname: string, req: IncomingMessage, res: ServerResponse, parsedUrl: URL): boolean {
   if (pathname === '/api/watch/alerts' && req.method === 'GET') {
@@ -24,6 +25,10 @@ export function handleWatchRoutes(pathname: string, req: IncomingMessage, res: S
     }
     if (!SITES[site]) {
       sendJson(res, 400, { erro: true, mensagem: `Site "${site}" não encontrado` });
+      return true;
+    }
+    if (!isSiteEnabled(site)) {
+      sendJson(res, 400, { erro: true, mensagem: `Site "${site}" está desabilitado no momento` });
       return true;
     }
     try {
@@ -86,6 +91,10 @@ export function handleWatchRoutes(pathname: string, req: IncomingMessage, res: S
           sendJson(res, 400, { erro: true, mensagem: `Site "${site}" não encontrado` });
           return;
         }
+        if (!isSiteEnabled(site)) {
+          sendJson(res, 400, { erro: true, mensagem: `Site "${site}" está desabilitado no momento` });
+          return;
+        }
         if (canal !== 'discord') {
           sendJson(res, 400, { erro: true, mensagem: 'Canal suportado: discord' });
           return;
@@ -143,6 +152,10 @@ export function handleWatchRoutes(pathname: string, req: IncomingMessage, res: S
         }
         if (!SITES[site]) {
           sendJson(res, 400, { erro: true, mensagem: `Site "${site}" não encontrado` });
+          return;
+        }
+        if (!isSiteEnabled(site)) {
+          sendJson(res, 400, { erro: true, mensagem: `Site "${site}" está desabilitado no momento` });
           return;
         }
         if (canal !== 'discord') {

@@ -205,7 +205,7 @@ export default function App() {
             </div>
           </div>
           {modo === 'manual' && state !== 'initial' && (
-            <SearchForm onSearch={search} loading={loading} history={history} compact />
+            <SearchForm onSearch={search} loading={loading} history={history} compact sites={sites} />
           )}
         </div>
       </header>
@@ -321,7 +321,7 @@ export default function App() {
                       Pesquise em lojas como KaBuM!, Pichau e Terabyte, veja preco, parcelamento e crie alertas quando o valor baixar.
                     </p>
                     <div className="mt-6 max-w-xl mx-auto">
-                      <SearchForm onSearch={search} loading={loading} history={history} />
+                      <SearchForm onSearch={search} loading={loading} history={history} sites={sites} />
                     </div>
                     <div className="mt-4 max-w-xl mx-auto">
                       <SearchHistory history={history} onSelect={handleHistorySelect} compact align="center" />

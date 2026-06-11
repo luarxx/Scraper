@@ -5,10 +5,13 @@ import { ScraperRateLimitError } from './retry';
 function extrairProdutosKabum(termo: string): Produto[] {
   const produtosJsonLd: Produto[] = [];
   const vistosJsonLd = new Set<string>();
+  let totalJsonLdScripts = 0;
+  let totalJsonLdProdutos = 0;
 
   Array.from(document.querySelectorAll('script[type="application/ld+json"]')).forEach((script) => {
     const text = script.textContent?.trim();
     if (!text) return;
+    totalJsonLdScripts++;
 
     try {
       const parsed = JSON.parse(text);
@@ -99,17 +102,33 @@ function extrairProdutosKabum(termo: string): Produto[] {
     } catch { /* empty */ }
   });
 
+  console.log(`[Kabum] Scripts JSON-LD encontrados: ${totalJsonLdScripts}, produtos extraídos: ${produtosJsonLd.length}`);
+
   const links = Array.from(document.querySelectorAll('a[href*="/produto/"]'));
   const results: Produto[] = [];
 
+  let ignoradosSellerOffer = 0;
+  let ignoradosSemTitulo = 0;
+  let comTitulo = 0;
+
   links.forEach((a) => {
     const href = a.getAttribute('href') || '';
-    if (href.includes('seller_offer') || href.includes('buyBox') || href.includes('similar')) return;
+    if (href.includes('seller_offer') || href.includes('buyBox') || href.includes('similar')) {
+      ignoradosSellerOffer++;
+      return;
+    }
 
     const titleEl = a.querySelector('span.text-sm.text-left.text-gray-800.text-ellipsis');
-    if (!titleEl) return;
+    if (!titleEl) {
+      ignoradosSemTitulo++;
+      return;
+    }
     const title = titleEl.textContent!.trim();
-    if (!title) return;
+    if (!title) {
+      ignoradosSemTitulo++;
+      return;
+    }
+    comTitulo++;
 
     const priceContainer = a.querySelector('div.flex.flex-col div.flex.gap-4.items-center');
     let price: string | null = null;
@@ -148,8 +167,12 @@ function extrairProdutosKabum(termo: string): Produto[] {
     });
   });
 
+  console.log(`[Kabum] Links /produto/: ${links.length} (ignorados seller_offer: ${ignoradosSellerOffer}, sem titulo: ${ignoradosSemTitulo}, com titulo: ${comTitulo})`);
+  console.log(`[Kabum] Produtos extraídos via DOM: ${results.length}`);
+
   if (results.length > 0) return results;
 
+  console.log(`[Kabum] Fallback para JSON-LD — ${produtosJsonLd.length} produto(s)`);
   return produtosJsonLd.map((produto) => ({
     ...produto,
     relevancia: termo

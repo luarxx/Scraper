@@ -48,6 +48,7 @@ export function detectarChallenge(page: Page): Promise<boolean> {
     const body = (document.body?.innerHTML || '').trim();
     const title = document.title || '';
     if (title.includes('Um momento') || title.includes('Just a moment')) return true;
+    if (title.includes('Azion')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('verificação de segurança')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('Enable JavaScript')) return true;
     return false;

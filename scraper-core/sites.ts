@@ -186,8 +186,8 @@ export const SITES: Record<string, SiteConfig> = {
     nome: 'KaBuM!',
     urlBase: 'https://www.kabum.com.br',
     searchUrl: (termo) => `https://www.kabum.com.br/busca/${encodeURIComponent(termo)}`,
-    waitStrategy: 'domcontentloaded',
-    precisaHomePrimeiro: false,
+    waitStrategy: 'networkidle',
+    precisaHomePrimeiro: true,
     selectors: {
       productCard: 'a[href*="/produto/"]',
       title: 'span.text-sm.text-left.text-gray-800.text-ellipsis',

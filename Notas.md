@@ -447,3 +447,42 @@ Refinamento do Watch atual: em vez de polling a cada 3h, o usuário ativa o modo
 - ✅ **Dashboard** — KPIs de busca, breakdown por site, ordenação por performance.
 - ✅ **Autocomplete** — `/api/search/suggest` com base no histórico de buscas.
 - ✅ **Sanitização XSS** — `escapeHtml()` total, CSP headers, sem `dangerouslySetInnerHTML`.
+
+
+
+Plano de Implementação
+O que muda
+Atualmente cada termo abre/fecha seu próprio navegador. A mudança é: agrupar por site, um navegador por grupo, termos sequenciais dentro do mesmo navegador.
+
+Arquivos a alterar
+1. scraper-core/search.ts — Extrair a lógica central de busca
+
+Criar buscarProdutoNaPagina(siteKey, termo, page, viewport) — extrai a lógica entre criarPagina e browser.close() do buscarProdutoUmaVez atual. Não abre/fecha navegador nem contexto.
+Refatorar buscarProdutoUmaVez para chamar buscarProdutoNaPagina internamente (comportamento inalterado).
+Criar buscarProdutoNoBrowser(siteKey, termo, browser) — recebe um browser já aberto, cria contexto + página com sessão persistida, delega para buscarProdutoNaPagina, salva sessão, fecha apenas o contexto. Usado pelo Auto.
+Criar criarBrowserAuto() — wrapper que chama registrarStealth() + chromium.launch().
+2. server-core/auto.ts — Agrupar por site e gerenciar browsers
+
+Agrupar configs por site antes de executar:
+ts
+const grupos = Map<site, AutoConfig[]>;
+// cada entrada vira { site, configs: [...] }
+O pool de workers (executarComConcorrencia) passa a iterar sobre grupos de site em vez de configs individuais.
+Para cada grupo:
+criarBrowserAuto() — 1 navegador
+Loop sobre grupo.configs chamando buscarProdutoNoBrowser
+browser.close() no finally
+Resultado: se 3 termos são da KaBuM!, abre 1 navegador, pesquisa os 3 em sequência, fecha.
+A concorrência (AUTO_MAX_CONCURRENCY, default 3) agora controla quantos navegadores simultâneos — ideal para N sites.
+Comportamento final
+Configs	Navegadores abertos
+3 termos KabuM + 2 Pichau + 1 Terabyte	3 (um por site)
+5 termos KabuM + 3 Pichau	2
+6 termos KabuM (concurrency=3)	1 (só tem 1 site)
+5 sites diferentes (concurrency=3)	3 (2 esperam)
+O que não muda
+Retry por termo (via executarComRetry)
+Cache de 10min
+Persistência de sessão (cookies salvos após cada termo, carregados no próximo)
+Logging/DB/metrics
+Modo manual (buscarProduto/buscarProdutoUmaVez) intacto

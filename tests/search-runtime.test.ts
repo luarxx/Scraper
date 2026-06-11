@@ -37,10 +37,13 @@ function createTempRoot(): { root: string; sessionDir: string } {
 function createPageMock(options: SetupOptions): Record<string, unknown> {
   const productUrl = 'https://www.kabum.com.br/produto/1/ssd';
   return {
+    on: vi.fn(),
     addInitScript: vi.fn(async () => undefined),
     goto: vi.fn(async () => undefined),
     waitForFunction: vi.fn(async () => undefined),
     waitForSelector: vi.fn(async () => undefined),
+    screenshot: vi.fn(async () => undefined),
+    title: vi.fn(async () => 'Página de busca'),
     evaluate: vi.fn(async () => options.evaluateProducts ?? []),
     request: {
       get: vi.fn(async () => ({
@@ -111,6 +114,7 @@ async function setupSearchModule(options: SetupOptions = {}): Promise<{
     ROOT: root,
     CACHE_DIR: path.join(root, 'data', 'cache'),
     SESSION_STATE_DIR: sessionDir,
+    SCREENSHOT_DIR: path.join(root, 'data', 'screenshots'),
   }));
 
   vi.doMock('playwright-extra', () => ({

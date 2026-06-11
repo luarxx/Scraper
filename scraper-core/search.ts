@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { Page } from 'playwright';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import { HEADLESS, ROOT, TIMEOUT } from './config';
+import { HEADLESS, ROOT, TIMEOUT, SCREENSHOT_DIR } from './config';
 import { comportamentoHumano, detectarChallenge, randomWait } from './browserBehavior';
 import { gerarFingerprint, criarFingerprintInitScript } from './fingerprint';
 import { lerCache, salvarCache, normalizarTermo } from './cache';
@@ -26,6 +26,23 @@ function registrarStealth(): void {
 
 function devePersistirSessao(site: SiteConfig): boolean {
   return site.persistSession !== false;
+}
+
+async function capturarSnapshot(page: Page, siteKey: string, rotulo: string): Promise<void> {
+  try {
+    if (!fs.existsSync(SCREENSHOT_DIR)) {
+      fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+    }
+    const timestamp = Date.now();
+    const safe = rotulo.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const base = path.join(SCREENSHOT_DIR, `${siteKey}_${safe}_${timestamp}`);
+    await page.screenshot({ path: `${base}.png`, fullPage: true });
+    const html = await page.content();
+    fs.writeFileSync(`${base}.html`, html, 'utf-8');
+    console.log(`[Diagnóstico] Snapshot salvo: ${base}.png`);
+  } catch {
+    /* snapshot é best-effort */
+  }
 }
 
 function criarResultadoErro(siteKey: string, site: SiteConfig, termoBusca: string, err: unknown): Resultado {
@@ -106,24 +123,64 @@ async function salvarSessaoComSucesso(siteKey: string, site: SiteConfig, context
   await salvarSessaoDoContexto(context, siteKey, devePersistirSessao(site));
 }
 
-async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: string, viewport: { width: number; height: number }): Promise<Produto[]> {
+async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: string, viewport: { width: number; height: number }, siteKey: string): Promise<Produto[]> {
   if (!site.searchUrl || !site.waitStrategy || !site.selectors || !site.extrairProdutos) {
     throw new ScraperParseError('Site sem configuração DOM para busca.');
   }
 
   const urlBusca = site.searchUrl(termoBusca);
-  await page.goto(urlBusca, { waitUntil: site.waitStrategy, timeout: TIMEOUT });
+  console.log(`  → URL de busca: ${urlBusca}`);
+
+  const navStart = Date.now();
+  let navError: string | null = null;
+  try {
+    await page.goto(urlBusca, { waitUntil: site.waitStrategy, timeout: TIMEOUT });
+  } catch (err) {
+    navError = err instanceof Error ? err.message : String(err);
+    console.log(`  → ⚠️ Erro no navegador: ${navError}`);
+  }
+  console.log(`  → Navegação levou ${Date.now() - navStart}ms`);
+
+  const titulo = await page.title().catch(() => 'ERRO');
+  const urlAtual = page.url();
+  const bodyLen = await page.evaluate(() => document.body?.innerHTML?.length || 0).catch(() => -1);
+  console.log(`  → Título: "${titulo}"`);
+  console.log(`  → URL atual: ${urlAtual}`);
+  console.log(`  → Body HTML: ${bodyLen} caracteres`);
+
+  if (navError) {
+    await capturarSnapshot(page, siteKey, 'nav_error');
+    throw new ScraperParseError(`Falha ao navegar para ${urlBusca}: ${navError}`);
+  }
+
   await randomWait(2000, 4000);
   await comportamentoHumano(page, viewport);
+
+  const temChallenge = await detectarChallenge(page);
+  console.log(`  → Challenge detectado: ${temChallenge}`);
   await verificarChallenge(page, 'busca');
 
   const cardSelector = site.selectors.productCard;
+  let cardCount = 0;
+  let selectorTimeout = false;
   try {
     await page.waitForSelector(cardSelector, { timeout: 10000 });
-  } catch { /* empty */ }
+    cardCount = await page.evaluate((sel: string) => document.querySelectorAll(sel).length, cardSelector);
+    console.log(`  → ${cardCount} card(s) encontrado(s) com seletor "${cardSelector}"`);
+  } catch {
+    selectorTimeout = true;
+    console.log(`  → ⚠️ Nenhum card encontrado com seletor "${cardSelector}" em 10s`);
+  }
+
   await randomWait(300, 800);
 
   const produtos = await page.evaluate(site.extrairProdutos, termoBusca);
+  console.log(`  → ${produtos.length} produto(s) extraído(s) da página`);
+
+  if (produtos.length === 0 && selectorTimeout) {
+    await capturarSnapshot(page, siteKey, 'sem_produtos');
+  }
+
   return ordenarPorRelevancia(produtos, termoBusca);
 }
 
@@ -144,9 +201,21 @@ async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise
 
   const { browser, context, page, fingerprint } = await criarPagina(siteKey, site);
 
+  page.on('console', (msg) => {
+    if (msg.type() === 'log' || msg.type() === 'warning' || msg.type() === 'error') {
+      console.log(`   [Pagina:${siteKey}] ${msg.text()}`);
+    }
+  });
+
+  page.on('pageerror', (err) => {
+    console.log(`   [Pagina:${siteKey}] Erro nao capturado: ${err.message}`);
+  });
+
   try {
     if (site.precisaHomePrimeiro) {
+      console.log(`  → Navegando para home: ${site.urlBase}`);
       await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
+      console.log(`  → Home carregada: "${await page.title()}"`);
       await randomWait(1500, 3000);
       await comportamentoHumano(page, fingerprint.viewport);
     }
@@ -166,10 +235,10 @@ async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise
         }
 
         console.log(`[Busca Manual] API de ${site.nome} em rate limit; tentando fallback DOM.`);
-        produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport);
+        produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport, siteKey);
       }
     } else {
-      produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport);
+      produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport, siteKey);
     }
 
     const output: Resultado = {
@@ -181,11 +250,18 @@ async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise
       produtos,
     };
 
+    console.log(`[Busca Manual] "${termoBusca}" em ${site.nome} — ${produtos.length} produto(s)`);
+
     salvarResultadoBusca(output);
     salvarCache(siteKey, termoBusca, output);
     await salvarSessaoComSucesso(siteKey, site, context);
 
     return output;
+  } catch (err) {
+    await capturarSnapshot(page, siteKey, 'erro_busca').catch(() => undefined);
+    const msg = err instanceof Error ? err.message : String(err);
+    console.log(`[Busca Manual] Erro ao buscar "${termoBusca}" em ${site.nome}: ${msg}`);
+    throw err;
   } finally {
     await browser.close();
   }

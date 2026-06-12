@@ -10,6 +10,10 @@
     "commit": {
       "description": "Agente para commits automáticos com Conventional Commits em pt-BR.",
       "mode": "subagent"
+    },
+    "ask": {
+      "description": "Agente para responder perguntas sobre o codigo sem modificar arquivos.",
+      "mode": "primary"
     }
   },
   "permission": {

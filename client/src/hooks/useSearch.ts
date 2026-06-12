@@ -71,5 +71,18 @@ export function useSearch() {
     }
   }, []);
 
-  return { ...state, sites, search, fetchSites };
+  const reset = useCallback(() => {
+    setState({
+      loading: false,
+      produtos: [],
+      termo: '',
+      siteKey: '',
+      siteNome: '',
+      timestamp: '',
+      erro: null,
+      total: 0,
+    });
+  }, []);
+
+  return { ...state, sites, search, fetchSites, reset };
 }

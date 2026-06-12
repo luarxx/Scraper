@@ -1,10 +1,11 @@
 interface LogoProps {
   compact?: boolean;
+  onClick?: () => void;
 }
 
-export function Logo({ compact = false }: LogoProps) {
-  return (
-    <div className="flex items-center gap-2.5" aria-label="Scraper">
+export function Logo({ compact = false, onClick }: LogoProps) {
+  const content = (
+    <>
       <img
         src="/Logo.png"
         alt=""
@@ -22,6 +23,24 @@ export function Logo({ compact = false }: LogoProps) {
           </span>
         </div>
       )}
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        onClick={onClick}
+        className="flex items-center gap-2.5 cursor-pointer"
+        aria-label="Scraper"
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2.5" aria-label="Scraper">
+      {content}
     </div>
   );
 }

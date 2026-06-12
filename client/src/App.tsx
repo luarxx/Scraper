@@ -41,7 +41,7 @@ function comparePrice(a: Produto, b: Produto, direction: 'asc' | 'desc'): number
 }
 
 export default function App() {
-  const { loading, produtos, termo, siteKey, siteNome, timestamp, erro, search, fetchSites, sites } = useSearch();
+  const { loading, produtos, termo, siteKey, siteNome, timestamp, erro, search, fetchSites, sites, reset } = useSearch();
   const [modo, setModo] = useState<'manual' | 'auto' | 'wishlist' | 'watch' | 'dashboard'>('manual');
   const [watchDraft, setWatchDraft] = useState<WatchDraft | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>('relevance');
@@ -144,7 +144,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
             <div className="flex justify-center sm:justify-start">
-              <Logo />
+              <Logo onClick={() => { reset(); setModo('manual'); }} />
             </div>
             <div className="flex items-center justify-center sm:justify-end gap-1">
               <button

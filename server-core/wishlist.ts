@@ -182,76 +182,82 @@ export async function executarWishlistChecks(): Promise<void> {
     const produtoCached = cacheAuto.get(urlNormalizada);
 
     if (produtoCached) {
-      resolvidosPorAuto++;
-      const produto = { ...produtoCached, site: item.site, siteNome: siteNome(item.site), timestamp: new Date().toISOString() };
-      console.log(`[Desejos] Item "${item.title}" em ${siteNome(item.site)} — resolvido via Busca Automática, preço ${produto.price || 'N/D'}`);
-      const precoCents = brlToCents(produto.price);
-      salvarPrecos([produto], item.site);
+      const cachedPriceCents = brlToCents(produtoCached.price);
 
-      if (precoCents === null) {
-        const erro = 'Preço atual não identificado';
-        insertCheck.run(item.id, checkedAt, 'erro', null, produto.price, erro, 0);
+      if (cachedPriceCents !== null && cachedPriceCents === item.ultimo_preco_cents) {
+        console.log(`[Desejos] Item "${item.title}" em ${siteNome(item.site)} — cache com mesmo preço, forçando scrape real`);
+      } else {
+        resolvidosPorAuto++;
+        const produto = { ...produtoCached, site: item.site, siteNome: siteNome(item.site), timestamp: new Date().toISOString() };
+        console.log(`[Desejos] Item "${item.title}" em ${siteNome(item.site)} — resolvido via Busca Automática, preço ${produto.price || 'N/D'}`);
+        const precoCents = cachedPriceCents;
+        salvarPrecos([produto], item.site);
+
+        if (precoCents === null) {
+          const erro = 'Preço atual não identificado';
+          insertCheck.run(item.id, checkedAt, 'erro', null, produto.price, erro, 0);
+          registrarMetricaBusca({
+            origem: 'wishlist',
+            site: item.site,
+            termo: item.title,
+            url: item.url,
+            status: 'erro',
+            total: 0,
+            duracaoMs: Date.now() - startedAt,
+            erro,
+          });
+          erros++;
+          db.prepare(
+            `UPDATE wishlist_items SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
+          ).run(checkedAt, erro, checkedAt, item.id);
+          continue;
+        }
+
+        precosVerificados++;
+        const previousPriceCents = item.ultimo_preco_cents;
+        const shouldNotify = previousPriceCents !== null && precoCents < previousPriceCents;
+        const priceText = produto.price || centsToBrl(precoCents);
+        const discordSent = shouldNotify
+          ? await enviarWishlistDiscord(item, previousPriceCents, precoCents, priceText, produto.parcelamento)
+          : true;
+        const erro = shouldNotify && !discordSent ? 'Falha ao enviar notificação Discord' : null;
+
+        insertCheck.run(item.id, checkedAt, shouldNotify ? (discordSent ? 'disparado' : 'erro') : 'ok', precoCents, produto.price, erro, shouldNotify && discordSent ? 1 : 0);
         registrarMetricaBusca({
           origem: 'wishlist',
           site: item.site,
           termo: item.title,
           url: item.url,
-          status: 'erro',
-          total: 0,
+          status: erro ? 'erro' : 'ok',
+          total: 1,
           duracaoMs: Date.now() - startedAt,
           erro,
         });
-        erros++;
+
+        if (shouldNotify && discordSent) disparados++;
+        else if (erro) erros++;
+        else ok++;
+
         db.prepare(
-          `UPDATE wishlist_items SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
-        ).run(checkedAt, erro, checkedAt, item.id);
+          `UPDATE wishlist_items
+           SET title = ?, image = ?, ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, ultimo_disparo_em = ?, erro = ?, ativo = ?, status = ?, atualizado_em = ?
+           WHERE id = ?`
+        ).run(
+          produto.title || item.title,
+          produto.image || item.image,
+          precoCents,
+          produto.price,
+          produto.parcelamento,
+          checkedAt,
+          shouldNotify && discordSent ? checkedAt : item.ultimo_disparo_em,
+          erro,
+          1,
+          'ativo',
+          checkedAt,
+          item.id,
+        );
         continue;
       }
-
-      precosVerificados++;
-      const previousPriceCents = item.ultimo_preco_cents;
-      const shouldNotify = previousPriceCents !== null && precoCents < previousPriceCents;
-      const priceText = produto.price || centsToBrl(precoCents);
-      const discordSent = shouldNotify
-        ? await enviarWishlistDiscord(item, previousPriceCents, precoCents, priceText, produto.parcelamento)
-        : true;
-      const erro = shouldNotify && !discordSent ? 'Falha ao enviar notificação Discord' : null;
-
-      insertCheck.run(item.id, checkedAt, shouldNotify ? (discordSent ? 'disparado' : 'erro') : 'ok', precoCents, produto.price, erro, shouldNotify && discordSent ? 1 : 0);
-      registrarMetricaBusca({
-        origem: 'wishlist',
-        site: item.site,
-        termo: item.title,
-        url: item.url,
-        status: erro ? 'erro' : 'ok',
-        total: 1,
-        duracaoMs: Date.now() - startedAt,
-        erro,
-      });
-
-      if (shouldNotify && discordSent) disparados++;
-      else if (erro) erros++;
-      else ok++;
-
-      db.prepare(
-        `UPDATE wishlist_items
-         SET title = ?, image = ?, ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, ultimo_disparo_em = ?, erro = ?, ativo = ?, status = ?, atualizado_em = ?
-         WHERE id = ?`
-      ).run(
-        produto.title || item.title,
-        produto.image || item.image,
-        precoCents,
-        produto.price,
-        produto.parcelamento,
-        checkedAt,
-        shouldNotify && discordSent ? checkedAt : item.ultimo_disparo_em,
-        erro,
-        1,
-        'ativo',
-        checkedAt,
-        item.id,
-      );
-      continue;
     }
 
     try {

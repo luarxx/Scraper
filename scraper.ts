@@ -1,4 +1,4 @@
-export { buscarProduto, buscarProdutoPorUrl } from './scraper-core/search';
+export { buscarProduto, buscarProdutoNoBrowser, buscarProdutoPorUrl, criarBrowserAuto } from './scraper-core/search';
 export { extrairProdutoPorUrlHtml } from './scraper-core/productPageParser';
 export { gerarCacheKey, normalizarTermo } from './scraper-core/cache';
 export { ordenarPorRelevancia } from './scraper-core/ranking';

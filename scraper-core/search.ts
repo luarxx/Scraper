@@ -1,7 +1,7 @@
 import { chromium } from 'playwright-extra';
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Page } from 'playwright';
+import type { Browser, Page } from 'playwright';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { HEADLESS, ROOT, TIMEOUT, SCREENSHOT_DIR } from './config';
 import { comportamentoHumano, detectarChallenge, randomWait } from './browserBehavior';
@@ -22,6 +22,14 @@ function registrarStealth(): void {
   if (stealthRegistered) return;
   chromium.use(StealthPlugin());
   stealthRegistered = true;
+}
+
+export async function criarBrowserAuto(): Promise<Browser> {
+  registrarStealth();
+  return chromium.launch({
+    headless: HEADLESS,
+    args: ['--disable-blink-features=AutomationControlled'],
+  });
 }
 
 function devePersistirSessao(site: SiteConfig): boolean {
@@ -224,11 +232,14 @@ function salvarResultadoBusca(resultado: Resultado): void {
   fs.writeFileSync(path.join(dataDir, 'resultado.js'), `window.__RESULT = ${jsonStr};`, 'utf-8');
 }
 
-async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise<Resultado> {
+export async function buscarProdutoNaPagina(
+  page: Page,
+  siteKey: string,
+  termoBusca: string,
+  viewport: { width: number; height: number },
+): Promise<Produto[]> {
   const site = SITES[siteKey];
   if (!site) throw new Error(`Site "${siteKey}" não encontrado.`);
-
-  const { browser, context, page, fingerprint } = await criarPagina(siteKey, site);
 
   page.on('console', (msg) => {
     if (msg.type() === 'log' || msg.type() === 'warning' || msg.type() === 'error') {
@@ -240,35 +251,46 @@ async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise
     console.log(`   [Pagina:${siteKey}] Erro nao capturado: ${err.message}`);
   });
 
-  try {
+  if (site.precisaHomePrimeiro) {
+    console.log(`  → Navegando para home: ${site.urlBase}`);
+    await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
+    console.log(`  → Home carregada: "${await page.title()}"`);
+    await randomWait(1500, 3000);
+    await comportamentoHumano(page, viewport);
+  }
+
+  let produtos: Produto[];
+
+  if (site.usaApi) {
     if (site.precisaHomePrimeiro) {
-      console.log(`  → Navegando para home: ${site.urlBase}`);
-      await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
-      console.log(`  → Home carregada: "${await page.title()}"`);
-      await randomWait(1500, 3000);
-      await comportamentoHumano(page, fingerprint.viewport);
+      await verificarChallenge(page, 'busca');
     }
-
-    let produtos: Produto[];
-
-    if (site.usaApi) {
-      if (site.precisaHomePrimeiro) {
-        await verificarChallenge(page, 'busca');
+    try {
+      const data = await site.extrairProdutosViaApi!(page, termoBusca);
+      produtos = ordenarPorRelevancia(data, termoBusca);
+    } catch (err) {
+      if (!(err instanceof ScraperRateLimitError) || !site.extrairProdutos) {
+        throw err;
       }
-      try {
-        const data = await site.extrairProdutosViaApi!(page, termoBusca);
-        produtos = ordenarPorRelevancia(data, termoBusca);
-      } catch (err) {
-        if (!(err instanceof ScraperRateLimitError) || !site.extrairProdutos) {
-          throw err;
-        }
 
-        console.log(`[Busca Manual] API de ${site.nome} em rate limit; tentando fallback DOM.`);
-        produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport, siteKey);
-      }
-    } else {
-      produtos = await extrairProdutosViaDom(page, site, termoBusca, fingerprint.viewport, siteKey);
+      console.log(`[Busca Manual] API de ${site.nome} em rate limit; tentando fallback DOM.`);
+      produtos = await extrairProdutosViaDom(page, site, termoBusca, viewport, siteKey);
     }
+  } else {
+    produtos = await extrairProdutosViaDom(page, site, termoBusca, viewport, siteKey);
+  }
+
+  return produtos;
+}
+
+async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise<Resultado> {
+  const site = SITES[siteKey];
+  if (!site) throw new Error(`Site "${siteKey}" não encontrado.`);
+
+  const { browser, context, page, fingerprint } = await criarPagina(siteKey, site);
+
+  try {
+    const produtos = await buscarProdutoNaPagina(page, siteKey, termoBusca, fingerprint.viewport);
 
     const output: Resultado = {
       termo: termoBusca,
@@ -294,6 +316,71 @@ async function buscarProdutoUmaVez(siteKey: string, termoBusca: string): Promise
   } finally {
     await browser.close();
   }
+}
+
+async function buscarProdutoNoBrowserInner(
+  siteKey: string,
+  termoBusca: string,
+  browser: Browser,
+): Promise<Resultado> {
+  const site = SITES[siteKey];
+  if (!site) throw new Error(`Site "${siteKey}" não encontrado.`);
+
+  const fingerprint = gerarFingerprint(siteKey);
+  const { context, page } = await criarPaginaComSessao(
+    browser,
+    siteKey,
+    fingerprint,
+    devePersistirSessao(site),
+  );
+
+  await page.addInitScript(criarFingerprintInitScript(fingerprint));
+
+  try {
+    const produtos = await buscarProdutoNaPagina(page, siteKey, termoBusca, fingerprint.viewport);
+
+    const output: Resultado = {
+      termo: termoBusca,
+      site: siteKey,
+      siteNome: site.nome,
+      timestamp: new Date().toISOString(),
+      total: produtos.length,
+      produtos,
+    };
+
+    salvarCache(siteKey, termoBusca, output);
+    await salvarSessaoComSucesso(siteKey, site, context);
+
+    return output;
+  } catch (err) {
+    await capturarSnapshot(page, siteKey, 'erro_busca').catch(() => undefined);
+    throw err;
+  } finally {
+    await context.close();
+  }
+}
+
+export async function buscarProdutoNoBrowser(
+  siteKey: string,
+  termoBusca: string,
+  browser: Browser,
+): Promise<Resultado> {
+  const site = SITES[siteKey];
+  if (!site) throw new Error(`Site "${siteKey}" não encontrado.`);
+
+  const cacheHit = lerCache(siteKey, termoBusca);
+  if (cacheHit) return cacheHit;
+
+  return executarComRetry(
+    () => buscarProdutoNoBrowserInner(siteKey, termoBusca, browser),
+    {
+      maxAttemptsTransient: 3,
+      maxAttemptsChallenge: 2,
+      onRetry: ({ attempt, kind, delayMs, message }) => {
+        console.log(`[Busca Automática] Tentativa ${attempt} falhou (${kind}): ${message}. Retentando em ${delayMs}ms.`);
+      },
+    },
+  ).catch((err: unknown) => criarResultadoErro(siteKey, site, termoBusca, err));
 }
 
 async function executarBuscaProduto(siteKey: string, termoBusca: string): Promise<Resultado> {

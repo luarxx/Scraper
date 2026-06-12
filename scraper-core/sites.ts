@@ -3,6 +3,28 @@ import { TIMEOUT } from './config';
 import { ScraperRateLimitError } from './retry';
 
 function extrairProdutosKabum(termo: string): Produto[] {
+  const imagemPorUrl = new Map<string, string>();
+  const nextDataScript = document.getElementById('__NEXT_DATA__');
+  if (nextDataScript) {
+    try {
+      const nextData = JSON.parse(nextDataScript.textContent || '{}');
+      const catalogData = nextData?.props?.pageProps?.data?.catalogServer?.data;
+      if (Array.isArray(catalogData)) {
+        for (const item of catalogData) {
+          const productUrl = typeof item.url === 'string' ? item.url : (typeof item.link === 'string' ? item.link : '');
+          const img = typeof item.image === 'string' ? item.image
+            : typeof item.thumbnail === 'string' ? item.thumbnail
+            : Array.isArray(item.images) && typeof item.images[0] === 'string' ? item.images[0]
+            : '';
+          if (productUrl && img) {
+            const path = productUrl.replace(/https?:\/\/[^\/]+/, '');
+            imagemPorUrl.set(path, img.startsWith('http') ? img : `https:${img}`);
+          }
+        }
+      }
+    } catch { /* empty */ }
+  }
+
   const produtosJsonLd: Produto[] = [];
   const vistosJsonLd = new Set<string>();
   let totalJsonLdScripts = 0;
@@ -155,7 +177,23 @@ function extrairProdutosKabum(termo: string): Produto[] {
     }
 
     const imgEl = a.querySelector('img');
-    const image = imgEl ? (imgEl.getAttribute('src') || imgEl.getAttribute('data-src') || '') : '';
+    let image = '';
+    if (imgEl) {
+      const src = imgEl.getAttribute('src') || '';
+      image = src.startsWith('http') ? src : '';
+      if (!image) {
+        const srcset = imgEl.getAttribute('srcset');
+        if (srcset) {
+          const firstUrl = srcset.split(',')[0]?.trim().split(/\s+/)[0];
+          if (firstUrl?.startsWith('http')) image = firstUrl;
+        }
+      }
+      if (!image) image = imgEl.getAttribute('data-src') || '';
+    }
+    if (!image) {
+      const path = href.replace(/https?:\/\/[^\/]+/, '');
+      image = imagemPorUrl.get(path) || '';
+    }
 
     results.push({
       title,
@@ -186,7 +224,7 @@ export const SITES: Record<string, SiteConfig> = {
     nome: 'KaBuM!',
     urlBase: 'https://www.kabum.com.br',
     searchUrl: (termo) => `https://www.kabum.com.br/busca/${encodeURIComponent(termo)}`,
-    waitStrategy: 'networkidle',
+    waitStrategy: 'load',
     precisaHomePrimeiro: true,
     selectors: {
       productCard: 'a[href*="/produto/"]',

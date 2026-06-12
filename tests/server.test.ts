@@ -7,6 +7,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const buscarProdutoMock = vi.fn();
 const buscarProdutoPorUrlMock = vi.fn();
+const mockBrowser = { close: vi.fn(async () => undefined) };
+const criarBrowserAutoMock = vi.fn(async () => mockBrowser);
 
 type ServerModule = typeof import('../server');
 type ImportServerOptions = {
@@ -23,6 +25,8 @@ async function importServer(options: ImportServerOptions = {}): Promise<ServerMo
   vi.resetModules();
   buscarProdutoMock.mockReset();
   buscarProdutoPorUrlMock.mockReset();
+  criarBrowserAutoMock.mockReset();
+  mockBrowser.close.mockReset();
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'scraper-tests-'));
   process.env.SCRAPER_DB_PATH = path.join(dir, 'scraper.db');
   process.env.AUTO_INTERVAL_HOURS = options.auto;
@@ -53,7 +57,9 @@ async function importServer(options: ImportServerOptions = {}): Promise<ServerMo
       terabyteshop: { nome: 'TerabyteShop' },
     },
     buscarProduto: buscarProdutoMock,
+    buscarProdutoNoBrowser: buscarProdutoMock,
     buscarProdutoPorUrl: buscarProdutoPorUrlMock,
+    criarBrowserAuto: criarBrowserAutoMock,
   }));
 
   return import('../server');
@@ -558,8 +564,8 @@ describe('server API', () => {
     const resultados = mod.db.prepare(`SELECT termo, site, status, total FROM auto_resultados`).all() as { termo: string; site: string; status: string; total: number }[];
     expect(resultados).toHaveLength(1);
     expect(resultados[0]).toEqual({ termo: 'gpu', site: 'pichau', status: 'ok', total: 1 });
-    expect(buscarProdutoMock).toHaveBeenCalledWith('pichau', 'gpu');
-    expect(buscarProdutoMock).not.toHaveBeenCalledWith('kabum', 'ssd');
+    expect(buscarProdutoMock).toHaveBeenCalledWith('pichau', 'gpu', expect.any(Object));
+    expect(buscarProdutoMock).not.toHaveBeenCalledWith('kabum', 'ssd', expect.any(Object));
 
     mod.db.close();
   });
@@ -628,8 +634,8 @@ describe('watch scheduler rules', () => {
     mod.db.close();
   });
 
-  it('executa busca automática com até 3 buscas simultâneas', async () => {
-    const mod = await importServer({ autoConcurrency: '3' });
+  it('executa busca automática com concorrência por grupo de site', async () => {
+    const mod = await importServer({ autoConcurrency: '2' });
     const started: string[] = [];
     const resolvers = new Map<string, () => void>();
 
@@ -654,22 +660,30 @@ describe('watch scheduler rules', () => {
       });
     });
 
-    for (const [ordem, termo] of ['ssd', 'gpu', 'cpu', 'ram'].entries()) {
-      mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
-        .run(termo, 'kabum', ordem, '2026-06-05 10:00:00');
-    }
+    mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+      .run('ssd', 'kabum', 0, '2026-06-05 10:00:00');
+    mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+      .run('gpu', 'kabum', 1, '2026-06-05 10:00:00');
+    mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+      .run('cpu', 'pichau', 2, '2026-06-05 10:00:00');
+    mod.db.prepare(`INSERT INTO auto_config (termo, site, ordem, criado_em) VALUES (?, ?, ?, ?)`)
+      .run('ram', 'terabyteshop', 3, '2026-06-05 10:00:00');
 
     const runPromise = mod.executarAutoBuscas();
 
-    await waitUntil(() => started.length === 3);
-    expect(started).toEqual(['ssd', 'gpu', 'cpu']);
+    await waitUntil(() => started.length === 2);
+    expect(started).toContain('ssd');
+    expect(started).toContain('cpu');
 
     resolvers.get('ssd')?.();
+    await waitUntil(() => started.length === 3);
+    expect(started).toContain('gpu');
+
+    resolvers.get('cpu')?.();
     await waitUntil(() => started.length === 4);
-    expect(started).toEqual(['ssd', 'gpu', 'cpu', 'ram']);
+    expect(started).toContain('ram');
 
     resolvers.get('gpu')?.();
-    resolvers.get('cpu')?.();
     resolvers.get('ram')?.();
     await runPromise;
 

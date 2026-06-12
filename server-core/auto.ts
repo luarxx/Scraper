@@ -1,4 +1,4 @@
-import { buscarProduto } from '../scraper';
+import { buscarProdutoNoBrowser, criarBrowserAuto } from '../scraper';
 import { db } from './db';
 import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
@@ -81,51 +81,66 @@ export async function executarAutoBuscas(): Promise<void> {
   });
   insertMany(configsFiltrados);
 
-  await executarComConcorrencia(configsFiltrados, AUTO_MAX_CONCURRENCY, async (config) => {
-    const startedAt = Date.now();
+  const grupos = new Map<string, typeof configsFiltrados>();
+  for (const config of configsFiltrados) {
+    const list = grupos.get(config.site) || [];
+    list.push(config);
+    grupos.set(config.site, list);
+  }
+  const gruposArray = Array.from(grupos.entries());
+
+  await executarComConcorrencia(gruposArray, AUTO_MAX_CONCURRENCY, async ([_site, configs]) => {
+    const browser = await criarBrowserAuto();
     try {
-      const data = await buscarProduto(config.site, config.termo);
-      if ('erro' in data && data.erro) {
-        db.prepare(
-          `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
-        ).run(data.mensagem, execucaoId, config.id);
-        registrarMetricaBusca({
-          origem: 'auto',
-          site: config.site,
-          termo: config.termo,
-          status: 'erro',
-          total: 0,
-          duracaoMs: Date.now() - startedAt,
-          erro: data.mensagem,
-        });
-      } else {
-        db.prepare(
-          `UPDATE auto_resultados SET status = 'ok', total = ?, produtos = ? WHERE execucao_id = ? AND config_id = ?`
-        ).run(data.total, JSON.stringify(data.produtos), execucaoId, config.id);
-        salvarPrecos(data.produtos, config.site);
-        registrarMetricaBusca({
-          origem: 'auto',
-          site: config.site,
-          termo: config.termo,
-          status: 'ok',
-          total: data.total,
-          duracaoMs: Date.now() - startedAt,
-        });
+      for (const config of configs) {
+        const startedAt = Date.now();
+        try {
+          const data = await buscarProdutoNoBrowser(config.site, config.termo, browser);
+          if ('erro' in data && data.erro) {
+            db.prepare(
+              `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
+            ).run(data.mensagem, execucaoId, config.id);
+            registrarMetricaBusca({
+              origem: 'auto',
+              site: config.site,
+              termo: config.termo,
+              status: 'erro',
+              total: 0,
+              duracaoMs: Date.now() - startedAt,
+              erro: data.mensagem,
+            });
+          } else {
+            db.prepare(
+              `UPDATE auto_resultados SET status = 'ok', total = ?, produtos = ? WHERE execucao_id = ? AND config_id = ?`
+            ).run(data.total, JSON.stringify(data.produtos), execucaoId, config.id);
+            salvarPrecos(data.produtos, config.site);
+            registrarMetricaBusca({
+              origem: 'auto',
+              site: config.site,
+              termo: config.termo,
+              status: 'ok',
+              total: data.total,
+              duracaoMs: Date.now() - startedAt,
+            });
+          }
+        } catch (err: unknown) {
+          const error = err as Error;
+          db.prepare(
+            `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
+          ).run(error.message, execucaoId, config.id);
+          registrarMetricaBusca({
+            origem: 'auto',
+            site: config.site,
+            termo: config.termo,
+            status: 'erro',
+            total: 0,
+            duracaoMs: Date.now() - startedAt,
+            erro: error.message,
+          });
+        }
       }
-    } catch (err: unknown) {
-      const error = err as Error;
-      db.prepare(
-        `UPDATE auto_resultados SET status = 'erro', erro = ? WHERE execucao_id = ? AND config_id = ?`
-      ).run(error.message, execucaoId, config.id);
-      registrarMetricaBusca({
-        origem: 'auto',
-        site: config.site,
-        termo: config.termo,
-        status: 'erro',
-        total: 0,
-        duracaoMs: Date.now() - startedAt,
-        erro: error.message,
-      });
+    } finally {
+      await browser.close().catch(() => undefined);
     }
   });
 

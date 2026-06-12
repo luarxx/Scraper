@@ -860,4 +860,101 @@ describe('watch scheduler rules', () => {
 
     mod.db.close();
   });
+
+  it('força scrape real quando cache Auto Search está obsoleto e notifica oscilação de preço', async () => {
+    const mod = await importServer({ webhook: 'https://discord.test/webhook' });
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, text: async () => '' })));
+
+    // Seed Auto Search cache com preço obsoleto (R$ 699,99)
+    const execResult = mod.db.prepare(
+      `INSERT INTO auto_execucoes (iniciada_em, finalizada_em, status) VALUES (?, ?, 'concluido')`
+    ).run('2026-06-05 10:00:00', '2026-06-05 10:00:00');
+    const execucaoId = execResult.lastInsertRowid as number;
+
+    mod.db.prepare(
+      `INSERT INTO auto_resultados (execucao_id, termo, site, status, produtos)
+       VALUES (?, ?, ?, 'ok', ?)`
+    ).run(
+      execucaoId,
+      'ssd',
+      'kabum',
+      JSON.stringify([{
+        title: 'SSD NVMe',
+        price: 'R$ 699,99',
+        parcelamento: null,
+        image: '',
+        url: 'https://www.kabum.com.br/produto/1',
+        relevancia: 0,
+        site: 'kabum',
+        siteNome: 'KaBuM!',
+        timestamp: '2026-06-05T10:00:00.000Z',
+      }]),
+    );
+
+    // Wishlist item com mesmo preço do cache (R$ 699,99)
+    mod.db.prepare(
+      `INSERT INTO wishlist_items (title, url, site, image, ultimo_preco_cents, ultimo_preco_text, criado_em, atualizado_em)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run('SSD NVMe', 'https://www.kabum.com.br/produto/1', 'kabum', '', 69999, 'R$ 699,99', '2026-06-05 10:00:00', '2026-06-05 10:00:00');
+
+    // Preço subiu para R$ 853,52 — cache obsoleto, deve forçar scrape
+    buscarProdutoPorUrlMock.mockResolvedValue({
+      title: 'SSD NVMe',
+      price: 'R$ 853,52',
+      parcelamento: null,
+      image: '',
+      url: 'https://www.kabum.com.br/produto/1',
+      relevancia: 0,
+      site: 'kabum',
+      siteNome: 'KaBuM!',
+      timestamp: new Date().toISOString(),
+    });
+
+    await mod.executarWishlistChecks();
+
+    // Verifica: scrape foi forçado (ignorou cache), ultimo_preco_cents atualizado para 85352
+    let item = mod.db.prepare(`SELECT ultimo_preco_cents, erro, ativo, status FROM wishlist_items`).get() as {
+      ultimo_preco_cents: number; erro: string | null; ativo: number; status: string;
+    };
+    let check = mod.db.prepare(`SELECT status, notified FROM wishlist_checks`).get() as {
+      status: string; notified: number;
+    };
+    expect(item).toEqual({ ultimo_preco_cents: 85352, erro: null, ativo: 1, status: 'ativo' });
+    expect(check).toEqual({ status: 'ok', notified: 0 });
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+    expect(buscarProdutoPorUrlMock).toHaveBeenCalledTimes(1);
+
+    // Preço caiu de volta para R$ 699,99 — deve notificar (69999 < 85352)
+    buscarProdutoPorUrlMock.mockResolvedValue({
+      title: 'SSD NVMe',
+      price: 'R$ 699,99',
+      parcelamento: null,
+      image: '',
+      url: 'https://www.kabum.com.br/produto/1',
+      relevancia: 0,
+      site: 'kabum',
+      siteNome: 'KaBuM!',
+      timestamp: new Date().toISOString(),
+    });
+
+    await mod.executarWishlistChecks();
+
+    // Verifica: Discord notificado (preço caiu)
+    item = mod.db.prepare(`SELECT ultimo_preco_cents, erro, ativo, status FROM wishlist_items`).get() as {
+      ultimo_preco_cents: number; erro: string | null; ativo: number; status: string;
+    };
+    check = mod.db.prepare(`SELECT status, notified FROM wishlist_checks ORDER BY id DESC LIMIT 1`).get() as {
+      status: string; notified: number;
+    };
+    expect(item).toEqual({ ultimo_preco_cents: 69999, erro: null, ativo: 1, status: 'ativo' });
+    expect(check).toEqual({ status: 'disparado', notified: 1 });
+    expect(globalThis.fetch).toHaveBeenCalled();
+
+    const webhookBody = JSON.parse((vi.mocked(globalThis.fetch).mock.calls[0][1] as RequestInit).body as string);
+    const description = webhookBody.embeds[0].description.replace(/\u00a0/g, ' ');
+    expect(description).toContain('Preço anterior: **R$ 853,52**');
+    expect(description).toContain('Preço atual: **R$ 699,99**');
+
+    mod.db.close();
+  });
 });

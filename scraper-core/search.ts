@@ -241,14 +241,38 @@ export async function buscarProdutoNaPagina(
   const site = SITES[siteKey];
   if (!site) throw new Error(`Site "${siteKey}" não encontrado.`);
 
+  const SILENCIAR_PAGINA = [
+    'net::ERR_FAILED',
+    'net::ERR_BLOCKED_BY_RESPONSE',
+    'Failed to load resource',
+    'Content Security Policy',
+    'JQMIGRATE',
+    'freshchat',
+    'criteo',
+    'Minified React error',
+    '429',
+    'Refused to execute script',
+    'ERR_BLOCKED_BY_RESPONSE',
+    'PWA não suportado',
+    'TeraSmartSearch',
+    'carregando chunk',
+    'failed.',
+    'Cannot read properties of null',
+    'Loading chunk',
+  ];
+
   page.on('console', (msg) => {
+    const texto = msg.text();
+    if (SILENCIAR_PAGINA.some(p => texto.includes(p))) return;
     if (msg.type() === 'log' || msg.type() === 'warning' || msg.type() === 'error') {
-      console.log(`   [Pagina:${siteKey}] ${msg.text()}`);
+      console.log(`   [Pagina:${siteKey}] ${texto}`);
     }
   });
 
   page.on('pageerror', (err) => {
-    console.log(`   [Pagina:${siteKey}] Erro nao capturado: ${err.message}`);
+    const msg = err.message;
+    if (SILENCIAR_PAGINA.some(p => msg.includes(p))) return;
+    console.log(`   [Pagina:${siteKey}] Erro nao capturado: ${msg}`);
   });
 
   if (site.precisaHomePrimeiro) {

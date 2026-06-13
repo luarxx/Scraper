@@ -167,6 +167,14 @@ function shuffle<T>(items: T[]): T[] {
   return copy;
 }
 
+const PERFIS_HARDWARE = [
+  { hardwareConcurrency: 4,  deviceMemory: 4 },
+  { hardwareConcurrency: 6,  deviceMemory: 8 },
+  { hardwareConcurrency: 8,  deviceMemory: 8 },
+  { hardwareConcurrency: 12, deviceMemory: 16 },
+  { hardwareConcurrency: 16, deviceMemory: 32 },
+];
+
 export function gerarFingerprint(siteKey: string): Fingerprint {
   let fingerprint: Fingerprint;
   let assinatura: string;
@@ -186,8 +194,7 @@ export function gerarFingerprint(siteKey: string): Fingerprint {
         height: 1080 + randomInt(-100, 100),
       },
       plugins: Math.random() < 0.7 ? [] : shuffle(PLUGIN_POOL).slice(0, 1),
-      hardwareConcurrency: sample([4, 6, 8, 10, 12, 16]),
-      deviceMemory: sample([4, 8]),
+      ...sample(PERFIS_HARDWARE),
       languages: ['pt-BR', 'pt', 'en-US', 'en'],
       platform: perfil.platform,
       webglVendor: perfil.webglVendor,

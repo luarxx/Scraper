@@ -70,10 +70,26 @@ function montarLaunchArgs(): string[] {
   return args;
 }
 
+function chromeChannel(): string | undefined {
+  if (process.env.SCRAPER_VPS !== 'true') return undefined;
+  const chromePaths = [
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser',
+    '/snap/bin/chromium',
+  ];
+  const found = chromePaths.some(p => fs.existsSync(p));
+  if (!found) {
+    console.warn('[Chrome] Nenhum Chrome/Chromium encontrado. Usando Chromium embutido do Playwright.');
+  }
+  return found ? 'chrome' : undefined;
+}
+
 export async function criarBrowserAuto(): Promise<Browser> {
   registrarStealth();
   return chromium.launch({
     headless: HEADLESS,
+    channel: chromeChannel(),
     args: montarLaunchArgs(),
   });
 }
@@ -174,7 +190,7 @@ async function criarPagina(siteKey: string, site: SiteConfig) {
   const fingerprint = gerarFingerprint(siteKey);
   const browser = await chromium.launch({
     headless: HEADLESS,
-    channel: HEADLESS ? 'chromium' : undefined,
+    channel: chromeChannel(),
     args: montarLaunchArgs(),
   });
 

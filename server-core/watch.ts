@@ -4,7 +4,7 @@ import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
 import { brlToCents, centsToBrl } from './money';
 import { salvarPrecos } from './priceHistory';
-import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime } from './time';
+import { dbDatetimeToApi, formatApiDatetime, formatDbDatetime } from './time';
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
 const DISCORD_WEBHOOK_AVATAR_URL = process.env.DISCORD_WEBHOOK_AVATAR_URL || '';
@@ -14,10 +14,34 @@ const configuredWatchIntervalHours = Number(process.env.WATCH_INTERVAL_HOURS);
 export const WATCH_INTERVAL_HOURS = Number.isFinite(configuredWatchIntervalHours)
   ? Math.max(MIN_WATCH_INTERVAL_HOURS, Math.floor(configuredWatchIntervalHours))
   : DEFAULT_WATCH_INTERVAL_HOURS;
-const WATCH_INTERVALO_MS = WATCH_INTERVAL_HOURS * 60 * 60 * 1000;
+
+const configuredWatchJitterHours = Number(process.env.WATCH_INTERVAL_JITTER_HOURS);
+export const WATCH_INTERVAL_JITTER_HOURS = Number.isFinite(configuredWatchJitterHours)
+  ? Math.max(0, Math.floor(configuredWatchJitterHours))
+  : 6;
+
 let watchStatus: 'idle' | 'executando' | 'agendado' = 'idle';
 let proximaWatchExecucao: string | null = null;
-let watchTimer: ReturnType<typeof setInterval> | null = null;
+let watchTimer: ReturnType<typeof setTimeout> | null = null;
+
+function sortearIntervaloWatchMs(): number {
+  const baseMs = WATCH_INTERVAL_HOURS * 60 * 60 * 1000;
+  if (WATCH_INTERVAL_JITTER_HOURS <= 0) return baseMs;
+  const extraHours = Math.floor(Math.random() * (WATCH_INTERVAL_JITTER_HOURS + 1));
+  return baseMs + extraHours * 60 * 60 * 1000;
+}
+
+function agendarProximaWatch(): void {
+  const delayMs = sortearIntervaloWatchMs();
+  const next = new Date(Date.now() + delayMs);
+  proximaWatchExecucao = formatApiDatetime(next);
+  watchStatus = 'agendado';
+
+  watchTimer = setTimeout(async () => {
+    await executarWatchAlerts();
+    agendarProximaWatch();
+  }, delayMs);
+}
 
 export type WatchAlertRow = {
   id: number;
@@ -134,10 +158,6 @@ export function normalizarWatchAlert(row: WatchAlertRow) {
   };
 }
 
-function calcularProximoWatchHorario(): Date {
-  return calcularProximoHorarioIntervalo(WATCH_INTERVAL_HOURS);
-}
-
 export async function executarWatchAlerts(): Promise<void> {
   if (watchStatus === 'executando') return;
   watchStatus = 'executando';
@@ -151,7 +171,6 @@ export async function executarWatchAlerts(): Promise<void> {
 
   if (alertasFiltrados.length === 0) {
     watchStatus = 'agendado';
-    proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
     return;
   }
 
@@ -353,19 +372,10 @@ export async function executarWatchAlerts(): Promise<void> {
 
   console.log(`[Watch] Verificação concluída — ${alertasFiltrados.length} alerta(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)${resolvidosPorAuto > 0 ? `, ${resolvidosPorAuto} resolvido(s) via Busca Automática` : ''}`);
   watchStatus = 'agendado';
-  proximaWatchExecucao = formatApiDatetime(calcularProximoWatchHorario());
 }
 
 export function iniciarWatchScheduler(): void {
-  const next = calcularProximoWatchHorario();
-  const delay = Math.max(0, next.getTime() - Date.now());
-  proximaWatchExecucao = formatApiDatetime(next);
-  if (watchStatus === 'idle') watchStatus = 'agendado';
-
-  setTimeout(() => {
-    executarWatchAlerts();
-    watchTimer = setInterval(executarWatchAlerts, WATCH_INTERVALO_MS);
-  }, delay);
+  agendarProximaWatch();
 }
 
 export function getWatchStatus(): {

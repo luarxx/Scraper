@@ -4,7 +4,7 @@ import { isSiteEnabled } from './enabledSites';
 import { AUTO_DISABLED } from './env';
 import { registrarMetricaBusca } from './metrics';
 import { salvarPrecos } from './priceHistory';
-import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime, parseLocalDatetime } from './time';
+import { dbDatetimeToApi, formatApiDatetime, formatDbDatetime, parseLocalDatetime } from './time';
 
 const MIN_AUTO_INTERVAL_HOURS = 3;
 const DEFAULT_AUTO_INTERVAL_HOURS = 6;
@@ -17,14 +17,20 @@ export { AUTO_DISABLED } from './env';
 export const AUTO_INTERVAL_HOURS = Number.isFinite(configuredIntervalHours)
   ? Math.max(MIN_AUTO_INTERVAL_HOURS, Math.floor(configuredIntervalHours))
   : DEFAULT_AUTO_INTERVAL_HOURS;
+
+const configuredJitterHours = Number(process.env.AUTO_INTERVAL_JITTER_HOURS);
+export const AUTO_INTERVAL_JITTER_HOURS = Number.isFinite(configuredJitterHours)
+  ? Math.max(0, Math.floor(configuredJitterHours))
+  : 6;
+
 const configuredAutoConcurrency = Number(process.env.AUTO_MAX_CONCURRENCY);
 export const AUTO_MAX_CONCURRENCY = Number.isFinite(configuredAutoConcurrency)
   ? Math.min(MAX_AUTO_CONCURRENCY, Math.max(MIN_AUTO_CONCURRENCY, Math.floor(configuredAutoConcurrency)))
   : DEFAULT_AUTO_CONCURRENCY;
-const INTERVALO_MS = AUTO_INTERVAL_HOURS * 60 * 60 * 1000;
+const MIN_INTERVALO_MS = AUTO_INTERVAL_HOURS * 60 * 60 * 1000;
 let schedulerStatus: 'idle' | 'executando' | 'agendado' = 'idle';
 let proximaExecucao: string | null = null;
-let schedulerTimer: ReturnType<typeof setInterval> | null = null;
+let schedulerTimer: ReturnType<typeof setTimeout> | null = null;
 
 type AutoConfig = {
   id: number;
@@ -32,8 +38,28 @@ type AutoConfig = {
   site: string;
 };
 
+function sortearIntervaloMs(): number {
+  const baseMs = AUTO_INTERVAL_HOURS * 60 * 60 * 1000;
+  if (AUTO_INTERVAL_JITTER_HOURS <= 0) return baseMs;
+  const extraHours = Math.floor(Math.random() * (AUTO_INTERVAL_JITTER_HOURS + 1));
+  return baseMs + extraHours * 60 * 60 * 1000;
+}
+
 function calcularProximoHorario(): Date {
-  return calcularProximoHorarioIntervalo(AUTO_INTERVAL_HOURS);
+  return new Date(Date.now() + sortearIntervaloMs());
+}
+
+function agendarProxima(): void {
+  if (AUTO_DISABLED) return;
+  const delayMs = sortearIntervaloMs();
+  const next = new Date(Date.now() + delayMs);
+  proximaExecucao = formatApiDatetime(next);
+  schedulerStatus = 'agendado';
+
+  schedulerTimer = setTimeout(async () => {
+    await executarAutoBuscas();
+    agendarProxima();
+  }, delayMs);
 }
 
 async function executarComConcorrencia<T>(items: T[], limit: number, worker: (item: T) => Promise<void>): Promise<void> {
@@ -162,7 +188,6 @@ export async function executarAutoBuscas(): Promise<void> {
   console.log(`[Busca Automática] Concluída — ${resultados.length} termo(s), ${ok} ok, ${erros} erro(s), ${totalProdutos} produto(s) no total`);
 
   schedulerStatus = 'agendado';
-  proximaExecucao = formatApiDatetime(calcularProximoHorario());
 }
 
 export function iniciarScheduler(): void {
@@ -180,7 +205,7 @@ export function iniciarScheduler(): void {
     const ultimaDate = parseLocalDatetime(ultimaExec.iniciada_em);
     const agora = new Date();
     const diffMs = agora.getTime() - ultimaDate.getTime();
-    if (diffMs >= INTERVALO_MS || ultimaExec.status === 'executando') {
+    if (diffMs >= MIN_INTERVALO_MS || ultimaExec.status === 'executando') {
       deveExecutarImediatamente = true;
     }
   } else {
@@ -191,18 +216,10 @@ export function iniciarScheduler(): void {
   }
 
   if (deveExecutarImediatamente) {
-    executarAutoBuscas();
+    executarAutoBuscas().finally(() => agendarProxima());
+  } else {
+    agendarProxima();
   }
-
-  const next = calcularProximoHorario();
-  const delay = Math.max(0, next.getTime() - Date.now());
-  proximaExecucao = formatApiDatetime(next);
-  if (schedulerStatus === 'idle') schedulerStatus = 'agendado';
-
-  setTimeout(() => {
-    executarAutoBuscas();
-    schedulerTimer = setInterval(executarAutoBuscas, INTERVALO_MS);
-  }, delay);
 }
 
 export function getAutoStatus(): {

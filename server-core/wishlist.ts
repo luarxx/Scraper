@@ -4,7 +4,7 @@ import { isSiteEnabled } from './enabledSites';
 import { registrarMetricaBusca } from './metrics';
 import { brlToCents, centsToBrl } from './money';
 import { salvarPrecos } from './priceHistory';
-import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime } from './time';
+import { dbDatetimeToApi, formatApiDatetime, formatDbDatetime } from './time';
 import { normalizarUrl, carregarCacheAutoResultados } from './watch';
 
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || '';
@@ -15,10 +15,34 @@ const configuredWishlistIntervalHours = Number(process.env.WISHLIST_INTERVAL_HOU
 export const WISHLIST_INTERVAL_HOURS = Number.isFinite(configuredWishlistIntervalHours)
   ? Math.max(MIN_WISHLIST_INTERVAL_HOURS, Math.floor(configuredWishlistIntervalHours))
   : DEFAULT_WISHLIST_INTERVAL_HOURS;
-const WISHLIST_INTERVALO_MS = WISHLIST_INTERVAL_HOURS * 60 * 60 * 1000;
+
+const configuredWishlistJitterHours = Number(process.env.WISHLIST_INTERVAL_JITTER_HOURS);
+export const WISHLIST_INTERVAL_JITTER_HOURS = Number.isFinite(configuredWishlistJitterHours)
+  ? Math.max(0, Math.floor(configuredWishlistJitterHours))
+  : 6;
+
 let wishlistStatus: 'idle' | 'executando' | 'agendado' = 'idle';
 let proximaWishlistExecucao: string | null = null;
-let wishlistTimer: ReturnType<typeof setInterval> | null = null;
+let wishlistTimer: ReturnType<typeof setTimeout> | null = null;
+
+function sortearIntervaloWishlistMs(): number {
+  const baseMs = WISHLIST_INTERVAL_HOURS * 60 * 60 * 1000;
+  if (WISHLIST_INTERVAL_JITTER_HOURS <= 0) return baseMs;
+  const extraHours = Math.floor(Math.random() * (WISHLIST_INTERVAL_JITTER_HOURS + 1));
+  return baseMs + extraHours * 60 * 60 * 1000;
+}
+
+function agendarProximaWishlist(): void {
+  const delayMs = sortearIntervaloWishlistMs();
+  const next = new Date(Date.now() + delayMs);
+  proximaWishlistExecucao = formatApiDatetime(next);
+  wishlistStatus = 'agendado';
+
+  wishlistTimer = setTimeout(async () => {
+    await executarWishlistChecks();
+    agendarProximaWishlist();
+  }, delayMs);
+}
 
 export type WishlistItemRow = {
   id: number;
@@ -140,10 +164,6 @@ export function normalizarWishlistItem(row: WishlistItemRow) {
   };
 }
 
-function calcularProximoWishlistHorario(): Date {
-  return calcularProximoHorarioIntervalo(WISHLIST_INTERVAL_HOURS);
-}
-
 export async function executarWishlistChecks(): Promise<void> {
   if (wishlistStatus === 'executando') return;
   wishlistStatus = 'executando';
@@ -157,7 +177,6 @@ export async function executarWishlistChecks(): Promise<void> {
 
   if (itensFiltrados.length === 0) {
     wishlistStatus = 'agendado';
-    proximaWishlistExecucao = formatApiDatetime(calcularProximoWishlistHorario());
     return;
   }
 
@@ -351,19 +370,10 @@ export async function executarWishlistChecks(): Promise<void> {
 
   console.log(`[Desejos] Verificação concluída — ${itensFiltrados.length} item(s), ${ok} ok, ${disparados} disparado(s), ${erros} erro(s), ${precosVerificados} preço(s) verificado(s)${resolvidosPorAuto > 0 ? `, ${resolvidosPorAuto} resolvido(s) via Busca Automática` : ''}`);
   wishlistStatus = 'agendado';
-  proximaWishlistExecucao = formatApiDatetime(calcularProximoWishlistHorario());
 }
 
 export function iniciarWishlistScheduler(): void {
-  const next = calcularProximoWishlistHorario();
-  const delay = Math.max(0, next.getTime() - Date.now());
-  proximaWishlistExecucao = formatApiDatetime(next);
-  if (wishlistStatus === 'idle') wishlistStatus = 'agendado';
-
-  setTimeout(() => {
-    executarWishlistChecks();
-    wishlistTimer = setInterval(executarWishlistChecks, WISHLIST_INTERVALO_MS);
-  }, delay);
+  agendarProximaWishlist();
 }
 
 export function getWishlistStatus(): {

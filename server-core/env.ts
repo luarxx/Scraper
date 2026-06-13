@@ -40,3 +40,5 @@ export const DISABLED_SITES: string[] = (process.env.DISABLED_SITES || '')
   .split(',')
   .map(s => s.trim().toLowerCase())
   .filter(Boolean);
+
+export const AUTO_DISABLED = process.env.AUTO_DISABLED === 'true' || process.env.AUTO_DISABLED === '1';

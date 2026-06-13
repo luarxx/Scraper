@@ -4,6 +4,7 @@ import { getStatsDashboard, getPeriodStats, getOriginBreakdown, getRecentActivit
 import { getAutoStatus } from '../auto';
 import { getWatchStatus } from '../watch';
 import { getWishlistStatus } from '../wishlist';
+import { AUTO_DISABLED } from '../env';
 import { dbDatetimeToApi } from '../time';
 
 export function handleStatsRoutes(pathname: string, req: IncomingMessage, res: ServerResponse): boolean {
@@ -21,7 +22,7 @@ export function handleStatsRoutes(pathname: string, req: IncomingMessage, res: S
     let watchStatus: Record<string, unknown> = { status: 'idle', ultima_execucao: null, proxima_execucao: null, total_ativos: 0, total_disparados: 0, webhook_configurado: false };
     let wishlistStatus: Record<string, unknown> = { status: 'idle', ultima_execucao: null, proxima_execucao: null, total_ativos: 0, webhook_configurado: false };
 
-    try { autoStatus = getAutoStatus(); } catch {}
+    try { autoStatus = { ...getAutoStatus(), disabled: AUTO_DISABLED }; } catch {}
     try { watchStatus = getWatchStatus(); } catch {}
     try { wishlistStatus = getWishlistStatus(); } catch {}
 

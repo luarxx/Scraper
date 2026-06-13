@@ -1,5 +1,5 @@
 import * as http from 'http';
-import { AUTO_INTERVAL_HOURS, AUTO_MAX_CONCURRENCY, executarAutoBuscas, getAutoStatus, iniciarScheduler } from './server-core/auto';
+import { AUTO_DISABLED, AUTO_INTERVAL_HOURS, AUTO_MAX_CONCURRENCY, executarAutoBuscas, getAutoStatus, iniciarScheduler } from './server-core/auto';
 import { createServer } from './server-core/app';
 import { db, initDatabase } from './server-core/db';
 import { PORT, PORT_AUTO_FALLBACK, PORT_MAX_ATTEMPTS, resolveProjectRoot } from './server-core/env';
@@ -28,7 +28,7 @@ function logStartup(currentPort: number): void {
   console.log(startupLine('◆  Scraper pronto'));
   console.log(startupRule('├', '─', '┤'));
   console.log(startupRow('●', 'Servidor', `http://localhost:${currentPort}`));
-  console.log(startupRow('◷', 'Auto-busca', `a cada ${AUTO_INTERVAL_HOURS}h`));
+  console.log(startupRow('◷', 'Auto-busca', AUTO_DISABLED ? 'desativado' : `a cada ${AUTO_INTERVAL_HOURS}h`));
   console.log(startupRow('◉', 'Watch', `a cada ${WATCH_INTERVAL_HOURS}h`));
   console.log(startupRow('▣', 'Desejos', `a cada ${WISHLIST_INTERVAL_HOURS}h`));
   console.log(startupRule('└', '─', '┘'));
@@ -58,7 +58,7 @@ function startServer(): http.Server {
     process.exitCode = 1;
   });
   server.listen(currentPort, () => {
-    iniciarScheduler();
+    if (!AUTO_DISABLED) iniciarScheduler();
     iniciarWatchScheduler();
     iniciarWishlistScheduler();
     logStartup(currentPort);
@@ -67,6 +67,7 @@ function startServer(): http.Server {
 }
 
 export {
+  AUTO_DISABLED,
   AUTO_INTERVAL_HOURS,
   AUTO_MAX_CONCURRENCY,
   WATCH_INTERVAL_HOURS,

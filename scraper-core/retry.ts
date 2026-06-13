@@ -26,6 +26,7 @@ export interface RetryOptions {
   maxAttemptsTransient?: number;
   maxAttemptsChallenge?: number;
   baseDelayMs?: number;
+  baseDelayChallengeMs?: number;
   jitterRatio?: number;
   random?: () => number;
   sleep?: (ms: number) => Promise<void>;
@@ -110,6 +111,7 @@ export async function executarComRetry<T>(
   const maxAttemptsTransient = options.maxAttemptsTransient ?? 3;
   const maxAttemptsChallenge = options.maxAttemptsChallenge ?? 2;
   const baseDelayMs = options.baseDelayMs ?? 500;
+  const baseDelayChallengeMs = options.baseDelayChallengeMs ?? 5000;
   const jitterRatio = options.jitterRatio ?? 0.35;
   const random = options.random ?? Math.random;
   const sleep = options.sleep ?? defaultSleep;
@@ -129,7 +131,10 @@ export async function executarComRetry<T>(
         throw classification.error;
       }
 
-      const backoffMs = calcularBackoffMs(attempt, baseDelayMs, jitterRatio, random);
+      const effectiveBaseDelay = classification.kind === 'challenge'
+        ? baseDelayChallengeMs
+        : baseDelayMs;
+      const backoffMs = calcularBackoffMs(attempt, effectiveBaseDelay, jitterRatio, random);
       const delayMs = classification.retryAfterMs ? Math.max(backoffMs, classification.retryAfterMs) : backoffMs;
       options.onRetry?.({
         attempt,

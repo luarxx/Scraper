@@ -45,6 +45,11 @@ function createPageMock(options: SetupOptions): Record<string, unknown> {
     screenshot: vi.fn(async () => undefined),
     title: vi.fn(async () => 'Página de busca'),
     evaluate: vi.fn(async () => options.evaluateProducts ?? []),
+    mouse: {
+      wheel: vi.fn(async () => undefined),
+      move: vi.fn(async () => undefined),
+      click: vi.fn(async () => undefined),
+    },
     request: {
       get: vi.fn(async () => ({
         ok: () => (options.apiStatus ?? 200) >= 200 && (options.apiStatus ?? 200) < 300,
@@ -252,7 +257,7 @@ describe('search runtime', () => {
     expect(fs.existsSync(path.join(sessionDir, 'kabum.json'))).toBe(false);
   });
 
-  it('não salva storageState quando challenge persiste após retries', async () => {
+  it('não salva storageState quando challenge persiste após retries', { timeout: 20000 }, async () => {
     const { mod, runtimes, sessionDir, launchMock } = await setupSearchModule({ challenge: true });
 
     await expect(mod.buscarProdutoPorUrl('kabum', 'https://www.kabum.com.br/produto/1/ssd'))

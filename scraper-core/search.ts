@@ -42,9 +42,13 @@ const ARGS_OPCIONAIS = [
   '--disable-sync',
 ];
 
+const ARGS_DISABLE_FEATURES = [
+  '--disable-features=OptimizationGuideModelDownloading,OptimizationHintsFetching,OptimizationTargetPrediction,TranslateUI,MediaRouter,DialMediaRouteProvider',
+];
+
 function montarLaunchArgs(): string[] {
   const isVps = process.env.SCRAPER_VPS === 'true';
-  const args = [...ARGS_ESSENCIAIS];
+  const args = [...ARGS_ESSENCIAIS, ...ARGS_DISABLE_FEATURES];
 
   if (isVps) {
     args.push(...ARGS_VPS);
@@ -238,11 +242,17 @@ async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: s
     );
   }
 
+  const temChallengeInicial = await detectarChallenge(page);
+  console.log(`  → Challenge detectado (inicial): ${temChallengeInicial}`);
+  if (temChallengeInicial) {
+    await verificarChallenge(page, 'busca');
+  }
+
   await randomWait(2000, 4000);
   await comportamentoHumano(page, viewport);
 
   const temChallenge = await detectarChallenge(page);
-  console.log(`  → Challenge detectado: ${temChallenge}`);
+  console.log(`  → Challenge detectado (pós-interação): ${temChallenge}`);
   await verificarChallenge(page, 'busca');
 
   const cardSelector = site.selectors.productCard;
@@ -331,15 +341,16 @@ export async function buscarProdutoNaPagina(
     console.log(`  → Home carregada: "${tituloHome}"`);
 
     if (/just a moment|um momento/i.test(tituloHome)) {
-      console.log('  → Desafio Cloudflare detectado, aguardando resolução (15s)...');
+      console.log('  → Desafio Cloudflare detectado, aguardando resolução (30s)...');
       try {
         await page.waitForFunction(() => {
           const t = document.title || '';
           return !/just a moment|um momento/i.test(t);
-        }, { timeout: 15000 });
+        }, { timeout: 30000 });
         console.log(`  → Desafio resolvido, título: "${await page.title()}"`);
       } catch {
         console.log('  → Desafio Cloudflare não resolvido dentro do tempo limite');
+        throw new ScraperChallengeError('Desafio Cloudflare na home page não resolvido dentro do tempo limite.');
       }
     }
 

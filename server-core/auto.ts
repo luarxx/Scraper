@@ -50,10 +50,6 @@ async function executarComConcorrencia<T>(items: T[], limit: number, worker: (it
 }
 
 export async function executarAutoBuscas(): Promise<void> {
-  if (AUTO_DISABLED) {
-    console.log('[Busca Automática] Desativada via AUTO_DISABLED');
-    return;
-  }
   if (schedulerStatus === 'executando') return;
   schedulerStatus = 'executando';
   proximaExecucao = null;

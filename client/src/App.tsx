@@ -14,6 +14,7 @@ import { StatsDashboardPanel } from './components/StatsDashboardPanel';
 import { WishlistPanel } from './components/WishlistPanel';
 import { Icon } from './components/Icon';
 import { Logo } from './components/Logo';
+import { DomInspector } from './components/DomInspector';
 import type { Produto, WatchDraft, WishlistItem } from './types';
 import { formatBrazilDateTime } from './utils/date';
 import { parseBrlPrice } from './utils/price';
@@ -339,6 +340,7 @@ export default function App() {
           )}
         </>
       )}
+      <DomInspector />
     </div>
   );
 }

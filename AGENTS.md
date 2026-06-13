@@ -97,6 +97,11 @@ Para Auto Search:
 - Regra: Auto Search salva resultados e historico, mas nao envia Discord.
 - Leia `Docs/features/auto-search.md` se a tarefa envolver Auto.
 
+Para DOM Inspector:
+- Frontend: `DomInspector`, renderizado em `App.tsx`.
+- Ferramenta dev frontend pura, sem backend.
+- Leia `Docs/features/dom-inspector.md` se precisar de mais contexto.
+
 Para Watch Alerts:
 - Backend: `server-core/watch.ts`, rotas `/api/watch/*`, `buscarProdutoPorUrl`.
 - Frontend: `WatchPanel`, `useWatchAlerts`, botao "Criar alerta" em `ProductCard`.

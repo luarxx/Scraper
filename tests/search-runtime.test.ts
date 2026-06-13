@@ -40,7 +40,9 @@ function createPageMock(options: SetupOptions): Record<string, unknown> {
     on: vi.fn(),
     addInitScript: vi.fn(async () => undefined),
     goto: vi.fn(async () => undefined),
-    waitForFunction: vi.fn(async () => undefined),
+    waitForFunction: vi.fn(async () => {
+      if (options.challenge) throw new Error('timeout');
+    }),
     waitForSelector: vi.fn(async () => undefined),
     screenshot: vi.fn(async () => undefined),
     title: vi.fn(async () => 'Página de busca'),
@@ -261,7 +263,7 @@ describe('search runtime', () => {
     const { mod, runtimes, sessionDir, launchMock } = await setupSearchModule({ challenge: true });
 
     await expect(mod.buscarProdutoPorUrl('kabum', 'https://www.kabum.com.br/produto/1/ssd'))
-      .rejects.toThrow('desafio de segurança');
+      .rejects.toThrow(/desafio de segurança/i);
 
     expect(launchMock).toHaveBeenCalledTimes(2);
     expect(runtimes.every((runtime) => runtime.context.storageState.mock.calls.length === 0)).toBe(true);

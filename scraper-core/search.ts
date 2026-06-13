@@ -42,13 +42,9 @@ const ARGS_OPCIONAIS = [
   '--disable-sync',
 ];
 
-const ARGS_DISABLE_FEATURES = [
-  '--disable-features=OptimizationGuideModelDownloading,OptimizationHintsFetching,OptimizationTargetPrediction,TranslateUI,MediaRouter,DialMediaRouteProvider',
-];
-
 function montarLaunchArgs(): string[] {
   const isVps = process.env.SCRAPER_VPS === 'true';
-  const args = [...ARGS_ESSENCIAIS, ...ARGS_DISABLE_FEATURES];
+  const args = [...ARGS_ESSENCIAIS];
 
   if (isVps) {
     args.push(...ARGS_VPS);
@@ -130,7 +126,27 @@ async function verificarChallenge(page: Page, contexto: 'busca' | 'produto'): Pr
   if (!isChallenge) return;
 
   if (HEADLESS) {
-    throw new ScraperChallengeError('O site ativou um desafio de segurança.');
+    console.log(`  → Desafio detectado (${contexto}), aguardando resolução (15s)...`);
+    try {
+      await page.waitForFunction(() => {
+        const body = (document.body?.innerHTML || '').trim();
+        const title = document.title || '';
+        const hasChallenge = /just a moment|um momento/i.test(title)
+          || title.includes('Azion')
+          || (body.length > 0 && body.length < 10000 && (
+            body.includes('verificação de segurança') || body.includes('Enable JavaScript')
+          ))
+          || !!document.getElementById('challenge-form')
+          || !!document.querySelector('.cf-browser-verification, .cf-challenge, [data-translate="verify"]')
+          || !!document.querySelector('iframe[src*="challenges.cloudflare.com"]');
+        const hasContent = document.body?.innerText?.trim().length;
+        return !hasChallenge && Boolean(hasContent);
+      }, { timeout: 15000 });
+      console.log(`  → Challenge resolvido (${contexto})`);
+      return;
+    } catch {
+      throw new ScraperChallengeError(`Desafio de segurança não resolvido na ${contexto}.`);
+    }
   }
 
   console.log('🔓 Resolva o captcha na janela aberta...');
@@ -349,8 +365,24 @@ export async function buscarProdutoNaPagina(
         }, { timeout: 30000 });
         console.log(`  → Desafio resolvido, título: "${await page.title()}"`);
       } catch {
-        console.log('  → Desafio Cloudflare não resolvido dentro do tempo limite');
-        throw new ScraperChallengeError('Desafio Cloudflare na home page não resolvido dentro do tempo limite.');
+        console.log('  → Desafio Cloudflare não resolvido dentro do tempo limite, recarregando...');
+        try {
+          await page.reload({ waitUntil: 'domcontentloaded', timeout: TIMEOUT });
+          const tituloReload = await page.title();
+          if (/just a moment|um momento/i.test(tituloReload)) {
+            await page.waitForFunction(() => {
+              const t = document.title || '';
+              return !/just a moment|um momento/i.test(t);
+            }, { timeout: 30000 }).catch(() => undefined);
+          }
+          const tituloFinal = await page.title();
+          if (/just a moment|um momento/i.test(tituloFinal)) {
+            throw new ScraperChallengeError('Desafio Cloudflare na home page não resolvido dentro do tempo limite.');
+          }
+          console.log(`  → Desafio resolvido no reload, título: "${tituloFinal}"`);
+        } catch (err) {
+          throw err instanceof ScraperChallengeError ? err : new ScraperChallengeError('Desafio Cloudflare na home page não resolvido dentro do tempo limite.');
+        }
       }
     }
 

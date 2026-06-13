@@ -58,13 +58,13 @@ Apos navegacao, o scraper simula comportamento humano com variabilidade probabil
 
 ## Cloudflare Challenge Handling
 
-Ao navegar para home de sites com `precisaHomePrimeiro`, se o titulo da pagina contiver "Just a moment" ou "Um momento", o scraper aguarda ate 15s pela resolucao automatica do desafio (polling do titulo). Se o desafio resolver, a navegacao prossegue normalmente. Senao, `verificarChallenge()` lanca `ScraperChallengeError` e ativa o sistema de retry.
+Ao navegar para home de sites com `precisaHomePrimeiro`, se o titulo da pagina contiver "Just a moment" ou "Um momento", o scraper aguarda ate 30s pela resolucao automatica do desafio (polling do titulo). Se resolver, prossegue. Se nao, tenta um reload da pagina com nova espera de 30s. Apos falhar no reload, lanca `ScraperChallengeError` e ativa o sistema de retry.
 
 ## Headless vs Non-Headless
 
-- Em modo headless, challenge detectado vira erro retryable e nao salva sessao.
-- Em modo nao-headless, aguarda resolucao manual.
-- Timeout de resolucao manual: 60s.
+- Em modo headless, ao detectar challenge, o scraper aguarda ate 15s pela resolucao antes de lancar `ScraperChallengeError`.
+- Em modo nao-headless, aguarda resolucao manual por ate 60s.
+- Challenge resolvido em headless tambem salva sessao normalmente.
 
 ## Browser Launch Args
 

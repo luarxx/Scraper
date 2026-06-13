@@ -1,6 +1,7 @@
 import { buscarProdutoNoBrowser, criarBrowserAuto } from '../scraper';
 import { db } from './db';
 import { isSiteEnabled } from './enabledSites';
+import { AUTO_DISABLED } from './env';
 import { registrarMetricaBusca } from './metrics';
 import { salvarPrecos } from './priceHistory';
 import { calcularProximoHorarioIntervalo, dbDatetimeToApi, formatApiDatetime, formatDbDatetime, parseLocalDatetime } from './time';
@@ -11,6 +12,8 @@ const MIN_AUTO_CONCURRENCY = 1;
 const MAX_AUTO_CONCURRENCY = 10;
 const DEFAULT_AUTO_CONCURRENCY = 3;
 const configuredIntervalHours = Number(process.env.AUTO_INTERVAL_HOURS);
+export { AUTO_DISABLED } from './env';
+
 export const AUTO_INTERVAL_HOURS = Number.isFinite(configuredIntervalHours)
   ? Math.max(MIN_AUTO_INTERVAL_HOURS, Math.floor(configuredIntervalHours))
   : DEFAULT_AUTO_INTERVAL_HOURS;
@@ -47,6 +50,10 @@ async function executarComConcorrencia<T>(items: T[], limit: number, worker: (it
 }
 
 export async function executarAutoBuscas(): Promise<void> {
+  if (AUTO_DISABLED) {
+    console.log('[Busca Automática] Desativada via AUTO_DISABLED');
+    return;
+  }
   if (schedulerStatus === 'executando') return;
   schedulerStatus = 'executando';
   proximaExecucao = null;
@@ -163,6 +170,10 @@ export async function executarAutoBuscas(): Promise<void> {
 }
 
 export function iniciarScheduler(): void {
+  if (AUTO_DISABLED) {
+    console.log('[Busca Automática] Scheduler não iniciado — AUTO_DISABLED ativo');
+    return;
+  }
   const ultimaExec = db.prepare(
     `SELECT iniciada_em, status FROM auto_execucoes ORDER BY id DESC LIMIT 1`
   ).get() as { iniciada_em: string; status: string } | undefined;

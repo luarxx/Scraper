@@ -178,91 +178,75 @@ export async function executarWatchAlerts(): Promise<void> {
     if (produtoCached) {
       const cachedPriceCents = brlToCents(produtoCached.price);
 
-      if (cachedPriceCents !== null && cachedPriceCents === alerta.ultimo_preco_cents) {
-        console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — cache com mesmo preço, forçando scrape real`);
-      } else {
-        resolvidosPorAuto++;
-        const produto = { ...produtoCached, site: alerta.site, siteNome: siteNome(alerta.site), timestamp: new Date().toISOString() };
-        console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — resolvido via Busca Automática, preço ${produto.price || 'N/D'}`);
-        const precoCents = cachedPriceCents;
-        salvarPrecos([produto], alerta.site);
+      if (cachedPriceCents !== null) {
+        if (cachedPriceCents === alerta.ultimo_preco_cents) {
+          console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — cache com mesmo preço, forçando scrape real`);
+        } else {
+          resolvidosPorAuto++;
+          const produto = { ...produtoCached, site: alerta.site, siteNome: siteNome(alerta.site), timestamp: new Date().toISOString() };
+          console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — resolvido via Busca Automática, preço ${produto.price || 'N/D'}`);
+          const precoCents = cachedPriceCents;
+          salvarPrecos([produto], alerta.site);
 
-        if (precoCents === null) {
-          const erro = 'Preço atual não identificado';
-          insertCheck.run(alerta.id, checkedAt, 'erro', null, produto.price, erro, 0);
-          registrarMetricaBusca({
-            origem: 'watch',
-            site: alerta.site,
-            termo: alerta.nome,
-            url: alerta.url,
-            status: 'erro',
-            total: 0,
-            duracaoMs: Date.now() - startedAt,
-            erro,
-          });
-          erros++;
-          db.prepare(
-            `UPDATE watch_alerts SET ultimo_check_em = ?, erro = ?, atualizado_em = ? WHERE id = ?`
-          ).run(checkedAt, erro, checkedAt, alerta.id);
+          precosVerificados++;
+
+          if (precoCents <= alerta.preco_alvo_cents) {
+            const notified = await enviarWatchDiscord(alerta, precoCents, produto.price || centsToBrl(precoCents), produto.parcelamento);
+            const erro = notified ? null : 'Falha ao enviar notificação Discord';
+            insertCheck.run(alerta.id, checkedAt, notified ? 'disparado' : 'erro', precoCents, produto.price, erro, notified ? 1 : 0);
+            registrarMetricaBusca({
+              origem: 'watch',
+              site: alerta.site,
+              termo: alerta.nome,
+              url: alerta.url,
+              status: notified ? 'ok' : 'erro',
+              total: 1,
+              duracaoMs: Date.now() - startedAt,
+              erro,
+            });
+            if (notified) {
+              disparados++;
+            } else {
+              erros++;
+            }
+            db.prepare(
+              `UPDATE watch_alerts
+               SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, status = ?, ativo = ?, disparado_em = ?, erro = ?, atualizado_em = ?
+               WHERE id = ?`
+            ).run(
+              precoCents,
+              produto.price,
+              produto.parcelamento,
+              checkedAt,
+              notified ? 'disparado' : 'ativo',
+              notified ? 0 : 1,
+              notified ? checkedAt : null,
+              erro,
+              checkedAt,
+              alerta.id,
+            );
+          } else {
+            insertCheck.run(alerta.id, checkedAt, 'ok', precoCents, produto.price, null, 0);
+            registrarMetricaBusca({
+              origem: 'watch',
+              site: alerta.site,
+              termo: alerta.nome,
+              url: alerta.url,
+              status: 'ok',
+              total: 1,
+              duracaoMs: Date.now() - startedAt,
+            });
+            ok++;
+            db.prepare(
+              `UPDATE watch_alerts
+               SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, erro = NULL, atualizado_em = ?
+               WHERE id = ?`
+            ).run(precoCents, produto.price, produto.parcelamento, checkedAt, checkedAt, alerta.id);
+          }
           continue;
         }
-
-        precosVerificados++;
-
-        if (precoCents <= alerta.preco_alvo_cents) {
-          const notified = await enviarWatchDiscord(alerta, precoCents, produto.price || centsToBrl(precoCents), produto.parcelamento);
-          const erro = notified ? null : 'Falha ao enviar notificação Discord';
-          insertCheck.run(alerta.id, checkedAt, notified ? 'disparado' : 'erro', precoCents, produto.price, erro, notified ? 1 : 0);
-          registrarMetricaBusca({
-            origem: 'watch',
-            site: alerta.site,
-            termo: alerta.nome,
-            url: alerta.url,
-            status: notified ? 'ok' : 'erro',
-            total: 1,
-            duracaoMs: Date.now() - startedAt,
-            erro,
-          });
-          if (notified) {
-            disparados++;
-          } else {
-            erros++;
-          }
-          db.prepare(
-            `UPDATE watch_alerts
-             SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, status = ?, ativo = ?, disparado_em = ?, erro = ?, atualizado_em = ?
-             WHERE id = ?`
-          ).run(
-            precoCents,
-            produto.price,
-            produto.parcelamento,
-            checkedAt,
-            notified ? 'disparado' : 'ativo',
-            notified ? 0 : 1,
-            notified ? checkedAt : null,
-            erro,
-            checkedAt,
-            alerta.id,
-          );
-        } else {
-          insertCheck.run(alerta.id, checkedAt, 'ok', precoCents, produto.price, null, 0);
-          registrarMetricaBusca({
-            origem: 'watch',
-            site: alerta.site,
-            termo: alerta.nome,
-            url: alerta.url,
-            status: 'ok',
-            total: 1,
-            duracaoMs: Date.now() - startedAt,
-          });
-          ok++;
-          db.prepare(
-            `UPDATE watch_alerts
-             SET ultimo_preco_cents = ?, ultimo_preco_text = ?, ultimo_parcelamento = ?, ultimo_check_em = ?, erro = NULL, atualizado_em = ?
-             WHERE id = ?`
-          ).run(precoCents, produto.price, produto.parcelamento, checkedAt, checkedAt, alerta.id);
-        }
-        continue;
+      } else {
+        console.log(`[Watch] Alerta "${alerta.nome}" em ${siteNome(alerta.site)} — cache sem preço, buscando direto`);
       }
     }
 

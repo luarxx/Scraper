@@ -2,9 +2,15 @@ import type { IncomingMessage, ServerResponse } from 'http';
 import { SITES } from '../../scraper';
 import { executarAutoBuscas, getAutoStatus, isAutoRunning } from '../auto';
 import { db } from '../db';
+import { AUTO_DISABLED } from '../env';
 import { sendJson } from '../http';
 import { dbDatetimeToApi } from '../time';
 import { getEnabledSiteKeys, isSiteEnabled } from '../enabledSites';
+
+function autoDesativado(res: ServerResponse): boolean {
+  sendJson(res, 503, { erro: true, mensagem: 'Auto Search está desativado (AUTO_DISABLED)' });
+  return true;
+}
 
 export function handleAutoRoutes(pathname: string, req: IncomingMessage, res: ServerResponse): boolean {
   if (pathname === '/api/auto/config' && req.method === 'GET') {
@@ -12,6 +18,8 @@ export function handleAutoRoutes(pathname: string, req: IncomingMessage, res: Se
     sendJson(res, 200, configs);
     return true;
   }
+
+  if (AUTO_DISABLED && req.method !== 'GET') return autoDesativado(res);
 
   if (pathname === '/api/auto/config' && req.method === 'POST') {
     let body = '';

@@ -9,8 +9,8 @@ O scraper usa mitigacoes de anti-deteccao para reduzir bloqueios em e-commerces.
 - User-Agent de Chrome desktop real/recente.
 - Plataformas cobertas: Windows, Linux e macOS.
 - Viewport aproximada: `1920 +/- 200` por `1080 +/- 100`.
-- Locale: `pt-BR`.
-- Timezone: `America/Sao_Paulo`.
+- Locale: 80% das sessoes usam `pt-BR`; 20% variam para `pt` ou `en-US`.
+- Timezone: 80% das sessoes usam `America/Sao_Paulo`; 20% variam para `America/Recife` ou `America/Manaus`.
 
 ## Session Reuse
 
@@ -35,13 +35,17 @@ O scraper usa mitigacoes de anti-deteccao para reduzir bloqueios em e-commerces.
 
 ## Browser Behavior
 
-Apos navegacao, o scraper simula comportamento humano:
+Apos navegacao, o scraper simula comportamento humano com variabilidade probabilistica:
 
-- movimento gradual de mouse;
-- scroll via `page.mouse.wheel()`;
-- 3 a 5 passos de scroll;
-- passos de 200 a 400px;
-- pausas aleatorias entre acoes.
+- **Mouse move**: 80% de chance de executar; 40% dos movimentos sao irregulares (mais passos, jitter maior, hesitacoes e overshoot).
+- **Scroll probabilistico** via `page.mouse.wheel()`:
+  - 15%: nenhum scroll.
+  - 20%: scroll leve (1-2 passos de 100-200px).
+  - 45%: scroll normal (2-4 passos de 200-500px).
+  - 20%: scroll pesado (1-3 passos de 800-2000px).
+- **Pausas de leitura** (`idleLongo`): 25% de chance antes do mouse, entre mouse e scroll, e apos scroll reverso; duracao de 2-8s.
+- **Scroll reverso**: 50% de chance (antes 65%); pode incluir segundo ajuste de 30%.
+- Pausas aleatorias entre cada acao.
 
 ## Challenge Detection
 

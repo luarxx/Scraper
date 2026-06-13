@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-export const HEADLESS = true;
+export const HEADLESS: boolean = process.env.SCRAPER_HEADLESS !== 'false';
 export const TIMEOUT = 30000;
 export const CACHE_TTL = 10 * 60 * 1000;
 export const ROOT = path.resolve(__dirname, '..');

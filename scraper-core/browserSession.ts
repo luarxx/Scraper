@@ -48,8 +48,8 @@ export async function criarContextoComSessao(
   const contextOptions: Parameters<Browser['newContext']>[0] = {
     userAgent: fingerprint.userAgent,
     viewport: fingerprint.viewport,
-    locale: 'pt-BR',
-    timezoneId: 'America/Sao_Paulo',
+    locale: fingerprint.locale,
+    timezoneId: fingerprint.timezoneId,
     ...(storageState ? { storageState } : {}),
   };
 

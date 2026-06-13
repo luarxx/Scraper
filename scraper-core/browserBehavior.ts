@@ -113,6 +113,9 @@ export function detectarChallenge(page: Page): Promise<boolean> {
     if (title.includes('Azion')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('verificação de segurança')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('Enable JavaScript')) return true;
+    if (document.getElementById('challenge-form')) return true;
+    if (document.querySelector('.cf-browser-verification, .cf-challenge, [data-translate="verify"]')) return true;
+    if (document.querySelector('iframe[src*="challenges.cloudflare.com"]')) return true;
     return false;
   })()`);
 }

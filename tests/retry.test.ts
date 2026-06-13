@@ -31,6 +31,7 @@ describe('retry helper', () => {
 
     await expect(executarComRetry(action, {
       baseDelayMs: 100,
+      baseDelayChallengeMs: 100,
       jitterRatio: 0,
       sleep: async (ms) => { delays.push(ms); },
     })).rejects.toThrow('captcha ativo');

@@ -19,7 +19,7 @@ export function handleAutoRoutes(pathname: string, req: IncomingMessage, res: Se
     return true;
   }
 
-  if (AUTO_DISABLED && req.method !== 'GET') return autoDesativado(res);
+  if (AUTO_DISABLED && req.method !== 'GET' && pathname !== '/api/auto/run') return autoDesativado(res);
 
   if (pathname === '/api/auto/config' && req.method === 'POST') {
     let body = '';

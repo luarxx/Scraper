@@ -1,6 +1,7 @@
 export function brlToCents(price: string | null): number | null {
   if (!price) return null;
-  let s = price.replace(/R\$\s*/i, '').trim();
+  const normalized = price.replace(/\u00a0/g, ' ');
+  let s = normalized.replace(/R\$\s*/i, '').trim();
   const lastDot = s.lastIndexOf('.');
   const lastComma = s.lastIndexOf(',');
   if (lastComma > lastDot) {

@@ -494,7 +494,7 @@ async function buscarProdutoPorUrlUmaVez(siteKey: string, produtoUrl: string, no
     const textoVisivel = await page.locator('body').innerText({ timeout: 5000 }).catch(() => '');
     const produto = extrairProdutoPorUrlHtml(siteKey, html, page.url(), nomeFallback, textoVisivel);
 
-    if (!produto.title || !produto.price) {
+    if (!produto.title || !produto.price || !/R\$\s*\d{1,3}(?:\.\d{3})*,\d{2}/.test(produto.price)) {
       throw new ScraperParseError('Não foi possível identificar o preço atual na página do produto.');
     }
 

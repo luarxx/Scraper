@@ -3,7 +3,7 @@ import type { AnyNode } from 'domhandler';
 import type { Produto } from './types';
 
 function cleanText(value: string | null | undefined): string {
-  return (value || '').replace(/\s+/g, ' ').trim();
+  return (value || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function normalizarTextoComparacao(value: string): string {

@@ -103,6 +103,7 @@ afterEach(() => {
   delete process.env.WISHLIST_INTERVAL_HOURS;
   delete process.env.DISCORD_WEBHOOK_URL;
   delete process.env.DISABLED_SITES;
+  delete process.env.AUTO_BETWEEN_DELAY_MS;
   vi.doUnmock('../scraper');
 });
 
@@ -635,6 +636,7 @@ describe('watch scheduler rules', () => {
   });
 
   it('executa busca automática com concorrência por grupo de site', async () => {
+    process.env.AUTO_BETWEEN_DELAY_MS = '0';
     const mod = await importServer({ autoConcurrency: '2' });
     const started: string[] = [];
     const resolvers = new Map<string, () => void>();

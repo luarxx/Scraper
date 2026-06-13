@@ -121,7 +121,8 @@ export async function executarAutoBuscas(): Promise<void> {
   await executarComConcorrencia(gruposArray, AUTO_MAX_CONCURRENCY, async ([_site, configs]) => {
     const browser = await criarBrowserAuto();
     try {
-      for (const config of configs) {
+      for (let i = 0; i < configs.length; i++) {
+        const config = configs[i];
         const startedAt = Date.now();
         try {
           const data = await buscarProdutoNoBrowser(config.site, config.termo, browser);
@@ -166,6 +167,16 @@ export async function executarAutoBuscas(): Promise<void> {
             duracaoMs: Date.now() - startedAt,
             erro: error.message,
           });
+        }
+        if (i < configs.length - 1) {
+          const configuredDelay = Number(process.env.AUTO_BETWEEN_DELAY_MS);
+          const delayMs = Number.isFinite(configuredDelay) && configuredDelay >= 0
+            ? configuredDelay
+            : 5000 + Math.floor(Math.random() * 25001);
+          if (delayMs > 0) {
+            console.log(`[Busca Automática] Aguardando ${Math.round(delayMs / 1000)}s antes da próxima busca em ${config.site}...`);
+            await new Promise(r => setTimeout(r, delayMs));
+          }
         }
       }
     } finally {

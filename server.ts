@@ -1,12 +1,12 @@
 import * as http from 'http';
-import { AUTO_DISABLED, AUTO_INTERVAL_HOURS, AUTO_MAX_CONCURRENCY, executarAutoBuscas, getAutoStatus, iniciarScheduler } from './server-core/auto';
+import { AUTO_DISABLED, AUTO_INTERVAL_HOURS, AUTO_INTERVAL_JITTER_HOURS, AUTO_MAX_CONCURRENCY, executarAutoBuscas, getAutoStatus, iniciarScheduler } from './server-core/auto';
 import { createServer } from './server-core/app';
 import { db, initDatabase } from './server-core/db';
 import { PORT, PORT_AUTO_FALLBACK, PORT_MAX_ATTEMPTS, resolveProjectRoot } from './server-core/env';
 import { brlToCents, centsToBrl, parseTargetPrice } from './server-core/money';
 import { calcularProximoHorarioIntervalo, formatApiDatetime, formatDbDatetime } from './server-core/time';
-import { WATCH_INTERVAL_HOURS, executarWatchAlerts, getWatchStatus, iniciarWatchScheduler, normalizarWatchAlert } from './server-core/watch';
-import { WISHLIST_INTERVAL_HOURS, executarWishlistChecks, getWishlistStatus, iniciarWishlistScheduler, normalizarWishlistItem } from './server-core/wishlist';
+import { WATCH_INTERVAL_HOURS, WATCH_INTERVAL_JITTER_HOURS, executarWatchAlerts, getWatchStatus, iniciarWatchScheduler, normalizarWatchAlert } from './server-core/watch';
+import { WISHLIST_INTERVAL_HOURS, WISHLIST_INTERVAL_JITTER_HOURS, executarWishlistChecks, getWishlistStatus, iniciarWishlistScheduler, normalizarWishlistItem } from './server-core/wishlist';
 
 const STARTUP_BOX_WIDTH = 46;
 
@@ -28,9 +28,9 @@ function logStartup(currentPort: number): void {
   console.log(startupLine('◆  Scraper pronto'));
   console.log(startupRule('├', '─', '┤'));
   console.log(startupRow('●', 'Servidor', `http://localhost:${currentPort}`));
-  console.log(startupRow('◷', 'Auto-busca', AUTO_DISABLED ? 'desativado' : `a cada ${AUTO_INTERVAL_HOURS}h`));
-  console.log(startupRow('◉', 'Watch', `a cada ${WATCH_INTERVAL_HOURS}h`));
-  console.log(startupRow('▣', 'Desejos', `a cada ${WISHLIST_INTERVAL_HOURS}h`));
+  console.log(startupRow('◷', 'Auto-busca', AUTO_DISABLED ? 'desativado' : `a cada ${AUTO_INTERVAL_HOURS}-${AUTO_INTERVAL_HOURS + AUTO_INTERVAL_JITTER_HOURS}h`));
+  console.log(startupRow('◉', 'Watch', `a cada ${WATCH_INTERVAL_HOURS}-${WATCH_INTERVAL_HOURS + WATCH_INTERVAL_JITTER_HOURS}h`));
+  console.log(startupRow('▣', 'Desejos', `a cada ${WISHLIST_INTERVAL_HOURS}-${WISHLIST_INTERVAL_HOURS + WISHLIST_INTERVAL_JITTER_HOURS}h`));
   console.log(startupRule('└', '─', '┘'));
   console.log('');
 }
@@ -69,8 +69,12 @@ function startServer(): http.Server {
 export {
   AUTO_DISABLED,
   AUTO_INTERVAL_HOURS,
+  AUTO_INTERVAL_JITTER_HOURS,
   AUTO_MAX_CONCURRENCY,
   WATCH_INTERVAL_HOURS,
+  WATCH_INTERVAL_JITTER_HOURS,
+  WISHLIST_INTERVAL_HOURS,
+  WISHLIST_INTERVAL_JITTER_HOURS,
   brlToCents,
   calcularProximoHorarioIntervalo,
   centsToBrl,
@@ -90,7 +94,6 @@ export {
   parseTargetPrice,
   resolveProjectRoot,
   startServer,
-  WISHLIST_INTERVAL_HOURS,
 };
 
 if (require.main === module) {

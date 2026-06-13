@@ -1,9 +1,8 @@
 import { useCallback, useEffect } from 'react';
 import {
-  Activity, AlertCircle, AlertTriangle, ArrowDownRight, ArrowUpRight,
-  BarChart3, Bell, CheckCircle2, Clock, Cpu, ExternalLink, Gauge,
-  Globe, HardDrive, Heart, Info, List, Minus, Package, RefreshCw,
-  Search, Settings, ShieldCheck, Store, XCircle, Zap,
+  Activity, BarChart3, Bell, CheckCircle2, Clock, Cpu, Gauge,
+  Globe, HardDrive, Heart, List, Package, RefreshCw,
+  Search, Settings, ShieldCheck, Store, XCircle,
 } from 'lucide-react';
 import { useStatsDashboard, type PeriodFilter } from '../hooks/useStatsDashboard';
 import type { AtividadeRecenteItem, OriginStats } from '../types';

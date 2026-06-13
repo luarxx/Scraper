@@ -108,3 +108,51 @@ export function getStatsDashboard(): StatsDashboardResponse {
     sites,
   };
 }
+
+function getPeriodCondition(period: string): string {
+  switch (period) {
+    case '24h': return "criado_em >= datetime('now', '-3 hours', '-24 hours')";
+    case '7d': return "criado_em >= datetime('now', '-3 hours', '-7 days')";
+    case '30d': return "criado_em >= datetime('now', '-3 hours', '-30 days')";
+    default: return '1=1';
+  }
+}
+
+export function getPeriodStats(period: string): { total: number; sucessos: number; erros: number; taxa_sucesso: number; tempo_medio_resposta_ms: number | null } {
+  const condition = getPeriodCondition(period);
+  const row = db.prepare(
+    `SELECT COUNT(*) as total, SUM(CASE WHEN status = 'ok' THEN 1 ELSE 0 END) as sucessos, AVG(duracao_ms) as tempo_medio FROM search_metrics WHERE ${condition}`
+  ).get() as { total: number; sucessos: number | null; tempo_medio: number | null };
+  const total = row.total || 0;
+  const sucessos = row.sucessos || 0;
+  return {
+    total, sucessos, erros: total - sucessos,
+    taxa_sucesso: total === 0 ? 0 : Number(((sucessos / total) * 100).toFixed(2)),
+    tempo_medio_resposta_ms: row.tempo_medio ? Math.round(row.tempo_medio) : null,
+  };
+}
+
+export function getOriginBreakdown(period: string): Array<{ origem: string; total: number; sucessos: number; erros: number; taxa_sucesso: number; tempo_medio_resposta_ms: number }> {
+  const condition = getPeriodCondition(period);
+  const rows = db.prepare(
+    `SELECT origem, COUNT(*) as total, SUM(CASE WHEN status = 'ok' THEN 1 ELSE 0 END) as sucessos, AVG(duracao_ms) as tempo_medio FROM search_metrics WHERE ${condition} GROUP BY origem ORDER BY total DESC`
+  ).all() as { origem: string; total: number; sucessos: number | null; tempo_medio: number | null }[];
+  return rows.map(row => {
+    const sucessos = row.sucessos || 0;
+    const total = row.total || 0;
+    return { origem: row.origem, total, sucessos, erros: total - sucessos, taxa_sucesso: total === 0 ? 0 : Number(((sucessos / total) * 100).toFixed(2)), tempo_medio_resposta_ms: Math.round(row.tempo_medio || 0) };
+  });
+}
+
+export function getRecentActivity(limit: number = 10): Array<{ id: number; origem: string; site: string; termo: string | null; status: string; total: number; duracao_ms: number; erro: string | null; criado_em: string }> {
+  return db.prepare(`SELECT id, origem, site, termo, status, total, duracao_ms, erro, criado_em FROM search_metrics ORDER BY criado_em DESC LIMIT ?`).all(limit) as any;
+}
+
+export function getConfigCounts(): { auto_configs: number; watch_alertas_ativos: number; watch_disparados: number; wishlist_itens_ativos: number; total_produtos_rastreados: number; total_price_history_urls: number } {
+  const autoCount = db.prepare("SELECT COUNT(*) as c FROM auto_config WHERE ativo = 1").get() as { c: number };
+  const watchAtivos = db.prepare("SELECT COUNT(*) as c FROM watch_alerts WHERE ativo = 1 AND status = 'ativo'").get() as { c: number };
+  const watchDisparados = db.prepare("SELECT COUNT(*) as c FROM watch_alerts WHERE status = 'disparado'").get() as { c: number };
+  const wishlistCount = db.prepare("SELECT COUNT(*) as c FROM wishlist_items WHERE ativo = 1").get() as { c: number };
+  const historyUrls = db.prepare("SELECT COUNT(DISTINCT url || '|' || site) as c FROM price_history").get() as { c: number };
+  return { auto_configs: autoCount.c, watch_alertas_ativos: watchAtivos.c, watch_disparados: watchDisparados.c, wishlist_itens_ativos: wishlistCount.c, total_produtos_rastreados: watchAtivos.c + wishlistCount.c, total_price_history_urls: historyUrls.c };
+}

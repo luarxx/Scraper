@@ -52,11 +52,29 @@ Apos navegacao, o scraper simula comportamento humano:
 - `verificacao de seguranca`
 - `Enable JavaScript`
 
+## Cloudflare Challenge Handling
+
+Ao navegar para home de sites com `precisaHomePrimeiro`, se o titulo da pagina contiver "Just a moment" ou "Um momento", o scraper aguarda ate 15s pela resolucao automatica do desafio (polling do titulo). Se o desafio resolver, a navegacao prossegue normalmente. Senao, `verificarChallenge()` lanca `ScraperChallengeError` e ativa o sistema de retry.
+
 ## Headless vs Non-Headless
 
 - Em modo headless, challenge detectado vira erro retryable e nao salva sessao.
 - Em modo nao-headless, aguarda resolucao manual.
 - Timeout de resolucao manual: 60s.
+
+## Browser Launch Args
+
+O Chromium e lancado com as seguintes flags para reduzir detectabilidade e garantir compatibilidade com VPS Linux:
+
+- `--disable-blink-features=AutomationControlled`
+- `--no-sandbox` e `--disable-setuid-sandbox` (essencial em Linux/VPS)
+- `--disable-dev-shm-usage` (evita problemas de memoria compartilhada em containers)
+- `--disable-gpu` (VPS sem GPU)
+- `--use-gl=angle` e `--use-angle=swiftshader` (renderizacao software)
+
+## Resource Blocking
+
+No modo DOM fallback, apenas recursos nao essenciais sao bloqueados (`media`, `font`, `image`) para evitar sinais de automacao. Stylesheets nao sao mais bloqueados, pois pages sem CSS sao um forte indicio de bot.
 
 ## Retries and Backoff
 

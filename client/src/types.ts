@@ -200,3 +200,82 @@ export interface StatsDashboardResponse {
   atualizado_em: string | null;
   sites: SiteStats[];
 }
+
+// ─── Enhanced Dashboard ──────────────────────────────────────
+
+export interface OriginStats {
+  origem: string;
+  total: number;
+  sucessos: number;
+  erros: number;
+  taxa_sucesso: number;
+  tempo_medio_resposta_ms: number;
+}
+
+export interface SistemaAutoInfo {
+  status: string;
+  ultima_execucao: string | null;
+  proxima_execucao: string | null;
+  total_configurados: number;
+}
+
+export interface SistemaWatchInfo {
+  status: string;
+  ultima_execucao: string | null;
+  proxima_execucao: string | null;
+  total_ativos: number;
+  total_disparados: number;
+  webhook_configurado: boolean;
+}
+
+export interface SistemaWishlistInfo {
+  status: string;
+  ultima_execucao: string | null;
+  proxima_execucao: string | null;
+  total_ativos: number;
+  webhook_configurado: boolean;
+}
+
+export interface DashboardSistemas {
+  auto: SistemaAutoInfo;
+  watch: SistemaWatchInfo;
+  wishlist: SistemaWishlistInfo;
+}
+
+export interface DashboardConfiguracoes {
+  auto_configs: number;
+  watch_alertas_ativos: number;
+  watch_disparados: number;
+  wishlist_itens_ativos: number;
+  total_produtos_rastreados: number;
+  total_price_history_urls: number;
+}
+
+export interface AtividadeRecenteItem {
+  id: number;
+  origem: string;
+  site: string;
+  termo: string | null;
+  status: string;
+  total: number;
+  duracao_ms: number;
+  erro: string | null;
+  criado_em: string;
+}
+
+export interface PeriodoStats {
+  total: number;
+  sucessos: number;
+  erros: number;
+  taxa_sucesso: number;
+  tempo_medio_resposta_ms: number | null;
+}
+
+export interface EnhancedStatsDashboardResponse extends StatsDashboardResponse {
+  periodo: string;
+  periodo_stats: PeriodoStats;
+  por_origem: OriginStats[];
+  sistemas: DashboardSistemas;
+  configuracoes: DashboardConfiguracoes;
+  atividade_recente: AtividadeRecenteItem[];
+}

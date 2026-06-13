@@ -24,11 +24,21 @@ function registrarStealth(): void {
   stealthRegistered = true;
 }
 
+const LAUNCH_ARGS = [
+  '--disable-blink-features=AutomationControlled',
+  '--no-sandbox',
+  '--disable-setuid-sandbox',
+  '--disable-dev-shm-usage',
+  '--disable-gpu',
+  '--use-gl=angle',
+  '--use-angle=swiftshader',
+];
+
 export async function criarBrowserAuto(): Promise<Browser> {
   registrarStealth();
   return chromium.launch({
     headless: HEADLESS,
-    args: ['--disable-blink-features=AutomationControlled'],
+    args: LAUNCH_ARGS,
   });
 }
 
@@ -108,7 +118,7 @@ async function criarPagina(siteKey: string, site: SiteConfig) {
   const fingerprint = gerarFingerprint(siteKey);
   const browser = await chromium.launch({
     headless: HEADLESS,
-    args: ['--disable-blink-features=AutomationControlled'],
+    args: LAUNCH_ARGS,
   });
 
   try {
@@ -150,7 +160,7 @@ async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: s
     });
     await page.route('**/*', (route) => {
       const type = route.request().resourceType();
-      if (['image', 'font', 'media', 'stylesheet', 'other'].includes(type)) {
+      if (['media', 'font', 'image'].includes(type)) {
         route.abort().catch(() => undefined);
       } else {
         route.continue().catch(() => undefined);
@@ -278,7 +288,22 @@ export async function buscarProdutoNaPagina(
   if (site.precisaHomePrimeiro) {
     console.log(`  → Navegando para home: ${site.urlBase}`);
     await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
-    console.log(`  → Home carregada: "${await page.title()}"`);
+    const tituloHome = await page.title();
+    console.log(`  → Home carregada: "${tituloHome}"`);
+
+    if (/just a moment|um momento/i.test(tituloHome)) {
+      console.log('  → Desafio Cloudflare detectado, aguardando resolução (15s)...');
+      try {
+        await page.waitForFunction(() => {
+          const t = document.title || '';
+          return !/just a moment|um momento/i.test(t);
+        }, { timeout: 15000 });
+        console.log(`  → Desafio resolvido, título: "${await page.title()}"`);
+      } catch {
+        console.log('  → Desafio Cloudflare não resolvido dentro do tempo limite');
+      }
+    }
+
     await randomWait(1500, 3000);
     await comportamentoHumano(page, viewport);
   }

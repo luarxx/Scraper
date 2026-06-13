@@ -8,6 +8,8 @@ export interface Fingerprint {
   platform: string;
   webglVendor: string;
   webglRenderer: string;
+  locale: string;
+  timezoneId: string;
 }
 
 interface PluginFingerprint {
@@ -17,27 +19,100 @@ interface PluginFingerprint {
   mimeTypes: Array<{ type: string; suffixes: string; description: string }>;
 }
 
-const USER_AGENTS = [
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.53 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.217 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.179 Safari/537.36',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.215 Safari/537.36',
-  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.178 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
-];
+interface PerfilCompleto {
+  userAgent: string;
+  webglVendor: string;
+  webglRenderer: string;
+  platform: string;
+}
 
-const WEBGL_PROFILES = [
-  { vendor: 'Google Inc. (Intel)', renderer: 'ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)' },
-  { vendor: 'Google Inc. (Intel)', renderer: 'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics Direct3D11 vs_5_0 ps_5_0, D3D11)' },
-  { vendor: 'Google Inc. (NVIDIA)', renderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)' },
-  { vendor: 'Google Inc. (NVIDIA)', renderer: 'ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 SUPER Direct3D11 vs_5_0 ps_5_0, D3D11)' },
-  { vendor: 'Google Inc. (AMD)', renderer: 'ANGLE (AMD, AMD Radeon RX 6600 Direct3D11 vs_5_0 ps_5_0, D3D11)' },
-  { vendor: 'Intel Inc.', renderer: 'Intel Iris OpenGL Engine' },
-  { vendor: 'Apple Inc.', renderer: 'Apple M1' },
-  { vendor: 'Google Inc.', renderer: 'ANGLE (Mesa, llvmpipe (LLVM 17.0.6, 256 bits), OpenGL 4.5)' },
+const PERFIS: PerfilCompleto[] = [
+  // Windows + Intel UHD 630
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
+    webglVendor: 'Google Inc. (Intel)',
+    webglRenderer: 'ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.53 Safari/537.36',
+    webglVendor: 'Google Inc. (Intel)',
+    webglRenderer: 'ANGLE (Intel, Intel(R) UHD Graphics 630 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  // Windows + Intel Iris Xe
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.217 Safari/537.36',
+    webglVendor: 'Google Inc. (Intel)',
+    webglRenderer: 'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  // Windows + NVIDIA RTX 3060
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
+    webglVendor: 'Google Inc. (NVIDIA)',
+    webglRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.179 Safari/537.36',
+    webglVendor: 'Google Inc. (NVIDIA)',
+    webglRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  // Windows + NVIDIA GTX 1660 SUPER
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
+    webglVendor: 'Google Inc. (NVIDIA)',
+    webglRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 SUPER Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  // Windows + AMD RX 6600
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.53 Safari/537.36',
+    webglVendor: 'Google Inc. (AMD)',
+    webglRenderer: 'ANGLE (AMD, AMD Radeon RX 6600 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  // Mac + Intel Iris OpenGL
+  {
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
+    webglVendor: 'Intel Inc.',
+    webglRenderer: 'Intel Iris OpenGL Engine',
+    platform: 'MacIntel',
+  },
+  {
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
+    webglVendor: 'Intel Inc.',
+    webglRenderer: 'Intel Iris OpenGL Engine',
+    platform: 'MacIntel',
+  },
+  // Mac + Apple M1
+  {
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_4_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
+    webglVendor: 'Apple Inc.',
+    webglRenderer: 'Apple M1',
+    platform: 'MacIntel',
+  },
+  {
+    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_7_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
+    webglVendor: 'Apple Inc.',
+    webglRenderer: 'Apple M1',
+    platform: 'MacIntel',
+  },
+  // Linux + llvmpipe/Mesa
+  {
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.215 Safari/537.36',
+    webglVendor: 'Google Inc.',
+    webglRenderer: 'ANGLE (Mesa, llvmpipe (LLVM 17.0.6, 256 bits), OpenGL 4.5)',
+    platform: 'Linux x86_64',
+  },
+  {
+    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.178 Safari/537.36',
+    webglVendor: 'Google Inc.',
+    webglRenderer: 'ANGLE (Mesa, llvmpipe (LLVM 17.0.6, 256 bits), OpenGL 4.5)',
+    platform: 'Linux x86_64',
+  },
 ];
 
 const PLUGIN_POOL: PluginFingerprint[] = [
@@ -97,22 +172,28 @@ export function gerarFingerprint(siteKey: string): Fingerprint {
   let assinatura: string;
 
   do {
-    const userAgent = sample(USER_AGENTS);
-    const webgl = sample(WEBGL_PROFILES);
-    const platform = userAgent.includes('Macintosh') ? 'MacIntel' : userAgent.includes('Linux') ? 'Linux x86_64' : 'Win32';
+    const perfil = sample(PERFIS);
+    const locale = Math.random() < 0.8
+      ? 'pt-BR'
+      : sample(['pt', 'en-US']);
+    const timezoneId = Math.random() < 0.8
+      ? 'America/Sao_Paulo'
+      : sample(['America/Recife', 'America/Manaus']);
     fingerprint = {
-      userAgent,
+      userAgent: perfil.userAgent,
       viewport: {
         width: 1920 + randomInt(-200, 200),
         height: 1080 + randomInt(-100, 100),
       },
-      plugins: shuffle(PLUGIN_POOL).slice(0, randomInt(3, 5)),
+      plugins: Math.random() < 0.7 ? [] : shuffle(PLUGIN_POOL).slice(0, 1),
       hardwareConcurrency: sample([4, 6, 8, 10, 12, 16]),
       deviceMemory: sample([4, 8]),
       languages: ['pt-BR', 'pt', 'en-US', 'en'],
-      platform,
-      webglVendor: webgl.vendor,
-      webglRenderer: webgl.renderer,
+      platform: perfil.platform,
+      webglVendor: perfil.webglVendor,
+      webglRenderer: perfil.webglRenderer,
+      locale,
+      timezoneId,
     };
     assinatura = `${fingerprint.userAgent}|${fingerprint.viewport.width}x${fingerprint.viewport.height}|${fingerprint.webglVendor}|${fingerprint.webglRenderer}`;
   } while (lastFingerprintBySite.get(siteKey) === assinatura);

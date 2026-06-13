@@ -5,6 +5,7 @@ import type { Browser, Page } from 'playwright';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { HEADLESS, ROOT, TIMEOUT, SCREENSHOT_DIR } from './config';
 import { comportamentoHumano, detectarChallenge, randomWait } from './browserBehavior';
+import { randomInt } from './random';
 import { gerarFingerprint, criarFingerprintInitScript } from './fingerprint';
 import { lerCache, salvarCache, normalizarTermo } from './cache';
 import { extrairProdutoPorUrlHtml } from './productPageParser';
@@ -24,9 +25,12 @@ function registrarStealth(): void {
   stealthRegistered = true;
 }
 
-const LAUNCH_ARGS = [
+const ARGS_ESSENCIAIS = [
   '--disable-blink-features=AutomationControlled',
   '--no-sandbox',
+];
+
+const ARGS_VPS = [
   '--disable-setuid-sandbox',
   '--disable-dev-shm-usage',
   '--disable-gpu',
@@ -34,11 +38,43 @@ const LAUNCH_ARGS = [
   '--use-angle=swiftshader',
 ];
 
+const ARGS_OPCIONAIS = [
+  '--disable-sync',
+];
+
+function montarLaunchArgs(): string[] {
+  const isVps = process.env.SCRAPER_VPS === 'true';
+  const args = [...ARGS_ESSENCIAIS];
+
+  if (isVps) {
+    args.push(...ARGS_VPS);
+  }
+
+  if (Math.random() < 0.3) {
+    const removivel = args.indexOf('--no-sandbox');
+    if (removivel !== -1) {
+      args.splice(removivel, 1);
+    }
+  }
+
+  if (Math.random() < 0.2) {
+    const opt = ARGS_OPCIONAIS[Math.floor(Math.random() * ARGS_OPCIONAIS.length)];
+    args.push(opt);
+  }
+
+  for (let i = args.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [args[i], args[j]] = [args[j], args[i]];
+  }
+
+  return args;
+}
+
 export async function criarBrowserAuto(): Promise<Browser> {
   registrarStealth();
   return chromium.launch({
     headless: HEADLESS,
-    args: LAUNCH_ARGS,
+    args: montarLaunchArgs(),
   });
 }
 
@@ -118,7 +154,8 @@ async function criarPagina(siteKey: string, site: SiteConfig) {
   const fingerprint = gerarFingerprint(siteKey);
   const browser = await chromium.launch({
     headless: HEADLESS,
-    args: LAUNCH_ARGS,
+    channel: HEADLESS ? 'chromium' : undefined,
+    args: montarLaunchArgs(),
   });
 
   try {
@@ -160,7 +197,7 @@ async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: s
     });
     await page.route('**/*', (route) => {
       const type = route.request().resourceType();
-      if (['media', 'font', 'image'].includes(type)) {
+      if (type === 'media') {
         route.abort().catch(() => undefined);
       } else {
         route.continue().catch(() => undefined);
@@ -170,6 +207,7 @@ async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: s
     /* best-effort */
   }
 
+  await randomWait(1800, 4500);
   const navStart = Date.now();
   let navError: string | null = null;
   try {
@@ -285,8 +323,9 @@ export async function buscarProdutoNaPagina(
     console.log(`   [Pagina:${siteKey}] Erro nao capturado: ${msg}`);
   });
 
-  if (site.precisaHomePrimeiro) {
+  if (site.precisaHomePrimeiro || !site.usaApi) {
     console.log(`  → Navegando para home: ${site.urlBase}`);
+    await randomWait(1800, 4500);
     await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
     const tituloHome = await page.title();
     console.log(`  → Home carregada: "${tituloHome}"`);
@@ -306,6 +345,13 @@ export async function buscarProdutoNaPagina(
 
     await randomWait(1500, 3000);
     await comportamentoHumano(page, viewport);
+    if (Math.random() < 0.6) {
+      await page.mouse.click(
+        randomInt(100, viewport.width - 100),
+        randomInt(100, viewport.height - 100),
+      ).catch(() => undefined);
+      await randomWait(400, 1000);
+    }
   }
 
   let produtos: Produto[];
@@ -477,6 +523,7 @@ async function buscarProdutoPorUrlUmaVez(siteKey: string, produtoUrl: string, no
   const { browser, context, page, fingerprint } = await criarPagina(siteKey, site);
 
   try {
+    await randomWait(1800, 4500);
     await page.goto(produtoUrl, { waitUntil: site.waitStrategy || 'domcontentloaded', timeout: TIMEOUT });
     await randomWait(1200, 2500);
     if (siteKey === 'terabyteshop') {

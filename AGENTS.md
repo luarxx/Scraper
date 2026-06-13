@@ -77,6 +77,7 @@ Leia documentacao extra apenas quando a tarefa exigir:
 - Watch Alerts: `Docs/features/watch-alerts.md`
 - Estrategia de scraping: `Docs/scraper/strategy.md`
 - Anti-deteccao/Cloudflare: `Docs/scraper/anti-detection.md`
+- Plano de acao anti-deteccao: `Docs/scraper/anti-detection-action-plan.md`
 - Comandos operacionais: `Docs/operations/commands.md`
 - Deploy/VPS/GitHub Actions: `Docs/operations/deploy.md`
 - UI/UX/design system: `DESIGN.md`

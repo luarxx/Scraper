@@ -111,6 +111,7 @@ export function detectarChallenge(page: Page): Promise<boolean> {
     const title = document.title || '';
     if (title.includes('Um momento') || title.includes('Just a moment')) return true;
     if (title.includes('Azion')) return true;
+    if (title.includes('Site em Manutenção') || title.includes('Pru Pru') || body.includes('Pru Pru')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('verificação de segurança')) return true;
     if (body.length > 0 && body.length < 10000 && body.includes('Enable JavaScript')) return true;
     if (document.getElementById('challenge-form')) return true;

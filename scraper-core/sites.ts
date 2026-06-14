@@ -237,14 +237,21 @@ export const SITES: Record<string, SiteConfig> = {
     nome: 'Pichau',
     urlBase: 'https://www.pichau.com.br',
     searchUrl: (termo) => `https://www.pichau.com.br/search?q=${encodeURIComponent(termo)}`,
-    waitStrategy: 'domcontentloaded',
+    waitStrategy: 'load',
     precisaHomePrimeiro: true,
+    persistSession: false,
     selectors: {
       productCard: 'a[data-cy="list-product"]',
       title: 'h2',
       priceContainer: '[class*="price_vista"], [class*="price_total"]',
     },
     extrairProdutos: (termo) => {
+      const pageTitle = document.title || '';
+      const bodyHtml = document.body?.innerHTML || '';
+      if (pageTitle.includes('Site em Manutenção') || bodyHtml.includes('Pru Pru')) {
+        throw new Error(`Pichau retornou pagina de manutencao`);
+      }
+
       const links = Array.from(document.querySelectorAll('a[data-cy="list-product"]'));
       const results: Produto[] = [];
       const seen = new Set<string>();

@@ -91,7 +91,6 @@ function createPageMock(options: SetupOptions): Record<string, unknown> {
 async function setupSearchModule(options: SetupOptions = {}): Promise<{
   mod: SearchModule;
   launchMock: ReturnType<typeof vi.fn>;
-  useMock: ReturnType<typeof vi.fn>;
   salvarCacheMock?: ReturnType<typeof vi.fn>;
   runtimes: RuntimeMock[];
   sessionDir: string;
@@ -99,7 +98,6 @@ async function setupSearchModule(options: SetupOptions = {}): Promise<{
   vi.resetModules();
   const { root, sessionDir } = createTempRoot();
   const runtimes: RuntimeMock[] = [];
-  const useMock = vi.fn();
   const launchMock = vi.fn(async () => {
     const page = createPageMock(options);
     const context = {
@@ -124,14 +122,10 @@ async function setupSearchModule(options: SetupOptions = {}): Promise<{
     SCREENSHOT_DIR: path.join(root, 'data', 'screenshots'),
   }));
 
-  vi.doMock('playwright-extra', () => ({
+  vi.doMock('playwright', () => ({
     chromium: {
-      use: useMock,
       launch: launchMock,
     },
-  }));
-  vi.doMock('puppeteer-extra-plugin-stealth', () => ({
-    default: vi.fn(() => ({ name: 'stealth' })),
   }));
   vi.doMock('../scraper-core/browserBehavior', () => ({
     randomWait: vi.fn(async () => undefined),
@@ -150,7 +144,7 @@ async function setupSearchModule(options: SetupOptions = {}): Promise<{
   }
 
   const mod = await import('../scraper-core/search');
-  return { mod, launchMock, useMock, salvarCacheMock, runtimes, sessionDir };
+  return { mod, launchMock, salvarCacheMock, runtimes, sessionDir };
 }
 
 afterEach(() => {
@@ -159,8 +153,7 @@ afterEach(() => {
   vi.doUnmock('../scraper-core/config');
   vi.doUnmock('../scraper-core/cache');
   vi.doUnmock('../scraper-core/browserBehavior');
-  vi.doUnmock('playwright-extra');
-  vi.doUnmock('puppeteer-extra-plugin-stealth');
+  vi.doUnmock('playwright');
   while (tempDirs.length > 0) {
     const dir = tempDirs.pop();
     if (dir) fs.rmSync(dir, { recursive: true, force: true });
@@ -184,12 +177,11 @@ describe('search runtime', () => {
         relevancia: 1,
       }],
     };
-    const { mod, launchMock, useMock, salvarCacheMock } = await setupSearchModule({ cacheHit: cached });
+    const { mod, launchMock, salvarCacheMock } = await setupSearchModule({ cacheHit: cached });
 
     await expect(mod.buscarProduto('kabum', 'ssd')).resolves.toBe(cached);
 
     expect(launchMock).not.toHaveBeenCalled();
-    expect(useMock).not.toHaveBeenCalled();
     expect(salvarCacheMock).not.toHaveBeenCalled();
   });
 

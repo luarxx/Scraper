@@ -51,6 +51,44 @@ Use o formato:
 - Execute `git commit -m "<mensagem>"` com a mensagem gerada.
 - Se houver múltiplas mudanças não relacionadas, sugira commits separados e pergunte ao usuário como proceder.
 
+### 6. Exibir resumo detalhado do commit
+
+Após executar o commit, exiba um resumo detalhado no chat usando tabelas.
+
+**Mensagem do commit** (tabela de campo único):
+
+| Mensagem |
+|----------|
+| `{tipo}({escopo}): {descrição}` |
+
+**Arquivos alterados** (com descrição do que mudou em cada um):
+
+| Arquivo | O que foi alterado |
+|---------|-------------------|
+| `{caminho}` | {descrição da mudança no arquivo} |
+| `{caminho}` | {descrição da mudança no arquivo} |
+
+**Corpo da mensagem** (se houver):
+
+```
+{corpo}
+```
+
+Para gerar a coluna "O que foi alterado":
+1. Use `git diff HEAD~1..HEAD -- <caminho>` para analisar o diff de cada arquivo.
+2. Resuma as mudanças em **uma linha curta e objetiva** (máx 80 caracteres).
+   - Prefira verbos no presente: "Adiciona...", "Remove...", "Atualiza...", "Corrige...", "Extrai...", "Move...", "Renomeia...".
+   - Priorize o **o que** mudou, não detalhes técnicos.
+3. Se o diff for muito grande, destaque a mudança principal ignorando formatação/typing.
+
+Exemplo de saída esperada:
+
+| Arquivo | O que foi alterado |
+|---------|-------------------|
+| `scraper-core/fingerprint.ts` | Adiciona 3 novos perfis WebGL e expande init script anti-detecção |
+| `scraper-core/search.ts` | Remove dependência de playwright-extra em favor do Playwright puro |
+| `tests/search-runtime.test.ts` | Atualiza mocks para refletir remoção do stealth plugin |
+
 ## Regras Importantes
 
 - NUNCA faça `git push` sem perguntar primeiro.

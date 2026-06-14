@@ -255,7 +255,7 @@ async function extrairProdutosViaDom(page: Page, site: SiteConfig, termoBusca: s
     throw new ScraperParseError(`Falha ao navegar para ${urlBusca}: ${navError}`);
   }
 
-  if (/azion|blocked|forbidden|erro 403|access denied/i.test(titulo) || bodyLen < 1000) {
+  if (/azion|manutenção|blocked|forbidden|erro 403|access denied/i.test(titulo) || bodyLen < 1000) {
     await capturarSnapshot(page, siteKey, 'bloqueado');
     throw new ScraperParseError(
       `${site.nome} retornou pagina de bloqueio (titulo: "${titulo}", body: ${bodyLen} chars). ` +
@@ -360,6 +360,13 @@ export async function buscarProdutoNaPagina(
     await page.goto(site.urlBase, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
     const tituloHome = await page.title();
     console.log(`  → Home carregada: "${tituloHome}"`);
+
+    if (/site em manutenção|pru pru/i.test(tituloHome)) {
+      throw new ScraperParseError(
+        `${site.nome} retornou pagina de manutencao (titulo: "${tituloHome}"). ` +
+        `O site pode estar temporariamente fora do ar ou o IP bloqueado.`
+      );
+    }
 
     if (/just a moment|um momento/i.test(tituloHome)) {
       console.log('  → Desafio Cloudflare detectado, aguardando resolução (30s)...');

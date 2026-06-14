@@ -67,11 +67,32 @@ const PERFIS: PerfilCompleto[] = [
     webglRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce GTX 1660 SUPER Direct3D11 vs_5_0 ps_5_0, D3D11)',
     platform: 'Win32',
   },
+  // Windows + NVIDIA RTX 4060
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.54 Safari/537.36',
+    webglVendor: 'Google Inc. (NVIDIA)',
+    webglRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4060 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
   // Windows + AMD RX 6600
   {
     userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.53 Safari/537.36',
     webglVendor: 'Google Inc. (AMD)',
     webglRenderer: 'ANGLE (AMD, AMD Radeon RX 6600 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  // Windows + AMD RX 7600
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.53 Safari/537.36',
+    webglVendor: 'Google Inc. (AMD)',
+    webglRenderer: 'ANGLE (AMD, AMD Radeon RX 7600 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    platform: 'Win32',
+  },
+  // Windows + Intel Arc A750
+  {
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.216 Safari/537.36',
+    webglVendor: 'Google Inc. (Intel)',
+    webglRenderer: 'ANGLE (Intel, Intel(R) Arc(TM) A750 Graphics Direct3D11 vs_5_0 ps_5_0, D3D11)',
     platform: 'Win32',
   },
   // Mac + Intel Iris OpenGL
@@ -103,12 +124,6 @@ const PERFIS: PerfilCompleto[] = [
   // Linux + llvmpipe/Mesa
   {
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.215 Safari/537.36',
-    webglVendor: 'Google Inc.',
-    webglRenderer: 'ANGLE (Mesa, llvmpipe (LLVM 17.0.6, 256 bits), OpenGL 4.5)',
-    platform: 'Linux x86_64',
-  },
-  {
-    userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.7778.178 Safari/537.36',
     webglVendor: 'Google Inc.',
     webglRenderer: 'ANGLE (Mesa, llvmpipe (LLVM 17.0.6, 256 bits), OpenGL 4.5)',
     platform: 'Linux x86_64',
@@ -275,6 +290,48 @@ export function criarFingerprintInitScript(fingerprint: Fingerprint): string {
           return origGetParam2.call(this, p);
         };
       }
+
+      Object.defineProperty(navigator, 'connection', {
+        get: () => ({
+          effectiveType: ['4g', '4g', '4g', '3g'][Math.floor(Math.random() * 4)],
+          downlink: [10, 20, 50, 100][Math.floor(Math.random() * 4)],
+          rtt: [50, 100, 150, 200][Math.floor(Math.random() * 4)],
+          saveData: false,
+        }),
+      });
+      Object.defineProperty(navigator, 'maxTouchPoints', { get: () => 0 });
+      Object.defineProperty(screen, 'colorDepth', { get: () => 24 });
+      Object.defineProperty(screen, 'pixelDepth', { get: () => 24 });
+      window.chrome = {
+        runtime: {},
+        loadTimes: function () {},
+        csi: function () {},
+        app: {},
+      };
+
+      const origToDataURL = HTMLCanvasElement.prototype.toDataURL;
+      HTMLCanvasElement.prototype.toDataURL = function (...args) {
+        const canvas = this;
+        if (canvas.width > 16 && canvas.height > 16 && Math.random() < 0.05) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            const idx = Math.floor(Math.random() * 4);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            imageData.data[idx] = imageData.data[idx] ^ 1;
+            ctx.putImageData(imageData, 0, 0);
+          }
+        }
+        return origToDataURL.apply(this, args);
+      };
+      const origQuery = navigator.permissions?.query;
+      if (origQuery) {
+        navigator.permissions.query = function (desc) {
+          return desc.name === 'notifications'
+            ? Promise.resolve({ state: 'prompt' })
+            : Promise.resolve({ state: 'granted' });
+        };
+      }
+      Object.defineProperty(navigator, 'vendor', { get: () => 'Google Inc.' });
     })();
   `;
 }

@@ -1,8 +1,7 @@
-import { chromium } from 'playwright-extra';
+import { chromium } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
 import type { Browser, Page } from 'playwright';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { HEADLESS, ROOT, TIMEOUT, SCREENSHOT_DIR } from './config';
 import { comportamentoHumano, detectarChallenge, randomWait } from './browserBehavior';
 import { randomInt } from './random';
@@ -17,14 +16,6 @@ import type { Produto, Resultado, ResultadoProdutoUrl, SiteConfig } from './type
 
 const inFlightSearches = new Map<string, Promise<Resultado>>();
 const inFlightProductPages = new Map<string, Promise<ResultadoProdutoUrl>>();
-let stealthRegistered = false;
-
-function registrarStealth(): void {
-  if (stealthRegistered) return;
-  chromium.use(StealthPlugin());
-  stealthRegistered = true;
-}
-
 const ARGS_ESSENCIAIS = [
   '--disable-blink-features=AutomationControlled',
   '--no-sandbox',
@@ -86,7 +77,6 @@ function chromeChannel(): string | undefined {
 }
 
 export async function criarBrowserAuto(): Promise<Browser> {
-  registrarStealth();
   return chromium.launch({
     headless: HEADLESS,
     channel: chromeChannel(),
@@ -186,7 +176,6 @@ async function verificarChallenge(page: Page, contexto: 'busca' | 'produto'): Pr
 }
 
 async function criarPagina(siteKey: string, site: SiteConfig) {
-  registrarStealth();
   const fingerprint = gerarFingerprint(siteKey);
   const browser = await chromium.launch({
     headless: HEADLESS,
